@@ -1,0 +1,109 @@
+.main-menu {
+  margin: 15px 0;
+}
+
+.menu-item {
+  color: #1653a6;
+  text-decoration: none;
+  font-size: 15px;
+  display: flex;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.menu-item:hover {
+  background: #1653a6;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.menu-item.active {
+  background: #192a46;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.menu-item .menu-icon {
+  display: inline-block;
+  width: 50px;
+  height: 40px;
+  font-size: 35px;
+  line-height: 40px;
+  text-align: center;
+  margin-left: 5px;
+}
+
+.menu-item span {
+  display: inline-block;
+  line-height: 40px;
+  margin-left: 20px;
+  font-size: 14px;
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+  flex-grow: 1;
+}
+
+.main-menu .expand-more {
+  margin-top: 8px;
+  margin-left: 20px;
+}
+
+.main-menu .sub-menu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-in;
+  list-style: none;
+  padding-left: 5px;
+}
+
+.main-menu .sub-menu.active {
+  background-color: #f9f4f4;
+}
+
+.main-menu .sub-menu a {
+  display: block;
+  margin: 5px 0;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #333;
+  text-decoration: none;
+}
+
+.main-menu .sub-menu a.active {
+  background: #1653a6;
+  color: #fff;
+  border-radius: 5px;
+}
+.main-menu .sub-menu a:hover {
+  background: #1653a6;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.main-menu .sub-menu.active {
+  max-height: 300px;
+}
+
+.main-menu .sub-menu span {
+  position: relative;
+  bottom: 15px;
+  left: 20px;
+  font-size: 13px;
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+.main-menu .sub-menu .menu-icon {
+  display: inline-block;
+  width: 50px;
+  height: 40px;
+  font-size: 35px;
+  line-height: 60px;
+  text-align: center;
+  color: #000;
+}
+
+.sub-menu .menu-icon.active {
+  color: #fff;
+}
