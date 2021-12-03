@@ -95,6 +95,9 @@ const Roles = () => {
     );
     setModalOpen(false);
     setRoleName("");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   };
 
   const modalClose = () => {

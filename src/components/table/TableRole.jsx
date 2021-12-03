@@ -164,14 +164,16 @@ const TableRole = () => {
   const [editModal, setEditModal] = useState(false);
   const [dataRole, setDataRole] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [roleId, setRoleId] = useState("");
+  const [roleName, setRoleName] = useState("");
 
   useEffect(() => {
     setTimeout(() => {
-      getAreaList();
+      getRoleList();
     }, 3000);
-  }, [dataRole]);
+  }, []);
 
-  const getAreaList = async () => {
+  const getRoleList = async () => {
     await axios
       .get(
         `${authEndPoint[0].url}${
@@ -207,6 +209,80 @@ const TableRole = () => {
     setEditModal(false);
   };
 
+  const handleDelete = async (row) => {
+    await axios.delete(
+      `${authEndPoint[0].url}${
+        authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+      }/api/v1/role/${row.id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
+
+  const handleEdit = async (row) => {
+    setEditModal(true);
+    setRoleId(row.id);
+    setRoleName(row.role_name);
+  };
+
+  const updateRole = async (e) => {
+    e.preventDefault();
+    await axios.patch(
+      `${authEndPoint[0].url}${
+        authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+      }/api/v1/role/${roleId}`,
+      {
+        role_name: roleName,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    setRoleId("");
+    setRoleName("");
+    setEditModal(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={editModal}>
+        <div className={classes.paper}>
+          <form onSubmit={updateRole}>
+            <div className="row">
+              <div className="col-12">
+                <h3>Role Name</h3>
+              </div>
+              <div className="col-12">
+                <label htmlFor="">Role</label>
+                <input
+                  type="text"
+                  id="roleName"
+                  defaultValue={roleName}
+                  className="form-input"
+                  onChange={function (e) {
+                    setRoleName(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+            <br />
+            <div className="footer-modal">
+              <button onClick={modalClose}>Close</button>
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -238,13 +314,17 @@ const TableRole = () => {
                       {row.role_name}
                     </TableCell>
                     <TableCell style={{ width: 100 }} align="center">
-                      <button className="btn-edit" onClick={(e) => {}}>
+                      <button
+                        className="btn-edit"
+                        onClick={(e) => handleEdit(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
-                      <button className="btn-delete" onClick={(e) => {}}>
+                      <button
+                        className="btn-delete"
+                        onClick={(e) => handleDelete(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-filled"></span>
@@ -282,6 +362,15 @@ const TableRole = () => {
           </Table>
         </Paper>
       </TableContainer>
+      <Modal
+        open={editModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };

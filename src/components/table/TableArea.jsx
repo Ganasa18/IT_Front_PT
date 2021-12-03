@@ -247,7 +247,7 @@ const TableArea = () => {
                 <input
                   type="text"
                   id="areaName"
-                  value={areaName}
+                  defaultValue={areaName}
                   className="form-input"
                   onChange={function (e) {
                     setAreaName(e.target.value);

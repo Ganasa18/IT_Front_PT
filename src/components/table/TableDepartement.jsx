@@ -316,6 +316,7 @@ const TableDepartement = () => {
               <TableRow>
                 <StyledTableCell></StyledTableCell>
                 <StyledTableCell>Name</StyledTableCell>
+                <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -349,10 +350,16 @@ const TableDepartement = () => {
                         </TableCell>
 
                         <TableCell
-                          style={{ width: 600 }}
+                          style={{ width: 300 }}
                           component="th"
                           scope="row">
                           {row.departement_name}
+                        </TableCell>
+                        <TableCell
+                          style={{ width: 300 }}
+                          component="th"
+                          scope="row">
+                          {row.area_name}
                         </TableCell>
 
                         <TableCell style={{ width: 260 }} align="center">

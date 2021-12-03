@@ -44,7 +44,7 @@ const StepperEdit = (props) => {
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
   const [area, setArea] = useState([]);
-  const [departementEdit, setDepartementEdit] = useState(dataDepartement);
+  const [departementEdit] = useState(dataDepartement);
   const [subDepartementEdit, setSubDepartementEdit] = useState(null);
 
   const handleNext = async () => {

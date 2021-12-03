@@ -43,6 +43,10 @@ const Auth = () => {
             }, 2000);
           })
           .catch((error) => {
+            console.log(error.response.status);
+            if (error.response.status === 429) {
+              return setError(error.response.data);
+            }
             setError(
               error.response.data.message === undefined
                 ? error.response

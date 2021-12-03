@@ -37,11 +37,11 @@ import "./sidebar.css";
 const MenuItem = (props) => {
   const { name, subMenus, to, exact, icon } = props;
   const [expand, setExpand] = useState(false);
-  const [pathName] = useState(window.location.pathname);
+  // const [pathName] = useState(window.location.pathname);
 
-  useEffect(() => {
-    console.log(pathName);
-  }, []);
+  // useEffect(() => {
+  //   // console.log(pathName);
+  // }, []);
 
   const liRef = React.useRef(null);
 

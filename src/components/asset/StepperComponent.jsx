@@ -233,7 +233,7 @@ function getStepContent(stepIndex, area, lastDepartementId) {
                   />
                 </div>
                 <div className="col-6">
-                  <select name="" id="areaSelect" className="form-input-select">
+                  <select  id="areaSelect" className="form-input-select">
                     {area.map((row) => (
                       <option key={row.id} value={row.id}>
                         {row.area_name}
