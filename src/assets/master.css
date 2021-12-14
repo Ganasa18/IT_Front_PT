@@ -322,6 +322,77 @@ a {
   font-size: 13px;
 }
 
+.form-input-area {
+  width: 100%;
+  padding: 10px 30px;
+  margin: 10px 0 20px 0px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+  resize: none;
+}
+.position-image label {
+  margin-left: 5px;
+}
+.position-image {
+  position: relative;
+  bottom: 150px;
+}
+
+.wrapper-img {
+  position: relative;
+  height: 230px;
+  width: 100%;
+  border: 2px dashed #c2cdda;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 5px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.wrapper-img .image {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.wrapper-img .image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  opacity: 1;
+}
+
+.wrapper-img .icon {
+  position: absolute;
+  font-size: 80px;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -45%);
+  color: #1653a6;
+  display: block;
+}
+
+.margin-top {
+  margin-top: 20px;
+}
+
+#filesImg {
+  display: none;
+}
+
+#labelImg {
+  opacity: 0;
+}
+
 .form-input-pop {
   width: 80%;
   padding: 18px 30px;

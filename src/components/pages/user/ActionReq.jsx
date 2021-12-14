@@ -10,6 +10,7 @@ import {
   Fade,
   Modal,
   Snackbar,
+  Divider,
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
@@ -56,18 +57,117 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     position: "fixed",
     transform: "translate(-50%,-50%)",
-    top: "30%",
+    top: "38%",
     left: "50%",
-    width: 550,
+    width: 950,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(2, 6, 3),
   },
 }));
 
+// const readImg = (file) => {
+//   if (file.files && file.files[0]) {
+//     var reader = new FileReader();
+//     console.log(reader);
+//   }
+// };
+
+const handleImage = () => {
+  const labelImg = document.getElementById("labelImg");
+  labelImg.click();
+};
+
 const ActionReq = () => {
   const classes = useStyles();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const modalPop = () => {
+    setModalOpen(true);
+  };
+
+  const modalClose = () => {
+    setModalOpen(false);
+  };
+
+  function handleChangeImg(e) {
+    const output = document.getElementById("idimg");
+    const icon = document.querySelector(".wrapper-img .icon");
+
+    if (e.target.files.length !== 0) {
+      icon.style.display = "none";
+      output.src = URL.createObjectURL(e.target.files[0]);
+    }
+
+    output.onload = function () {
+      URL.revokeObjectURL(output.src); // free memory
+    };
+  }
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <form>
+            <div className="row">
+              <div className="col-12">
+                <h3>Create Action Request</h3>
+              </div>
+            </div>
+            <Divider />
+            <br />
+            <div className="row margin-top">
+              <div className="col-6">
+                <label htmlFor="">My Asset</label>
+                <input type="text" className="form-input" />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Description Of Problem(Chronological)</label>
+                <textarea
+                  className="form-input-area"
+                  id=""
+                  cols="30"
+                  rows="10"></textarea>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-6 position-image">
+                <label htmlFor="filesImg" id="labelImg">
+                  Image
+                </label>
+                <input
+                  accept="image/jpg,image/png,image/jpeg"
+                  type="file"
+                  className="image-req"
+                  id="filesImg"
+                  onChange={handleChangeImg.bind(this)}
+                />
+                <div className="wrapper-img" onClick={handleImage}>
+                  <div className="image">
+                    <img id="idimg" />
+                  </div>
+                  <div class="icon">
+                    <i class="iconify" data-icon="bi:image"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="footer-modal">
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -97,6 +197,7 @@ const ActionReq = () => {
               </div>
               <div className="col-4">
                 <Button
+                  onClick={modalPop}
                   variant="contained"
                   color="primary"
                   className={classes.buttonAdd}
@@ -114,6 +215,15 @@ const ActionReq = () => {
           </div>
         </Grid>
       </Grid>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };
