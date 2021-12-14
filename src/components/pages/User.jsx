@@ -235,15 +235,6 @@ const User = () => {
   const saveHandler = async (event) => {
     event.preventDefault();
 
-    // console.log(selectedValueEmply);
-    // console.log(valueUsername);
-    // console.log(valueEmail);
-    // console.log(valueNoHP);
-    // console.log(valueArea);
-    // console.log(valueDepartement);
-    // console.log(valueSubDepartement);
-    // console.log(valueRole);
-
     await axios
       .post(
         `${authEndPoint[0].url}${
@@ -274,6 +265,9 @@ const User = () => {
         setValueDepartement("");
         setValueSubDepartement("");
         setValueRole("");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       })
       .catch((err) => {
         alert(err.response.data.message);
@@ -424,7 +418,7 @@ const User = () => {
               <div className="col-6">
                 <label htmlFor="roleName">No Hp</label>
                 <input
-                  type="email"
+                  type="text"
                   id="roleName"
                   value={valueNoHP}
                   className="form-input"
@@ -445,8 +439,12 @@ const User = () => {
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>

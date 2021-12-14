@@ -26,20 +26,15 @@ import {
 // import ExpandMore from "@material-ui/icons/ExpandMore";
 // import HomeIcon from "@material-ui/icons/Home";
 import MenuIcon from "@material-ui/icons/Menu";
-import NotificationsIcon from "@material-ui/icons/Notifications";
+// import NotificationsIcon from "@material-ui/icons/Notifications";
 import classNames from "classnames";
 import logo from "../../assets/new_logo.png";
-import user from "../../assets/img.jpg";
+// import user from "../../assets/img.jpg";
 import "../../assets/master.css";
 import { menuData, menuDataUser, menuDataUser2 } from "../../assets/menu.js";
 import { BrowserRouter } from "react-router-dom";
-
 import Cookies from "universal-cookie";
-
 const cookies = new Cookies();
-const roleUser = cookies.get("role");
-const userId = cookies.get("uuid");
-const token = cookies.get("token");
 
 const drawerWidth = 300;
 
@@ -207,15 +202,22 @@ const useStyles = makeStyles((theme) => ({
   // },
 }));
 
-const PersistentDrawer = () => {
+const PersistentDrawer = (props) => {
+  const { userID, userRole, tokenUser } = props;
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [inactive, setInactive] = useState(false);
   const [menuDatas, setMenuDatas] = useState([]);
   const [userLogin, setUserLogin] = useState([]);
 
+  const roleUser = userRole;
+  const userId = userID;
+  const token = tokenUser;
+
   useEffect(() => {
-    getDataUser();
+    if (token) {
+      getDataUser();
+    }
     if (roleUser === "1") {
       setMenuDatas(menuData);
     } else if (roleUser === "2") {
@@ -224,6 +226,37 @@ const PersistentDrawer = () => {
       setMenuDatas(menuDataUser2);
     }
   }, []);
+
+  // const checkUser = () => {
+  //   if (roleUser === undefined) {
+  //     const URL = `${authEndPoint[0].url}${
+  //       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+  //     }/api/v1/auth/logout`;
+
+  //     (async () => {
+  //       let apiRes = null;
+  //       try {
+  //         apiRes = await axios
+  //           .get(`${URL}`, {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           })
+  //           .then((response) => {
+  //             cookies.remove("token", { path: "/" });
+  //             cookies.remove("uuid", { path: "/" });
+  //             cookies.remove("role", { path: "/" });
+  //           })
+  //           .catch((error) => {
+  //             console.log(error.response.status);
+  //           });
+  //       } catch (err) {
+  //         console.log(err);
+  //         apiRes = err.response;
+  //       } finally {
+  //         console.log(apiRes);
+  //       }
+  //     })();
+  //   }
+  // };
 
   const getDataUser = async () => {
     const URL = `${authEndPoint[0].url}${
@@ -235,7 +268,7 @@ const PersistentDrawer = () => {
       })
       .then((response) => {
         let Users = response.data.data.users;
-        const UserLogin = Users.find((item) => item.uuid === userId);
+        const UserLogin = Users.find((item) => item.id === parseInt(userId));
         UserLogin.password = undefined;
         setUserLogin(UserLogin);
       })
@@ -306,13 +339,18 @@ const PersistentDrawer = () => {
             </IconButton>
             <Typography variant="h6" noWrap></Typography>
             <div className={classes.grow} />
-            <div className={classes.notifarea}>
+            {/* <div className={classes.notifarea}>
               <span className={classes.totnotif}>4</span>
               <NotificationsIcon />
-            </div>
+            </div> */}
             <div className="menu-action">
               <div className="profile" onClick={menuToggle}>
-                <Avatar alt="User" src={user} className={classes.avasmall} />
+                <Avatar className={classes.avasmall}>
+                  {userLogin.username
+                    ? userLogin.username.substring(0, 1)
+                    : null}
+                </Avatar>
+                {/* <Avatar alt="User" src={user} className={classes.avasmall} /> */}
                 <div className={classes.username}>{userLogin.username}</div>
               </div>
               <div className="menu-drop">
@@ -322,6 +360,17 @@ const PersistentDrawer = () => {
                   <span>{userLogin.username}</span>
                 </h3>
                 <ul>
+                  <li>
+                    <i class="iconify iconMenu" data-icon="gg:profile"></i>
+                    <button
+                      onClick={() =>
+                        (window.location.href = `${
+                          window.location.protocol + "//" + window.location.host
+                        }/profile`)
+                      }>
+                      Profile
+                    </button>
+                  </li>
                   <li>
                     <i class="iconify iconMenu" data-icon="uil:signout"></i>
                     <button onClick={handleLogOut}>Log Out</button>

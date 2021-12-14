@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
+import { pathEndPoint } from "../../../assets/menu";
+import Loading from "../../asset/Loading";
+import { Link } from "react-router-dom";
 
-import Loading from "../asset/Loading";
 import {
   useTheme,
   makeStyles,
@@ -23,18 +23,14 @@ import {
   Backdrop,
   Snackbar,
 } from "@material-ui/core";
-import "../../assets/master.css";
+import "../../../assets/master.css";
+import "../../asset/chips.css";
 
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import MuiAlert from "@material-ui/lab/Alert";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -161,12 +157,38 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableArea = () => {
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const TableActionReq = () => {
+  const dataActReq = [
+    {
+      id: "1",
+      request_no: "123412344",
+      asset_no: "MKDACH011",
+      asset_name: "Accurate",
+      created: "02 Oct 2021",
+      description: "Meminta akses untuk accurate",
+      status: 12,
+    },
+    {
+      id: "2",
+      request_no: "12341234",
+      asset_no: "MKDPCH001",
+      asset_name: "PC lalala",
+      created: "02 Oct 2021",
+      description: "Pada saat nayalin laptop layar biru",
+      status: 9,
+    },
+  ];
+
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
   const [dataArea, setDataArea] = useState([]);
+  const [dataStatus, setDataStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [areaId, setAreaId] = useState("");
   const [areaName, setAreaName] = useState("");
@@ -174,44 +196,39 @@ const TableArea = () => {
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      getAreaList();
-    }, 3000);
-  }, [dataArea]);
+    getStatusList();
+  }, []);
 
-  const getAreaList = async () => {
+  const getStatusList = async () => {
     await axios
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
+        }/api/v1/status`
       )
       .then((response) => {
-        setDataArea(response.data.data.areas);
+        let newStatus = response.data.data.statuss;
+        const arr_request = [...dataActReq];
+        const arr_status = [...newStatus];
+
+        var statusmap = {};
+
+        arr_status.forEach(function (status_id) {
+          statusmap[status_id.id] = status_id;
+        });
+
+        arr_request.forEach(function (request_id) {
+          request_id.status_id = statusmap[request_id.status];
+        });
+
+        let JoinStatus = arr_request;
+        setDataArea(JoinStatus);
+        console.log(JoinStatus);
         setIsLoading(false);
       })
       .catch((error) => {
         console.log(error);
-        setIsLoading(false);
       });
-  };
-
-  const updateArea = async (e) => {
-    e.preventDefault();
-    await axios.patch(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${areaId}`,
-      {
-        area_name: areaName,
-        alias_name: aliasName,
-      }
-    );
-    setToast(true);
-    setAreaId("");
-    setAreaName("");
-    setAliasName("");
-    setEditModal(false);
   };
 
   const emptyRows =
@@ -221,87 +238,10 @@ const TableArea = () => {
     setPage(newPage);
   };
 
-  function handleEdit(row) {
-    setEditModal(true);
-    setAreaId(row.id);
-    setAreaName(row.area_name);
-    setAliasName(row.alias_name);
-  }
-
-  const handleDelete = async (row) => {
-    await axios.delete(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${row.id}`
-    );
-    setToast(true);
-  };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const modalClose = () => {
-    setEditModal(false);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToast(false);
-  };
-
-  const bodyModal = (
-    <>
-      <Fade in={editModal}>
-        <div className={classes.paper}>
-          <form onSubmit={updateArea}>
-            <div className="row">
-              <div className="col-12">
-                <h3>Area Name</h3>
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Area</label>
-                <input
-                  type="text"
-                  id="areaName"
-                  defaultValue={areaName}
-                  className="form-input"
-                  onChange={function (e) {
-                    setAreaName(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Alias Name</label>
-                <input
-                  type="text"
-                  id="aliasName"
-                  defaultValue={aliasName}
-                  className="form-input"
-                  onChange={function (e) {
-                    setAliasName(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-            <br />
-            <div className="footer-modal">
-              <button className={"btn-cancel"} onClick={modalClose}>
-                Cancel
-              </button>
-              <button className={"btn-submit"} type="submit">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </Fade>
-    </>
-  );
 
   return (
     <>
@@ -310,9 +250,11 @@ const TableArea = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Area Name</StyledTableCell>
-                <StyledTableCell>Alias Name</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                <StyledTableCell>Request No</StyledTableCell>
+                <StyledTableCell>Asset No</StyledTableCell>
+                <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>Date Created</StyledTableCell>
+                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -328,35 +270,28 @@ const TableArea = () => {
                   : dataArea
                 ).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.area_name}
+                    <TableCell component="th" scope="row">
+                      <Link to="/action-request/detail">{row.request_no}</Link>
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {row.asset_no}
                     </TableCell>
-                    <TableCell style={{ width: 100 }} align="center">
-                      <button
-                        className="btn-edit"
-                        onClick={(e) => handleEdit(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ci:edit"></span>
-                        <span className="name-btn">Edit</span>
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"></span>
-                        <span className="name-btn">Delete</span>
-                      </button>
+                    <TableCell component="th" scope="row">
+                      {row.asset_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.created}
+                    </TableCell>
+
+                    <TableCell component="th" scope="row" align="center">
+                      <span
+                        class="chip"
+                        style={{
+                          background: `${row.status_id.color_status}4C`,
+                          color: `${row.status_id.color_status}FF`,
+                        }}>
+                        {capitalizeFirstLetter(row.status_id.status_name)}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -389,27 +324,8 @@ const TableArea = () => {
           </Table>
         </Paper>
       </TableContainer>
-      <Modal
-        open={editModal}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}>
-        {bodyModal}
-      </Modal>
-
-      <Snackbar
-        autoHideDuration={4000}
-        open={toast}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleClose} severity="success">
-          submit successful
-        </Alert>
-      </Snackbar>
     </>
   );
 };
 
-export default TableArea;
+export default TableActionReq;

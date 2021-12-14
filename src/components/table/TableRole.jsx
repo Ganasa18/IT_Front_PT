@@ -20,6 +20,7 @@ import {
   Fade,
   Modal,
   Backdrop,
+  Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
 
@@ -29,6 +30,12 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const cookies = new Cookies();
 const token = cookies.get("token");
 
@@ -166,12 +173,21 @@ const TableRole = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [roleId, setRoleId] = useState("");
   const [roleName, setRoleName] = useState("");
+  const [toast, setToast] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       getRoleList();
     }, 3000);
   }, []);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const getRoleList = async () => {
     await axios
@@ -242,6 +258,7 @@ const TableRole = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    setToast(true);
     setRoleId("");
     setRoleName("");
     setEditModal(false);
@@ -274,8 +291,12 @@ const TableRole = () => {
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -371,6 +392,15 @@ const TableRole = () => {
         }}>
         {bodyModal}
       </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };

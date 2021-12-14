@@ -52,6 +52,16 @@ export const menuData = [
       },
       { name: "Area", to: "/master/area", icon: "fluent:status-16-filled" },
       {
+        name: "Category",
+        to: "/master/category",
+        icon: "dashicons:category",
+      },
+      {
+        name: "Troubleshoot",
+        to: "/master/troubleshoot",
+        icon: "clarity:error-standard-line",
+      },
+      {
         name: "User",
         to: "/master/user",
         icon: "ant-design:user-add-outlined",
@@ -70,10 +80,10 @@ export const menuDataUser = [
   },
   {
     id: 2,
-    name: "Ticket Management",
+    name: "Action Request",
     icon: "carbon:inventory-management",
     exact: true,
-    to: `/ticket`,
+    to: `/action-request`,
   },
 ];
 

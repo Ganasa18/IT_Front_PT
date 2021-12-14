@@ -33,8 +33,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
-
-import StepperEdit from "../asset/departement/StepperEdit";
+import StepperEdit from "../asset/category/StepperEdit";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -171,45 +170,41 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableDepartement = () => {
+const TableCategory = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [dataDepartement, setDataDepartement] = useState([]);
+  const [dataCategory, setDataCategory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState([]);
-  const [dataSubDepartement, setDataSubDepartement] = useState([]);
-  const [lastDepartementId, setLastDepartementId] = useState(null);
-  const [departementEdit, setDepartementEdit] = useState([]);
+  const [dataSubCategory, setDataSubCategory] = useState([]);
+  const [lastCategoryId, setLastCategoryId] = useState(null);
+  const [categoryEdit, setCategoryEdit] = useState([]);
 
   const modalPop = (row) => {
-    setDepartementEdit(row);
+    setCategoryEdit(row);
     setEditModal(true);
   };
 
-  const modalOut = () => {
-    setEditModal(false);
-  };
-
   useEffect(() => {
-    getDepartementList();
+    getCategoryList();
     getLatestId();
   }, []);
 
-  const getDepartementList = async () => {
+  const getCategoryList = async () => {
     await axios
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement`
+        }/api/v1/category`
       )
       .then((response) => {
-        setDataDepartement(response.data.data.departements);
+        setDataCategory(response.data.data.category);
         setIsLoading(false);
 
         setExpanded(
-          [...Array(response.data.data.departements.length)].map((val) => false)
+          [...Array(response.data.data.category.length)].map((val) => false)
         );
       })
       .catch((error) => {
@@ -223,27 +218,27 @@ const TableDepartement = () => {
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement/latestId`
+        }/api/v1/category`
       )
       .then((response) => {
-        setLastDepartementId(response.data.data.departement.id);
+        const dataCategory = response.data.data.category;
+        setLastCategoryId(dataCategory.shift().id);
       })
       .catch((err) => {
         console.error(err);
       });
   };
 
-  const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, dataDepartement.length - page * rowsPerPage);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleDelete = async (row) => {
+    await axios.delete(
+      `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/category/${row.id}`
+    );
+    setTimeout(() => {
+      alert("success");
+      window.location.reload();
+    }, 1000);
   };
 
   const handleClick = async (index, row) => {
@@ -265,22 +260,22 @@ const TableDepartement = () => {
         apiRes = await axios.get(
           `${pathEndPoint[0].url}${
             pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-          }/api/v1/subdepartement/${row.id}`
+          }/api/v1/subcategory/${row.id}`
         );
       } catch (err) {
         apiRes = err.response;
       } finally {
-        console.log(apiRes.status); // Could be success or error
+        // console.log(apiRes.status); // Could be success or error
 
         if (apiRes.status === 200) {
-          setDataSubDepartement(apiRes.data.data.subdepartement);
+          setDataSubCategory(apiRes.data.data.subcategory);
         }
 
         if (apiRes.status === 404) {
-          setDataSubDepartement([
+          setDataSubCategory([
             {
               id: 1,
-              subdepartement_name: "No Sub Departement",
+              subcategory_name: "No Sub Category",
             },
           ]);
         }
@@ -288,23 +283,28 @@ const TableDepartement = () => {
     })();
   };
 
-  const handleDelete = async (row) => {
-    await axios.delete(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/departement/${row.id}`
-    );
-    setTimeout(() => {
-      alert("success");
-      window.location.reload();
-    }, 1000);
+  const modalOut = () => {
+    setEditModal(false);
+  };
+
+  const emptyRows =
+    rowsPerPage -
+    Math.min(rowsPerPage, dataCategory.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const bodyModal = (
     <>
       <Fade in={editModal}>
         <div className={classes.paper}>
-          <StepperEdit dataDepartement={departementEdit} />
+          <StepperEdit dataCategory={categoryEdit} />
           <Button
             onClick={modalOut}
             className={classes.cancelBtn}
@@ -325,7 +325,6 @@ const TableDepartement = () => {
               <TableRow>
                 <StyledTableCell></StyledTableCell>
                 <StyledTableCell>Name</StyledTableCell>
-                <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -335,11 +334,11 @@ const TableDepartement = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataDepartement.slice(
+                  ? dataCategory.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataDepartement
+                  : dataCategory
                 )
                   .sort((a, b) => (a.id > b.id ? -1 : 1))
                   .map((row, index) => (
@@ -362,13 +361,7 @@ const TableDepartement = () => {
                           style={{ width: 300 }}
                           component="th"
                           scope="row">
-                          {row.departement_name}
-                        </TableCell>
-                        <TableCell
-                          style={{ width: 300 }}
-                          component="th"
-                          scope="row">
-                          {row.area_name}
+                          {row.category_name}
                         </TableCell>
 
                         <TableCell style={{ width: 260 }} align="center">
@@ -383,10 +376,10 @@ const TableDepartement = () => {
 
                           <button
                             disabled={`${
-                              lastDepartementId === row.id ? "disabled" : ""
+                              lastCategoryId === row.id ? "disabled" : ""
                             }`}
                             className={`btn-delete ${
-                              lastDepartementId === row.id ? "disabled" : ""
+                              lastCategoryId === row.id ? "disabled" : ""
                             }`}
                             onClick={() => handleDelete(row)}>
                             <span
@@ -412,14 +405,14 @@ const TableDepartement = () => {
                                 style={{ background: "#f9f4f4" }}>
                                 <TableHead>
                                   <TableRow>
-                                    <TableCell>Sub Departement</TableCell>
+                                    <TableCell>Sub Category</TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                  {dataSubDepartement.map((row) => (
+                                  {dataSubCategory.map((row) => (
                                     <TableRow key={row.id}>
                                       <TableCell>
-                                        {row.subdepartement_name}
+                                        {row.subcategory_name}
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -445,7 +438,7 @@ const TableDepartement = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataDepartement.length}
+                  count={dataCategory.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -474,4 +467,4 @@ const TableDepartement = () => {
   );
 };
 
-export default TableDepartement;
+export default TableCategory;

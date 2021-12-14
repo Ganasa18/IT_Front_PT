@@ -8,6 +8,7 @@ import {
   Backdrop,
   Fade,
   Modal,
+  Snackbar,
 } from "@material-ui/core";
 
 import "../../assets/master.css";
@@ -16,8 +17,14 @@ import axios from "axios";
 import { authEndPoint } from "../../assets/menu";
 import TableRole from "../table/TableRole";
 import Cookies from "universal-cookie";
+import MuiAlert from "@material-ui/lab/Alert";
+
 const cookies = new Cookies();
 const token = cookies.get("token");
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -74,6 +81,15 @@ const Roles = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");
+  const [toast, setToast] = useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const modalPop = () => {
     setModalOpen(true);
@@ -93,6 +109,7 @@ const Roles = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    setToast(true);
     setModalOpen(false);
     setRoleName("");
     setTimeout(() => {
@@ -130,8 +147,12 @@ const Roles = () => {
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -194,6 +215,15 @@ const Roles = () => {
         }}>
         {bodyModal}
       </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

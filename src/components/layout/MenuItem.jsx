@@ -11,6 +11,18 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 import { NavLink } from "react-router-dom";
 import "./sidebar.css";
 
+// function importAll(r) {
+//   let images = {};
+//   r.keys().map((item, index) => {
+//     images[item.replace("./", "")] = r(item);
+//   });
+//   return images;
+// }
+
+// const images = importAll(
+//   require.context("../../assets/svg_icon", false, /\.(png|jpe?g|svg)$/)
+// );
+
 // const SidebarItem = (props) => {
 //   const { name, subMenus, to, exact, index, id, onClick } = props;
 //   const [expand, setExpand] = useState(false);
@@ -69,6 +81,7 @@ const MenuItem = (props) => {
             <i className="iconify" data-icon={icon}></i>
           </div>
           <span>{name}</span>
+
           {subMenus && subMenus.length > 0 ? (
             <>
               {expand ? (
@@ -89,6 +102,7 @@ const MenuItem = (props) => {
                 /> */}
 
                 <div className={`menu-icon`}>
+                  {/* <img src={images["fluent_database.svg"].default} alt="icon" /> */}
                   <i className="iconify" data-icon={menu.icon}></i>
                 </div>
 

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../asset/Loading";
 import SelectSearch, { fuzzySearch } from "react-select-search";
+import { Link } from "react-router-dom";
 import "../../assets/select-search.css";
 
 import {
@@ -166,9 +167,9 @@ const TableUser = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [dataUser, setDataUser] = useState([]);
   const [dataRole, setDataRole] = useState([]);
   const [dataDepartement, setDataDepartement] = useState([]);
+  const [dataSubDepartement, setDataSubDepartement] = useState([]);
   const [dataArea, setDataArea] = useState([]);
   const [valueArea, setValueArea] = useState("");
   const [valueDepartement, setValueDepartement] = useState("");
@@ -177,6 +178,7 @@ const TableUser = () => {
   const [valueUsername, setValueUsername] = useState("");
   const [valueEmail, setValueEmail] = useState("");
   const [valueNoHP, setValueNoHP] = useState("");
+  const [valueUserId, setValueUserId] = useState("");
   const [resultJoinUser, setResultJoinUser] = useState([]);
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
 
@@ -202,6 +204,7 @@ const TableUser = () => {
   useEffect(() => {
     getDataUser();
     getAreaList();
+    getRoleList();
   }, []);
 
   const getDataUser = async () => {
@@ -259,6 +262,7 @@ const TableUser = () => {
           const arr_role = [...newDataRole];
           const arr_departement = [...newDataDepartement];
           const arr_subdepartement = [...newDataSubDepartement];
+
           const newArrDepart = arr_departement.map((row) => ({
             value: row.id,
             name: row.departement_name,
@@ -328,6 +332,9 @@ const TableUser = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   };
 
   const handleEditUser = async (row) => {
@@ -336,7 +343,11 @@ const TableUser = () => {
     setValueUsername(row.username);
     setValueArea(row.area);
     setValueEmail(row.email);
-    console.log(row);
+    setValueNoHP(row.no_handphone);
+    setValueDepartement(row.departement);
+    setValueSubDepartement(row.subdepartement);
+    setValueRole(row.role);
+    setValueUserId(row.uuid);
   };
 
   const getAreaList = async () => {
@@ -355,6 +366,31 @@ const TableUser = () => {
           name: row.area_name,
         }));
         setDataArea(newArr);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getRoleList = async () => {
+    await axios
+      .get(
+        `${authEndPoint[0].url}${
+          authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+        }/api/v1/role`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        const DataRole = response.data.data.roles;
+
+        const arr = [...DataRole];
+        const newArr = arr.map((row) => ({
+          value: row.id,
+          name: row.role_name,
+        }));
+        setDataRole(newArr);
       })
       .catch((error) => {
         console.log(error);
@@ -387,6 +423,91 @@ const TableUser = () => {
       });
   };
 
+  const handleSubDepartement = async (e) => {
+    await axios
+      .get(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/subdepartement/${valueDepartement}`
+      )
+      .then((response) => {
+        const SubDepartementList = response.data.data.subdepartement;
+        const newArr = SubDepartementList.map((dpt) => ({
+          value: dpt.id,
+          name: dpt.subdepartement_name,
+        }));
+        setDataSubDepartement(newArr);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
+  const saveHandler = async (event) => {
+    event.preventDefault();
+
+    await axios
+      .patch(
+        `${authEndPoint[0].url}${
+          authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+        }/api/v1/auth/${valueUserId}`,
+        {
+          username: valueUsername,
+          email: valueEmail,
+          password: "123",
+          no_handphone: valueNoHP,
+          area: valueArea,
+          departement: valueDepartement,
+          subdepartement: valueSubDepartement,
+          employe_status: selectedValueEmply,
+          role: valueRole,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        console.log(valueSubDepartement);
+        alert(response.data.status);
+        setSelectedValueEmply("permanent");
+        setValueUsername("");
+        setValueEmail("");
+        setValueNoHP("");
+        setValueArea("");
+        setValueDepartement("");
+        setValueSubDepartement("");
+        setValueRole("");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+  };
+
+  const handleResetPassword = async (row) => {
+    await axios
+      .patch(
+        `${authEndPoint[0].url}${
+          authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+        }/api/v1/auth/${row.uuid}`,
+        {
+          password: "123",
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        console.log(valueSubDepartement);
+        alert(response.data.status);
+      })
+      .catch((err) => {
+        alert(err.response.data.message);
+      });
+  };
+
   const emptyRows =
     rowsPerPage -
     Math.min(rowsPerPage, resultJoinUser.length - page * rowsPerPage);
@@ -395,7 +516,7 @@ const TableUser = () => {
     <>
       <Fade in={editModal}>
         <div className={classes.paper}>
-          <form>
+          <form onSubmit={saveHandler}>
             <div className="row">
               <div className="col-12">
                 <h3>Edit User</h3>
@@ -454,7 +575,9 @@ const TableUser = () => {
                 <label htmlFor="roleName">Departement</label>
                 <SelectSearch
                   options={dataDepartement}
+                  value={valueDepartement}
                   filterOptions={fuzzySearch}
+                  onChange={handleSubDepartement}
                   search
                   placeholder="Search Departement"
                 />
@@ -468,11 +591,47 @@ const TableUser = () => {
                   disabled
                 />
               </div>
+              <div className="col-6">
+                <label htmlFor="roleName">Sub Departement</label>
+                <SelectSearch
+                  options={dataSubDepartement}
+                  value={valueSubDepartement}
+                  onChange={setValueSubDepartement}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Sub Departement"
+                />
+              </div>
+
+              <div className="col-6">
+                <label htmlFor="roleName">No Hp</label>
+                <input
+                  type="text"
+                  defaultValue={valueNoHP}
+                  className="form-input"
+                  onChange={(e) => setValueNoHP(e.target.value)}
+                />
+              </div>
+              <div className="col-6">
+                <label htmlFor="roleName">Role</label>
+                <SelectSearch
+                  options={dataRole}
+                  value={valueRole}
+                  onChange={setValueRole}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Role"
+                />
+              </div>
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -511,7 +670,15 @@ const TableUser = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.username}
+                      <Link
+                        to={{
+                          pathname: "/user/asset",
+                          query: {
+                            row,
+                          },
+                        }}>
+                        {row.username}
+                      </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.email}
@@ -538,7 +705,7 @@ const TableUser = () => {
                       {row.role_id.role_name}
                     </TableCell>
 
-                    <TableCell style={{ width: 180 }} align="center">
+                    <TableCell style={{ width: 300 }} align="center">
                       <button
                         className="btn-edit"
                         onClick={(e) => handleEditUser(row)}>
@@ -546,6 +713,14 @@ const TableUser = () => {
                           class="iconify icon-btn"
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
+                      </button>
+                      <button
+                        className="btn-reset"
+                        onClick={(e) => handleResetPassword(row)}>
+                        <span
+                          class="iconify icon-btn"
+                          data-icon="grommet-icons:power-reset"></span>
+                        <span className="name-btn">Reset</span>
                       </button>
                       <button
                         disabled={`${

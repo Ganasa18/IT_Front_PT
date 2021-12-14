@@ -34,6 +34,7 @@ const Auth = () => {
                 path: "/",
                 expires: new Date(Date.now() + 86400000),
               });
+              cookies.set("id", response.data.data.user.id);
               cookies.set("uuid", response.data.data.user.uuid);
               cookies.set("role", response.data.data.user.role);
             }

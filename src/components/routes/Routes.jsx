@@ -7,6 +7,12 @@ import Area from "../pages/Area";
 import Departement from "../pages/Departement";
 // import NotFound from "../pages/NotFound";
 import User from "../pages/User";
+import UserAsset from "../pages/UserAsset";
+import Category from "../pages/Category";
+import Profile from "../pages/Profile";
+import ActionReq from "../pages/user/ActionReq";
+import ActionReqDetail from "../pages/user/ActionReqDetail";
+import Troubleshoot from "../pages/Troubleshoot";
 
 // import Cookies from "universal-cookie";
 
@@ -29,6 +35,30 @@ const Routes = () => {
       <Route path="/master/area" component={(props) => <Area {...props} />} />
       <Route path="/master/role" component={(props) => <Roles {...props} />} />
       <Route path="/master/user" component={(props) => <User {...props} />} />
+      <Route
+        path="/user/asset"
+        component={(props) => <UserAsset {...props} />}
+      />
+      <Route
+        path="/master/category"
+        component={(props) => <Category {...props} />}
+      />
+
+      <Route
+        path="/master/troubleshoot"
+        component={(props) => <Troubleshoot {...props} />}
+      />
+
+      <Route path="/profile" component={(props) => <Profile {...props} />} />
+      <Route
+        exact
+        path="/action-request"
+        component={(props) => <ActionReq {...props} />}
+      />
+      <Route
+        path="/action-request/detail"
+        component={(props) => <ActionReqDetail {...props} />}
+      />
     </Switch>
   );
 };

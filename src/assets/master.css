@@ -1,3 +1,7 @@
+a {
+  text-decoration: none;
+}
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -166,6 +170,35 @@
   border-radius: 5px;
   background: rgb(255 255 255);
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.card-profile {
+  height: 35vh;
+  width: 100%;
+  border-radius: 5px;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 5px 35px;
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1368px) {
+  .vertical-line {
+    border-left: 1px solid #bdbdbd;
+    height: 30vh;
+    position: absolute;
+    right: 60%;
+    transform: translate(15%, 5%);
+  }
+}
+
+@media screen and (min-width: 1700px) {
+  .vertical-line {
+    border-left: 1px solid #bdbdbd;
+    height: 30vh;
+    position: absolute;
+    right: 65%;
+    transform: translate(45%, 5%);
+  }
 }
 
 .card-modal {
@@ -362,7 +395,7 @@
   min-width: 64px;
   outline: none;
   border: none;
-  color: #ec9108;
+  color: #1653a6;
   background-color: transparent;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-weight: 500;
@@ -375,7 +408,7 @@
 }
 
 .btn-edit:hover {
-  background-color: #fbae3a75;
+  background-color: #1652a675;
 }
 
 .btn-edit .icon-btn {
@@ -386,6 +419,42 @@
 }
 .btn-edit .name-btn {
   right: 16px;
+  bottom: 4px;
+  position: absolute;
+}
+
+.btn-reset {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 15px 15px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: none;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-reset:hover {
+  background-color: #ec910879;
+}
+
+.btn-reset .icon-btn {
+  left: 4px;
+  bottom: 7px;
+  position: absolute;
+  font-size: 14px;
+}
+.btn-reset .name-btn {
+  right: 10px;
   bottom: 4px;
   position: absolute;
 }
@@ -476,7 +545,7 @@
   display: -moz-box;
   display: flex;
   flex-wrap: wrap;
-  max-height: 270px;
+  max-height: 160px;
   overflow-y: scroll;
   margin-left: 20px;
 }
@@ -519,14 +588,11 @@
 
 .input-create-element {
   padding: 12px 10px;
-  position: absolute;
-  left: 180px;
-  bottom: 75px;
   border: none;
   cursor: pointer;
   border-radius: 5px;
-  background-color: black;
-  color: #fff;
+  background-color: transparent;
+  color: #1653a6;
 }
 .input-create-element:hover {
   background-color: #4b6079;
@@ -564,6 +630,7 @@ li {
 }
 
 .menu-action .menu-drop {
+  overflow: hidden;
   position: absolute;
   top: 80px;
   right: 10px;
@@ -729,4 +796,89 @@ input[type="radio"] {
   border-radius: 4px;
   box-sizing: border-box;
   font-size: 13px;
+}
+
+.span_crumb {
+  cursor: pointer;
+  font-size: 18px;
+  color: #1653a6;
+}
+
+.btn-cancel {
+  margin: 0 5px 0 5px;
+  color: #eb5757;
+  width: 130px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #eb5757;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-cancel:hover {
+  background-color: #eb5757;
+  color: white;
+}
+
+.btn-submit {
+  margin: 0 5px 0 5px;
+  color: #fff;
+  width: 130px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: none;
+  background-color: #1653a6;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-submit:hover {
+  background-color: #1652a6c4;
+}
+
+.position-profile-btn {
+  position: relative;
+  left: 50%;
+  transform: translate(250%, 25%);
+}
+
+.filter-btn {
+  margin: 18px 5px 0 -10px;
+  color: #ec9108;
+  width: 130px;
+  height: 40px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.filter-btn:hover {
+  background-color: #ec91084b;
 }

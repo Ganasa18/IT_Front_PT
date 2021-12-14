@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { pathEndPoint } from "../../../assets/menu";
+
 import {
   makeStyles,
   Grid,
@@ -7,11 +9,12 @@ import {
   Backdrop,
   Fade,
   Modal,
+  Snackbar,
 } from "@material-ui/core";
-import "../../assets/master.css";
+import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
-import TableDepartement from "../table/TableDepartement";
-import StepperComponent from "../asset/departement/StepperComponent";
+import axios from "axios";
+import TableActionReq from "../../table/user/TableActionReq";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -55,56 +58,23 @@ const useStyles = makeStyles((theme) => ({
     transform: "translate(-50%,-50%)",
     top: "30%",
     left: "50%",
-    width: 850,
-
+    width: 550,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 4, 3),
   },
-  cancelBtn: {
-    color: "#EB5757",
-    border: "1px solid #EB5757",
-    width: "130px",
-    height: "40px",
-    fontSize: "13px",
-    position: "relative",
-    left: "0",
-    transform: "translate(35%, -40%)",
-  },
 }));
 
-const Departement = () => {
+const ActionReq = () => {
   const classes = useStyles();
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const modalPop = () => {
-    setModalOpen((prevSelected) => !prevSelected);
-  };
-
-  const bodyModal = (
-    <>
-      <Fade in={modalOpen}>
-        <div className={classes.paper}>
-          <StepperComponent />
-          <Button
-            className={classes.cancelBtn}
-            onClick={modalPop}
-            variant="outlined">
-            Cancel
-          </Button>
-        </div>
-      </Fade>
-    </>
-  );
-
   return (
-    <div>
+    <>
       <div className={classes.toolbar} />
       <Grid container className={classes.headerMaster} spacing={3}>
         <Grid item xs={12} sm={12}>
           <Typography variant="h6" gutterBottom>
-            Master Departement
+            Action Request
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12}>
@@ -122,10 +92,11 @@ const Departement = () => {
                   />
                 </div>
               </div>
-              <div className="col-4"></div>
+              <div className="col-4">
+                <button className="filter-btn">Filter</button>
+              </div>
               <div className="col-4">
                 <Button
-                  onClick={modalPop}
                   variant="contained"
                   color="primary"
                   className={classes.buttonAdd}
@@ -139,21 +110,12 @@ const Departement = () => {
 
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableDepartement />
+            <TableActionReq />
           </div>
         </Grid>
       </Grid>
-      <Modal
-        open={modalOpen}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}>
-        {bodyModal}
-      </Modal>
-    </div>
+    </>
   );
 };
 
-export default Departement;
+export default ActionReq;

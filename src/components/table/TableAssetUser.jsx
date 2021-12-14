@@ -3,9 +3,12 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { pathEndPoint } from "../../assets/menu";
+import AddIcon from "@material-ui/icons/Add";
 
 import Loading from "../asset/Loading";
 import {
+  Toolbar,
+  Checkbox,
   useTheme,
   makeStyles,
   Table,
@@ -18,23 +21,18 @@ import {
   TableRow,
   Paper,
   withStyles,
+  Typography,
+  Button,
   Fade,
   Modal,
   Backdrop,
-  Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
-
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import MuiAlert from "@material-ui/lab/Alert";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -129,12 +127,25 @@ const useStyles2 = makeStyles((theme) => ({
 
   posPagination: {
     position: "absolute",
-    right: "100px",
+    [theme.breakpoints.up("xl")]: {
+      right: "30px",
+      marginTop: "20px",
+    },
+    [theme.breakpoints.down("lg")]: {
+      right: "30px",
+      marginTop: "20px",
+    },
   },
 
   tableWidth: {
     margin: "auto",
-    width: "98%",
+    width: "100%",
+  },
+  theadDispos: {
+    "& th": {
+      color: "black",
+      backgroundColor: "white",
+    },
   },
 
   thead: {
@@ -159,82 +170,127 @@ const useStyles2 = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 4, 3),
   },
+  paperTble: {
+    height: "580px",
+  },
+  buttonAdd: {
+    [theme.breakpoints.up("xl")]: {
+      width: "150px",
+      left: "35%",
+      top: "8px",
+    },
+
+    [theme.breakpoints.down("lg")]: {
+      width: "140px",
+      height: "38px",
+      left: "-18%",
+      top: "8px",
+      fontSize: 11,
+    },
+    [theme.breakpoints.down("sm")]: {
+      bottom: "20px",
+      width: "120px",
+    },
+    fontSize: 12,
+    height: "50px",
+  },
 }));
 
-const TableArea = () => {
+const TableAssetUser = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [editModal, setEditModal] = useState(false);
-  const [dataArea, setDataArea] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [areaId, setAreaId] = useState("");
-  const [areaName, setAreaName] = useState("");
-  const [aliasName, setAliasName] = useState("");
-  const [toast, setToast] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(4);
+  //   const [dataArea, setDataArea] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [allSelected, setAllSelected] = useState(false);
+  const [selected, setSelected] = useState({});
 
-  useEffect(() => {
-    setTimeout(() => {
-      getAreaList();
-    }, 3000);
-  }, [dataArea]);
+  const dataArea = [
+    {
+      id: "1",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+    {
+      id: "2",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+    {
+      id: "3",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+    {
+      id: "4",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+    {
+      id: "5",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+    {
+      id: "6",
+      asset_no: "123444",
+      asset_name: "Macbook",
+      unit_part: "part",
+      category: "Hardware",
+      sub_category: "Laptop",
+    },
+  ];
 
-  const getAreaList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
-      )
-      .then((response) => {
-        setDataArea(response.data.data.areas);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
+  const toggleAllSelected = (e) => {
+    const { checked } = e.target;
+    setAllSelected(checked);
+
+    dataArea &&
+      setSelected(
+        dataArea.reduce(
+          (selected, { id }) => ({
+            ...selected,
+            [id]: checked,
+          }),
+          {}
+        )
+      );
   };
 
-  const updateArea = async (e) => {
-    e.preventDefault();
-    await axios.patch(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${areaId}`,
-      {
-        area_name: areaName,
-        alias_name: aliasName,
-      }
-    );
-    setToast(true);
-    setAreaId("");
-    setAreaName("");
-    setAliasName("");
-    setEditModal(false);
+  const toggleSelected = (id) => (e) => {
+    if (!e.target.checked) {
+      setAllSelected(false);
+    }
+
+    setSelected((selected) => ({
+      ...selected,
+      [id]: !selected[id],
+    }));
   };
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+
+  const isAllSelected = selectedCount === dataArea.length;
+
+  const isIndeterminate = selectedCount && selectedCount !== dataArea.length;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-  };
-
-  function handleEdit(row) {
-    setEditModal(true);
-    setAreaId(row.id);
-    setAreaName(row.area_name);
-    setAliasName(row.alias_name);
-  }
-
-  const handleDelete = async (row) => {
-    await axios.delete(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${row.id}`
-    );
-    setToast(true);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -242,76 +298,62 @@ const TableArea = () => {
     setPage(0);
   };
 
-  const modalClose = () => {
-    setEditModal(false);
-  };
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToast(false);
-  };
-
-  const bodyModal = (
-    <>
-      <Fade in={editModal}>
-        <div className={classes.paper}>
-          <form onSubmit={updateArea}>
-            <div className="row">
-              <div className="col-12">
-                <h3>Area Name</h3>
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Area</label>
-                <input
-                  type="text"
-                  id="areaName"
-                  defaultValue={areaName}
-                  className="form-input"
-                  onChange={function (e) {
-                    setAreaName(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Alias Name</label>
-                <input
-                  type="text"
-                  id="aliasName"
-                  defaultValue={aliasName}
-                  className="form-input"
-                  onChange={function (e) {
-                    setAliasName(e.target.value);
-                  }}
-                />
-              </div>
-            </div>
-            <br />
-            <div className="footer-modal">
-              <button className={"btn-cancel"} onClick={modalClose}>
-                Cancel
-              </button>
-              <button className={"btn-submit"} type="submit">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </Fade>
-    </>
-  );
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
 
   return (
     <>
       <TableContainer className={classes.tableWidth}>
-        <Paper>
-          <Table className={classes.table} aria-label="custom pagination table">
+        <Paper className={classes.paperTble}>
+          <Toolbar>
+            <div className="col-10">
+              <Typography
+                variant="h5"
+                component="div"
+                style={{ marginTop: "5px" }}>
+                Asset User
+              </Typography>
+            </div>
+            <div className="col-2">
+              <Button
+                className={classes.buttonAdd}
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}>
+                Create New
+              </Button>
+            </div>
+          </Toolbar>
+          <div className="display-disposal">
+            {selectedCount > 0 ? (
+              <>
+                <span style={{ marginRight: "5px" }}>( </span>
+                <span className="count">{selectedCount}</span>
+                <span className="selected">Selected Item )</span>
+              </>
+            ) : null}
+
+            <button className="btn-disposal">Disposal</button>
+          </div>
+
+          <Table
+            className={classes.table}
+            size="medium"
+            aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Area Name</StyledTableCell>
-                <StyledTableCell>Alias Name</StyledTableCell>
+                <StyledTableCell padding="checkbox" style={{ width: 50 }}>
+                  <Checkbox
+                    checked={allSelected || isAllSelected} // <-- all selected
+                    onChange={toggleAllSelected} // <-- toggle state
+                    indeterminate={isIndeterminate} // <-- some selected
+                  />
+                </StyledTableCell>
+                <StyledTableCell>Asset No</StyledTableCell>
+                <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>Unit/Parts</StyledTableCell>
+                <StyledTableCell>Category</StyledTableCell>
+                <StyledTableCell>Sub Category</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -328,41 +370,40 @@ const TableArea = () => {
                   : dataArea
                 ).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.area_name}
+                    <TableCell padding="checkbox" style={{ width: 50 }}>
+                      <Checkbox
+                        checked={selected[row.id] || allSelected} // <-- is selected
+                        onChange={toggleSelected(row.id)} // <-- toggle state
+                      />
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {row.asset_no}
                     </TableCell>
-                    <TableCell style={{ width: 100 }} align="center">
-                      <button
-                        className="btn-edit"
-                        onClick={(e) => handleEdit(row)}>
+                    <TableCell component="th" scope="row">
+                      {row.asset_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.unit_part}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.category}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.sub_category}
+                    </TableCell>
+                    <TableCell align="center">
+                      <button className="btn-edit" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
-                      <button
-                        className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"></span>
-                        <span className="name-btn">Delete</span>
-                      </button>
                     </TableCell>
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (
-                  <TableRow style={{ height: 20 * emptyRows }}>
-                    <TableCell colSpan={6} />
+                  <TableRow style={{ height: 0 * emptyRows }}>
+                    <TableCell colSpan={8} />
                   </TableRow>
                 )}
               </TableBody>
@@ -389,27 +430,8 @@ const TableArea = () => {
           </Table>
         </Paper>
       </TableContainer>
-      <Modal
-        open={editModal}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}>
-        {bodyModal}
-      </Modal>
-
-      <Snackbar
-        autoHideDuration={4000}
-        open={toast}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleClose} severity="success">
-          submit successful
-        </Alert>
-      </Snackbar>
     </>
   );
 };
 
-export default TableArea;
+export default TableAssetUser;

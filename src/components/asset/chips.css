@@ -1,0 +1,13 @@
+.chip {
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 0 10px;
+}
+
+.chip-action {
+  padding: 10px 45px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 0;
+}

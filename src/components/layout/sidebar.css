@@ -83,7 +83,7 @@
 }
 
 .main-menu .sub-menu.active {
-  max-height: 300px;
+  max-height: 400px;
 }
 
 .main-menu .sub-menu span {
@@ -107,3 +107,25 @@
 .sub-menu .menu-icon.active {
   color: #fff;
 }
+
+/* .menu-icon:hover .hover-text {
+  visibility: visible;
+}
+
+.hover-text {
+  font-style: italic;
+  position: absolute;
+  visibility: hidden;
+}
+
+.hover-text:hover::after {
+  background: #add8e6;
+  border-radius: 4px;
+  content: attr(title);
+  display: block;
+  left: 50px;
+  padding: 1em;
+  position: fixed;
+  width: 280px;
+  z-index: 1;
+} */

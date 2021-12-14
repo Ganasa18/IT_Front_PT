@@ -1,11 +1,47 @@
 import { ThemeProvider, createTheme, makeStyles } from "@material-ui/core";
+import React, { useEffect } from "react";
 import PersistentDrawer from "./components/layout/PersistentDrawer";
 import Auth from "./components/pages/Auth";
 import Cookies from "universal-cookie";
+import { authEndPoint } from "./assets/menu";
+import axios from "axios";
 
 const cookies = new Cookies();
 
 const authToken = cookies.get("token");
+const roleUser = cookies.get("role");
+const ID = cookies.get("id");
+
+const checkUser = () => {
+  if (roleUser === undefined) {
+    const URL = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/logout`;
+
+    (async () => {
+      let apiRes = null;
+      try {
+        apiRes = await axios
+          .get(`${URL}`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
+          .then((response) => {
+            cookies.remove("token", { path: "/" });
+            cookies.remove("uuid", { path: "/" });
+            cookies.remove("role", { path: "/" });
+          })
+          .catch((error) => {
+            console.log(error.response.status);
+          });
+      } catch (err) {
+        console.log(err);
+        apiRes = err.response;
+      } finally {
+        console.log(apiRes);
+      }
+    })();
+  }
+};
 
 const useStyles = makeStyles({
   root: {
@@ -23,6 +59,9 @@ const App = () => {
       },
       secondary: {
         main: "#EC9108",
+      },
+      error: {
+        main: "#EB5757",
       },
     },
     marginAppbar: "10px",
@@ -45,15 +84,35 @@ const App = () => {
           },
         },
       },
+      MuiCheckbox: {
+        colorSecondary: {
+          color: "#C1C1C1",
+          // "&$checked": {
+          //   color: "#1653A6",
+          // },
+        },
+      },
     },
   });
 
   const classes = useStyles();
 
+  useEffect(() => {
+    checkUser();
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <div className={classes.root}>
-        {!authToken ? <Auth /> : <PersistentDrawer />}
+        {!authToken ? (
+          <Auth />
+        ) : (
+          <PersistentDrawer
+            userID={ID}
+            userRole={roleUser}
+            tokenUser={authToken}
+          />
+        )}
       </div>
     </ThemeProvider>
   );

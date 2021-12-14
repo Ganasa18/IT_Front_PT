@@ -8,13 +8,19 @@ import {
   Backdrop,
   Fade,
   Modal,
+  Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
+import MuiAlert from "@material-ui/lab/Alert";
 import AddIcon from "@material-ui/icons/Add";
 import "rc-color-picker/assets/index.css";
 import TableStatus from "../table/TableStatus";
 import axios from "axios";
 import { pathEndPoint } from "../../assets/menu";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -72,8 +78,17 @@ const Status = () => {
   const [color, setColor] = useState(false);
   const [thiscolor, setThisColor] = useState("");
   const [statusName, setStatusName] = useState("");
+  const [toast, setToast] = useState(false);
 
   const colorHex = React.useRef(null);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const modalPop = () => {
     setModalOpen(true);
@@ -120,7 +135,7 @@ const Status = () => {
     //     color_status: thiscolor,
     //   },
     // ]);
-
+    setToast(true);
     setModalOpen(false);
     setColor(false);
   };
@@ -182,8 +197,12 @@ const Status = () => {
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className="btn-cancel" onClick={modalClose}>
+                Cancel
+              </button>
+              <button className="btn-submit" type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -233,6 +252,15 @@ const Status = () => {
         }}>
         {bodyModal}
       </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

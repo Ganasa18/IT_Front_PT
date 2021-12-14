@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-
+import { pathEndPoint } from "../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
-
 import Loading from "../asset/Loading";
+
 import {
   useTheme,
   makeStyles,
@@ -24,7 +23,6 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
-
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -161,33 +159,32 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableArea = () => {
+const TableTrouble = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [dataArea, setDataArea] = useState([]);
+  const [dataTrouble, setDataTrouble] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [areaId, setAreaId] = useState("");
-  const [areaName, setAreaName] = useState("");
-  const [aliasName, setAliasName] = useState("");
+  const [troubleId, setTroubleId] = useState("");
+  const [troubleName, setTroubleName] = useState("");
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
-      getAreaList();
+      getTroubleList();
     }, 3000);
-  }, [dataArea]);
+  }, []);
 
-  const getAreaList = async () => {
+  const getTroubleList = async () => {
     await axios
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
+        }/api/v1/trouble`
       )
       .then((response) => {
-        setDataArea(response.data.data.areas);
+        setDataTrouble(response.data.data.troubles);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -196,45 +193,37 @@ const TableArea = () => {
       });
   };
 
-  const updateArea = async (e) => {
-    e.preventDefault();
-    await axios.patch(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${areaId}`,
-      {
-        area_name: areaName,
-        alias_name: aliasName,
-      }
-    );
-    setToast(true);
-    setAreaId("");
-    setAreaName("");
-    setAliasName("");
-    setEditModal(false);
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
   };
-
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  function handleEdit(row) {
-    setEditModal(true);
-    setAreaId(row.id);
-    setAreaName(row.area_name);
-    setAliasName(row.alias_name);
-  }
 
   const handleDelete = async (row) => {
     await axios.delete(
       `${pathEndPoint[0].url}${
         pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${row.id}`
+      }/api/v1/trouble/${row.id}`
     );
-    setToast(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
+
+  const handleEdit = async (row) => {
+    setEditModal(true);
+    setTroubleId(row.id);
+    setTroubleName(row.trouble_name);
+  };
+
+  const emptyRows =
+    rowsPerPage -
+    Math.min(rowsPerPage, dataTrouble.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -246,44 +235,43 @@ const TableArea = () => {
     setEditModal(false);
   };
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToast(false);
+  const updateRole = async (e) => {
+    e.preventDefault();
+    await axios.patch(
+      `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/trouble/${troubleId}`,
+      {
+        trouble_name: troubleName,
+      }
+    );
+    setToast(true);
+    setTroubleId("");
+    setTroubleName("");
+    setEditModal(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   };
 
   const bodyModal = (
     <>
       <Fade in={editModal}>
         <div className={classes.paper}>
-          <form onSubmit={updateArea}>
+          <form onSubmit={updateRole}>
             <div className="row">
               <div className="col-12">
-                <h3>Area Name</h3>
+                <h3>Trouble Edit</h3>
               </div>
               <div className="col-12">
-                <label htmlFor="">Area</label>
+                <label htmlFor="">Trouble Name</label>
                 <input
                   type="text"
-                  id="areaName"
-                  defaultValue={areaName}
+                  id="troubleName"
+                  defaultValue={troubleName}
                   className="form-input"
                   onChange={function (e) {
-                    setAreaName(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Alias Name</label>
-                <input
-                  type="text"
-                  id="aliasName"
-                  defaultValue={aliasName}
-                  className="form-input"
-                  onChange={function (e) {
-                    setAliasName(e.target.value);
+                    setTroubleName(e.target.value);
                   }}
                 />
               </div>
@@ -310,8 +298,7 @@ const TableArea = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Area Name</StyledTableCell>
-                <StyledTableCell>Alias Name</StyledTableCell>
+                <StyledTableCell>Trouble Name</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -321,24 +308,18 @@ const TableArea = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? dataTrouble.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : dataTrouble
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell
                       style={{ width: 160 }}
                       component="th"
                       scope="row">
-                      {row.area_name}
-                    </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                      {row.trouble_name}
                     </TableCell>
                     <TableCell style={{ width: 100 }} align="center">
                       <button
@@ -373,7 +354,7 @@ const TableArea = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={dataTrouble.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -398,9 +379,8 @@ const TableArea = () => {
         }}>
         {bodyModal}
       </Modal>
-
       <Snackbar
-        autoHideDuration={4000}
+        autoHideDuration={5000}
         open={toast}
         onClose={handleClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}>
@@ -412,4 +392,4 @@ const TableArea = () => {
   );
 };
 
-export default TableArea;
+export default TableTrouble;

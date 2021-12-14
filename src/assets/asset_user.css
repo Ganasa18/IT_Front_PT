@@ -1,0 +1,277 @@
+.card-asset {
+  height: 30vh;
+  width: 100%;
+  border-radius: 5px;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 5px 35px;
+}
+
+.display-disposal {
+  display: flex;
+  justify-content: flex-end;
+  margin: 25px 45px 25px 0;
+  align-items: center;
+}
+
+.display-disposal .selected {
+  margin-right: 20px;
+}
+.display-disposal .count {
+  color: #ec9108;
+  margin-right: 5px;
+}
+
+/* BUTTON */
+.btn-disposal {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 10px 25px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-disposal:hover {
+  background-color: #fbae3a75;
+}
+
+.label-asset {
+  color: #9f9f9f;
+  font-size: 14px;
+}
+
+.card-asset-action {
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 25px 35px;
+}
+
+.card-comment {
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  position: relative;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px 17px;
+  display: inline-block;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  column-break-inside: avoid;
+  opacity: 1;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.card-comment .card-title {
+  border-bottom: 2px solid #e6e9ed;
+  padding: 1px 5px 6px;
+  margin-bottom: 10px;
+}
+.card-comment .card-body {
+  padding: 0 3px 6px;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 5px;
+}
+
+.card-footer {
+  border-top: 2px solid #e6e9ed;
+  padding: 20px 20px;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 25px;
+}
+
+.input-field-comment {
+  color: #a5a1a1;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  padding: 20px 80px 20px 20px;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.25);
+}
+
+.button-send {
+  position: absolute;
+  width: 80px;
+  height: 48px;
+  cursor: pointer;
+  border: none;
+  top: 25px;
+  background: #ffffff;
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 5px;
+  color: #1653a6;
+  font-size: 20px;
+}
+
+.text-center {
+  align-items: center;
+  text-align: center;
+}
+
+.container-chat {
+  max-height: 200px;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+/* .container-chat::-webkit-scrollbar {
+  display: none;
+} */
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.container-chat {
+  /* -ms-overflow-style: none; */
+  /* IE and Edge */
+  /* scrollbar-width: none; */
+  /* Firefox */
+}
+
+.container-chat::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.container-chat::-webkit-scrollbar-track {
+  box-shadow: inset rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.container-chat::-webkit-scrollbar-thumb {
+  background-color: rgb(134, 130, 130);
+  outline: none;
+}
+
+.body-chat {
+  position: relative;
+  height: 230px;
+}
+
+.talk-bubble {
+  margin: 40px;
+  position: relative;
+  border-radius: 5px;
+  width: 350px;
+  height: auto;
+  background-color: #2f81ed;
+  color: #f2f2f2;
+}
+
+.talk-bubble-right {
+  margin: 40px;
+  position: relative;
+  border-radius: 5px;
+  width: 350px;
+  height: auto;
+  background-color: #2f81ed3f;
+  color: #000;
+  left: 50%;
+  transform: translate(40%, 0%);
+}
+
+/* talk bubble contents */
+.talktext {
+  position: relative;
+  bottom: 10px;
+  padding: 1em;
+  text-align: left;
+  line-height: 1.5em;
+  word-wrap: break-word;
+}
+
+.talktext p {
+  /* remove webkit p margins */
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+}
+
+.talk-bubble .user-name,
+.talk-bubble-right .user-name {
+  position: relative;
+  bottom: 30px;
+  color: rgba(73, 73, 73, 0.76);
+}
+
+.talk-bubble .created,
+.talk-bubble-right .created {
+  position: absolute;
+  right: 5px;
+  font-size: 11px;
+  bottom: -30px;
+  color: rgba(0, 0, 0, 0.637);
+}
+
+.empty-chat {
+  height: 200px;
+  position: relative;
+  width: 100%;
+  display: grid;
+}
+
+.empty-chat .container {
+  margin: auto;
+}
+.empty-chat .icon-chat {
+  position: absolute;
+  font-size: 80px;
+  color: #a5a1a1;
+  left: 45%;
+  top: -50px;
+}
+
+.empty-chat p {
+  position: absolute;
+  font-size: 14px;
+  color: #a5a1a1;
+  left: 43%;
+  top: 30px;
+}
+
+.icon-attach {
+  color: #ec9108;
+  font-size: 25px;
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(60%, -45%);
+  cursor: pointer;
+}
+
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .card-asset {
+    height: 42vh;
+    padding: 5px 35px;
+  }
+
+  .talk-bubble {
+    width: 200px;
+  }
+
+  .talk-bubble-right {
+    width: 200px;
+    left: 45%;
+    transform: translate(40%, 0%);
+  }
+}

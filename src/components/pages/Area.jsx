@@ -9,11 +9,17 @@ import {
   Backdrop,
   Fade,
   Modal,
+  Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
 import TableArea from "../table/TableArea";
+
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -69,6 +75,16 @@ const Area = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
   const [areaName, setAreaName] = useState("");
+  const [aliasName, setAliasName] = useState("");
+  const [toast, setToast] = useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const modalPop = () => {
     setModalOpen(true);
@@ -87,9 +103,11 @@ const Area = () => {
       }/api/v1/area`,
       {
         area_name: areaName,
+        alias_name: aliasName,
       }
     );
 
+    setToast(true);
     setModalOpen(false);
   };
 
@@ -114,11 +132,27 @@ const Area = () => {
                   }}
                 />
               </div>
+              <div className="col-12">
+                <label htmlFor="">Alias Name</label>
+                <input
+                  type="text"
+                  id="aliasName"
+                  value={aliasName}
+                  className="form-input"
+                  onChange={function (e) {
+                    setAliasName(e.target.value);
+                  }}
+                />
+              </div>
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -179,6 +213,16 @@ const Area = () => {
         }}>
         {bodyModal}
       </Modal>
+
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

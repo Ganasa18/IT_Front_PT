@@ -10,8 +10,8 @@ import {
 } from "@material-ui/core";
 import "../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
-import TableDepartement from "../table/TableDepartement";
-import StepperComponent from "../asset/departement/StepperComponent";
+import TableCategory from "../table/TableCategory";
+import StepperComponent from "../asset/category/StepperComponent";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -56,7 +56,6 @@ const useStyles = makeStyles((theme) => ({
     top: "30%",
     left: "50%",
     width: 850,
-
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
@@ -74,7 +73,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Departement = () => {
+const Category = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -104,7 +103,7 @@ const Departement = () => {
       <Grid container className={classes.headerMaster} spacing={3}>
         <Grid item xs={12} sm={12}>
           <Typography variant="h6" gutterBottom>
-            Master Departement
+            Master Category
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12}>
@@ -139,7 +138,7 @@ const Departement = () => {
 
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableDepartement />
+            <TableCategory />
           </div>
         </Grid>
       </Grid>
@@ -156,4 +155,4 @@ const Departement = () => {
   );
 };
 
-export default Departement;
+export default Category;

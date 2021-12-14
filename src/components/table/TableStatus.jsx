@@ -20,6 +20,7 @@ import {
   Fade,
   Modal,
   Backdrop,
+  Snackbar,
 } from "@material-ui/core";
 import "../../assets/master.css";
 
@@ -28,6 +29,11 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -112,33 +118,6 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-// function createData(name, color) {
-//   return { name, color };
-// }
-
-// const rows = [
-//   createData("Progress", "#000000"),
-//   createData("Open", "#ffffff"),
-// ].sort((a, b) => (a.color < b.color ? -1 : 1));
-
-// const rows = [
-//   // {
-//   //   id: "1",
-//   //   name: "Open",
-//   //   color: "#FFFFFF",
-//   // },
-//   // {
-//   //   id: "2",
-//   //   name: "Progress",
-//   //   color: "#000000",
-//   // },
-//   // {
-//   //   id: "3",
-//   //   name: "Waiting",
-//   //   color: "#CECECE",
-//   // },
-// ].sort((a, b) => (a.id > b.id ? -1 : 1));
-
 const useStyles2 = makeStyles((theme) => ({
   table: {
     marginTop: "20px",
@@ -193,6 +172,7 @@ const TableStatus = (props) => {
   const colorHex = React.useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [statusId, setStatusId] = useState("");
+  const [toast, setToast] = useState(false);
 
   // useEffect(
   //   function () {
@@ -215,6 +195,14 @@ const TableStatus = (props) => {
       getStatusList();
     }, 3000);
   }, [dataColor]);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const getStatusList = async () => {
     await axios
@@ -243,6 +231,7 @@ const TableStatus = (props) => {
         color_status: thiscolor,
       }
     );
+    setToast(true);
     setStatusName("");
     setThisColor("");
     setEditModal(false);
@@ -331,8 +320,12 @@ const TableStatus = (props) => {
             </div>
             <br />
             <div className="footer-modal">
-              <button onClick={modalClose}>Close</button>
-              <button type="submit">Submit</button>
+              <button className="btn-cancel" onClick={modalClose}>
+                Cancel
+              </button>
+              <button className="btn-submit" type="submit">
+                Submit
+              </button>
             </div>
           </form>
         </div>
@@ -427,6 +420,15 @@ const TableStatus = (props) => {
         }}>
         {bodyModal}
       </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };

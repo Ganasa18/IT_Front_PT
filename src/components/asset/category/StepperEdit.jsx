@@ -61,18 +61,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function getSteps() {
-  return ["Departement", "Sub Departement"];
+  return ["Category", "Sub Category"];
 }
 
 const StepperEdit = (props) => {
-  const { dataDepartement } = props;
+  const { dataCategory } = props;
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
-  const [area, setArea] = useState([]);
-  const [departementEdit] = useState(dataDepartement);
-  const [subDepartementEdit, setSubDepartementEdit] = useState(null);
+  const [categoryEdit] = useState(dataCategory);
+  const [subCategoryEdit, setSubCategoryEdit] = useState(null);
   const [toast, setToast] = useState(false);
+
+  useEffect(() => {
+    getSubCategoryList();
+  }, []);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -84,19 +87,17 @@ const StepperEdit = (props) => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      const departementId = document.getElementById("departementId");
-      const departement = document.getElementById("departementName");
-      const area = document.getElementById("areaSelect");
+      const categoryId = document.getElementById("categoryId");
+      const category = document.getElementById("categoryName");
 
-      if (departement.value !== "") {
+      if (category.value !== "") {
         await axios
           .patch(
             `${pathEndPoint[0].url}${
               pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-            }/api/v1/departement/${departementId.value}`,
+            }/api/v1/category/${categoryId.value}`,
             {
-              departement_name: departement.value,
-              id_area: parseInt(area.value),
+              category_name: category.value,
             }
           )
           .then((response) => {
@@ -112,10 +113,9 @@ const StepperEdit = (props) => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
 
     if (activeStep === 1) {
-      var departementId = document.getElementById("departementId");
+      const categoryId = document.getElementById("categoryId");
       var selectId = document.querySelectorAll(".editfieldbox");
       var addField = document.querySelectorAll("input.addfield");
-
       var arr = [...selectId];
       var arr2 = [...addField];
 
@@ -123,11 +123,11 @@ const StepperEdit = (props) => {
         axios.post(
           `${pathEndPoint[0].url}${
             pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-          }/api/v1/subdepartement/`,
+          }/api/v1/subcategory/`,
           {
             id: parseInt(element.children[0].value),
-            subdepartement_name: element.children[1].value,
-            id_departement: parseInt(departementId.value),
+            subcategory_name: element.children[1].value,
+            id_category: parseInt(categoryId.value),
           }
         );
       });
@@ -137,10 +137,10 @@ const StepperEdit = (props) => {
           axios.post(
             `${pathEndPoint[0].url}${
               pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-            }/api/v1/subdepartement/`,
+            }/api/v1/subcategory/`,
             {
-              subdepartement_name: element.value,
-              id_departement: parseInt(departementId.value),
+              subcategory_name: element.value,
+              id_category: parseInt(categoryId.value),
             }
           );
         });
@@ -156,39 +156,25 @@ const StepperEdit = (props) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  useEffect(() => {
-    getAreaList();
-    getSubDepartementList();
-  }, []);
-
-  const getAreaList = async () => {
+  const getSubCategoryList = async () => {
     await axios
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
+        }/api/v1/subcategory`
       )
       .then((response) => {
-        setArea(response.data.data.areas);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+        const subdata = response.data.data.subcategory;
 
-  const getSubDepartementList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/subdepartement/${departementEdit.id}`
-      )
-      .then((response) => {
-        setSubDepartementEdit(response.data.data.subdepartement);
+        const obj = subdata.filter(
+          (item) => item.id_category === categoryEdit.id
+        );
+
+        setSubCategoryEdit(obj);
       })
       .catch((error) => {
         console.log(error);
-        setSubDepartementEdit([]);
+        setSubCategoryEdit([]);
       });
   };
 
@@ -218,12 +204,7 @@ const StepperEdit = (props) => {
           ) : (
             <div>
               <Typography className={classes.instructions}>
-                {getStepContent(
-                  activeStep,
-                  area,
-                  departementEdit,
-                  subDepartementEdit
-                )}
+                {getStepContent(activeStep, categoryEdit, subCategoryEdit)}
               </Typography>
               <div style={{ marginTop: "60px" }}>
                 {activeStep === 0 ? null : (
@@ -286,13 +267,13 @@ function createInput() {
   count++;
 }
 
-const deleteSubDepart = async (row) => {
+const deleteSubCategory = async (row) => {
   if (window.confirm("Delete the item?")) {
     await axios
       .delete(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/subdepartement/${row}`
+        }/api/v1/subcategory/${row}`
       )
       .then((response) => {
         alert(response.data.status);
@@ -307,7 +288,7 @@ const deleteSubDepart = async (row) => {
   }
 };
 
-function getStepContent(stepIndex, area, departementEdit, subDepartementEdit) {
+function getStepContent(stepIndex, categoryEdit, subCategoryEdit) {
   switch (stepIndex) {
     case 0:
       return (
@@ -319,31 +300,18 @@ function getStepContent(stepIndex, area, departementEdit, subDepartementEdit) {
                 <div className="col-6">
                   <input
                     type="hidden"
-                    id="departementId"
-                    value={departementEdit.id}
+                    id="categoryId"
+                    value={categoryEdit.id}
                   />
                   <input
-                    defaultValue={departementEdit.departement_name}
+                    defaultValue={categoryEdit.category_name}
                     type="text"
-                    id="departementName"
+                    id="categoryName"
                     className="form-input-pop"
-                    placeholder="Departement Name"
+                    placeholder="Category Name"
                   />
                 </div>
-                <div className="col-6">
-                  <select name="" id="areaSelect" className="form-input-select">
-                    {area.map((row) => (
-                      <option
-                        key={row.id}
-                        value={row.id}
-                        selected={`${
-                          departementEdit.id_area === row.id ? "selected" : ""
-                        }`}>
-                        {row.area_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <div className="col-6"></div>
               </div>
             </div>
           </div>
@@ -362,30 +330,25 @@ function getStepContent(stepIndex, area, departementEdit, subDepartementEdit) {
               </div>
               <input
                 type="hidden"
-                id="departementId"
-                defaultValue={departementEdit.id}
+                id="categoryId"
+                defaultValue={categoryEdit.id}
                 className="hiddenSubs"
               />
-
               <ul id="fields" className="ul-list">
-                {subDepartementEdit.length > 0 ? (
-                  subDepartementEdit.map((subs, index) => (
+                {subCategoryEdit.length > 0 ? (
+                  subCategoryEdit.map((subs, index) => (
                     <li className="box editfieldbox">
-                      <input
-                        type="hidden"
-                        value={subs.id}
-                        id="idSubDepartement"
-                      />
+                      <input type="hidden" value={subs.id} id="idSubCategory" />
                       <input
                         id={`editfield${count + index}`}
                         name={`editfield${count + index}`}
                         type="text"
                         className="input-field-pop-add"
-                        defaultValue={subs.subdepartement_name}
+                        defaultValue={subs.subcategory_name}
                       />
                       <button
                         class="remove input-group-button"
-                        onClick={(e) => deleteSubDepart(subs.id)}>
+                        onClick={(e) => deleteSubCategory(subs.id)}>
                         X
                       </button>
                     </li>

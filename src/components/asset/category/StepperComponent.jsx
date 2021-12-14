@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-import { pathEndPoint } from "../../assets/menu";
+import { pathEndPoint } from "../../../assets/menu";
 
-import "../../assets/master.css";
+import "../../../assets/master.css";
 import {
   makeStyles,
   Stepper,
@@ -11,8 +11,14 @@ import {
   Button,
   Typography,
   Divider,
+  Snackbar,
 } from "@material-ui/core";
 import axios from "axios";
+
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,6 +26,12 @@ const useStyles = makeStyles((theme) => ({
   },
   backButton: {
     marginRight: theme.spacing(1),
+    textTransform: "capitalize",
+    position: "absolute",
+    width: "130px",
+    height: "40px",
+    right: "0%",
+    transform: "translate(-185%, 50%)",
   },
   instructions: {
     marginTop: theme.spacing(1),
@@ -33,51 +45,46 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
     width: "25ch",
   },
+  btnNext: {
+    textTransform: "capitalize",
+    position: "relative",
+    width: "130px",
+    height: "40px",
+    left: "0",
+    transform: "translate(475%, 50%)",
+  },
+
+  iconContainer: {
+    transform: "scale(1.6)",
+  },
 }));
 
 function getSteps() {
-  return ["Departement", "Sub Departement"];
+  return ["Category", "Sub Category"];
 }
 
 const StepperComponent = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
-  const [area, setArea] = useState([]);
-  const [lastDepartementId, setLastDepartementId] = useState(null);
+  const [toast, setToast] = useState(false);
 
-  React.useEffect(() => {
-    getAreaList();
+  const [lastCategoryId, setLastCategoryId] = useState(null);
+
+  useEffect(() => {
     getLatestId();
-    // setTimeout(() => {
-    //   getLatestId();
-    // }, 3000);
   }, []);
-
-  const getAreaList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
-      )
-      .then((response) => {
-        setArea(response.data.data.areas);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
 
   const getLatestId = async () => {
     await axios
       .get(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement/latestId`
+        }/api/v1/category`
       )
       .then((response) => {
-        setLastDepartementId(response.data.data.departement.id);
+        const dataCategory = response.data.data.category;
+        setLastCategoryId(dataCategory.shift().id);
       })
       .catch((err) => {
         console.error(err);
@@ -86,18 +93,16 @@ const StepperComponent = () => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      const departement = document.getElementById("departementName");
-      const area = document.getElementById("areaSelect");
-      console.log(departement.value);
-      if (departement.value !== "") {
+      const category = document.getElementById("categoryName");
+
+      if (category.value !== "") {
         await axios
           .post(
             `${pathEndPoint[0].url}${
               pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-            }/api/v1/departement`,
+            }/api/v1/category`,
             {
-              departement_name: departement.value,
-              id_area: parseInt(area.value),
+              category_name: category.value,
             }
           )
           .then((response) => {
@@ -113,32 +118,38 @@ const StepperComponent = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
 
     if (activeStep === 1) {
-      alert("success");
-      var departementId = document.getElementById("departementId");
+      var categoryId = document.getElementById("categoryId");
       var lis = document.getElementById("fields").getElementsByTagName("li");
-      //   console.log(lis[1].children[0].value);
 
       var arr = [...lis];
       arr.forEach((element) => {
-        // console.log(element.children[0].value);
-        // console.log(departementId.value);
         axios.post(
           `${pathEndPoint[0].url}${
             pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-          }/api/v1/subdepartement/`,
+          }/api/v1/subcategory/`,
           {
-            subdepartement_name: element.children[0].value,
-            id_departement: parseInt(departementId.value),
+            subcategory_name: element.children[0].value,
+            id_category: parseInt(categoryId.value),
           }
         );
       });
-
-      window.location.reload();
+      setToast(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
   };
 
   return (
@@ -150,6 +161,7 @@ const StepperComponent = () => {
               <StepLabel
                 classes={{
                   label: classes.step_label_root,
+                  iconContainer: classes.iconContainer,
                 }}>
                 {label}
               </StepLabel>
@@ -167,19 +179,34 @@ const StepperComponent = () => {
           ) : (
             <div>
               <Typography className={classes.instructions}>
-                {getStepContent(activeStep, area, lastDepartementId)}
+                {getStepContent(activeStep, lastCategoryId)}
               </Typography>
               <div style={{ marginTop: "60px" }}>
-                <Button
+                {activeStep === 0 ? null : (
+                  <Button
+                    disabled={activeStep === 0}
+                    onClick={handleBack}
+                    className={classes.backButton}
+                    variant="outlined"
+                    color="primary">
+                    Back
+                  </Button>
+                )}
+
+                {/* <Button
                   disabled={activeStep === 0}
                   onClick={handleBack}
-                  className={classes.backButton}>
+                  className={classes.backButton}
+                  variant="outlined"
+                  color="primary">
                   Back
-                </Button>
+                </Button> */}
+
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleNext}>
+                  onClick={handleNext}
+                  className={classes.btnNext}>
                   {activeStep === steps.length - 1 ? "Finish" : "Next"}
                 </Button>
               </div>
@@ -187,6 +214,16 @@ const StepperComponent = () => {
           )}
         </div>
       </div>
+
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };
@@ -215,7 +252,7 @@ function createInput() {
   count++;
 }
 
-function getStepContent(stepIndex, area, lastDepartementId) {
+function getStepContent(stepIndex, lastCategoryId) {
   switch (stepIndex) {
     case 0:
       return (
@@ -227,20 +264,12 @@ function getStepContent(stepIndex, area, lastDepartementId) {
                 <div className="col-6">
                   <input
                     type="text"
-                    id="departementName"
+                    id="categoryName"
                     className="form-input-pop"
-                    placeholder="Departement Name"
+                    placeholder="Category Name"
                   />
                 </div>
-                <div className="col-6">
-                  <select  id="areaSelect" className="form-input-select">
-                    {area.map((row) => (
-                      <option key={row.id} value={row.id}>
-                        {row.area_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <div className="col-6"></div>
               </div>
             </div>
           </div>
@@ -252,11 +281,12 @@ function getStepContent(stepIndex, area, lastDepartementId) {
           <div className="row">
             <div className="col-12">
               <Divider />
-              <input
-                type="hidden"
-                id="departementId"
-                value={lastDepartementId + 1}
-              />
+              <div className="row">
+                <button className="input-create-element" onClick={createInput}>
+                  Add Field
+                </button>
+              </div>
+              <input type="hidden" id="categoryId" value={lastCategoryId + 1} />
 
               <ul id="fields" className="ul-list">
                 <li className="box">
@@ -268,19 +298,7 @@ function getStepContent(stepIndex, area, lastDepartementId) {
                   />
                 </li>
               </ul>
-
-              {/* <div className="input-group box">
-                <input type="text" className="input-field-pop " />
-                <button type="button" class="input-group-button">
-                  Add
-                </button>
-              </div> */}
             </div>
-          </div>
-          <div className="row">
-            <button className="input-create-element" onClick={createInput}>
-              Add Field
-            </button>
           </div>
         </>
       );
