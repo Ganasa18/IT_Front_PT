@@ -273,7 +273,11 @@ const ActionTicketTable = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link to="/ticket-admin/action-request/detail/information">
+                      <Link
+                        onClick={() =>
+                          localStorage.setItem("req_no", row.request_no)
+                        }
+                        to="/ticket-admin/action-request/detail/information">
                         {row.request_no}
                       </Link>
                     </TableCell>

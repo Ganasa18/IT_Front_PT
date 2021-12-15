@@ -996,3 +996,26 @@ input[type="radio"] {
   bottom: 4px;
   position: absolute;
 }
+
+.navigation-tabs {
+  width: 80px;
+  height: 24px;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 10px 4px;
+  background: #ffffff;
+  color: #1653a6;
+  position: relative;
+  top: 15px;
+}
+
+.navigation-tabs:hover {
+  background: #1653a699;
+  color: #ffffff;
+}
+
+.navigation-tabs.selected {
+  background: #1653a6;
+  color: #ffffff;
+}

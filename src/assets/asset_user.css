@@ -332,4 +332,8 @@
     left: 45%;
     transform: translate(40%, 0%);
   }
+
+  .icon-attach {
+    left: 72%;
+  }
 }

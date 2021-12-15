@@ -43,6 +43,7 @@ const links = [
 
 const ActionReqTicketDetail = () => {
   const classes = useStyles();
+  const req_no = localStorage.getItem("req_no");
 
   switch (window.location.pathname) {
     case "/ticket-admin/action-request/detail/information":
@@ -54,10 +55,15 @@ const ActionReqTicketDetail = () => {
             separator={<NavigateNextIcon fontSize="small" />}
             aria-label="breadcrumb">
             <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">412312312</Typography>
+            <Typography color="textPrimary">{req_no}</Typography>
           </Breadcrumbs>
           {links.map(({ url, text }) => (
-            <NavLink to={url}>{text}</NavLink>
+            <NavLink
+              to={url}
+              className={"navigation-tabs"}
+              activeClassName="selected">
+              {text}
+            </NavLink>
           ))}
 
           <Grid container spacing={3}>
@@ -138,10 +144,15 @@ const ActionReqTicketDetail = () => {
             separator={<NavigateNextIcon fontSize="small" />}
             aria-label="breadcrumb">
             <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">412312312</Typography>
+            <Typography color="textPrimary">{req_no}</Typography>
           </Breadcrumbs>
           {links.map(({ url, text }) => (
-            <NavLink to={url}>{text}</NavLink>
+            <NavLink
+              to={url}
+              className={"navigation-tabs"}
+              activeClassName="selected">
+              {text}
+            </NavLink>
           ))}
 
           <Grid container spacing={3}>
@@ -222,10 +233,15 @@ const ActionReqTicketDetail = () => {
             separator={<NavigateNextIcon fontSize="small" />}
             aria-label="breadcrumb">
             <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">412312312</Typography>
+            <Typography color="textPrimary">{req_no}</Typography>
           </Breadcrumbs>
           {links.map(({ url, text }) => (
-            <NavLink to={url}>{text}</NavLink>
+            <NavLink
+              to={url}
+              className={"navigation-tabs"}
+              activeClassName="selected">
+              {text}
+            </NavLink>
           ))}
 
           <Grid container spacing={3}>
