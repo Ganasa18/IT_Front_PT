@@ -7,6 +7,64 @@
   padding: 5px 35px;
 }
 
+.flex-card {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-approve {
+  display: flex;
+  position: relative;
+}
+
+.button-approve .approve-btn {
+  color: #219653;
+  width: 110px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #219653;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  right: 40%;
+}
+
+.button-approve .approve-btn:hover {
+  background-color: #2196534b;
+}
+
+.button-approve .deny-btn {
+  color: #eb5757;
+  width: 110px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #eb5757;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  right: 25%;
+}
+
+.button-approve .deny-btn:hover {
+  background-color: #eb57574b;
+}
+
 .display-disposal {
   display: flex;
   justify-content: flex-end;

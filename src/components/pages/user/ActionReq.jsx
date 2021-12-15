@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { pathEndPoint } from "../../../assets/menu";
 
 import {
   makeStyles,
@@ -57,7 +56,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     position: "fixed",
     transform: "translate(-50%,-50%)",
-    top: "38%",
+    top: "50%",
     left: "50%",
     width: 950,
     display: "block",

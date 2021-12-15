@@ -13,6 +13,10 @@ import Profile from "../pages/Profile";
 import ActionReq from "../pages/user/ActionReq";
 import ActionReqDetail from "../pages/user/ActionReqDetail";
 import Troubleshoot from "../pages/Troubleshoot";
+import ActionApproved from "../pages/lead/ActionApproved";
+import ActionApproveDetail from "../pages/lead/ActionApproveDetail";
+import ActionTicket from "../pages/ticket/ActionTicket";
+import ActionReqTicketDetail from "../pages/ticket/ActionReqTicketDetail";
 
 // import Cookies from "universal-cookie";
 
@@ -58,6 +62,27 @@ const Routes = () => {
       <Route
         path="/action-request/detail"
         component={(props) => <ActionReqDetail {...props} />}
+      />
+
+      <Route
+        exact
+        path="/approval/action-request"
+        component={(props) => <ActionApproved {...props} />}
+      />
+      <Route
+        path="/approval/action-request/detail"
+        component={(props) => <ActionApproveDetail {...props} />}
+      />
+
+      <Route
+        exact
+        path="/ticket-admin/action-request"
+        component={(props) => <ActionTicket {...props} />}
+      />
+
+      <Route
+        path="/ticket-admin/action-request/detail"
+        component={(props) => <ActionReqTicketDetail {...props} />}
       />
     </Switch>
   );

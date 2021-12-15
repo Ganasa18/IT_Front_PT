@@ -953,3 +953,46 @@ input[type="radio"] {
 .filter-btn:hover {
   background-color: #ec91084b;
 }
+
+.btn-response {
+  margin: 0 5px 0 5px;
+  color: #21968f;
+  padding: 15px 50px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: transparent;
+  color: #fff;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-response.disabled {
+  cursor: not-allowed;
+}
+
+.btn-response:hover {
+  background-color: #21968f2f;
+}
+
+.btn-response .icon-btn {
+  color: #21968f;
+  left: 8px;
+  bottom: 8px;
+  position: absolute;
+  font-size: 15px;
+}
+
+.btn-response .name-btn {
+  color: #21968f;
+  right: 8px;
+  bottom: 4px;
+  position: absolute;
+}

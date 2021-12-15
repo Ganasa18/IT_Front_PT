@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { Panel as ColorPickerPanel } from "rc-color-picker";
-import { pathEndPoint } from "../../assets/menu";
-import Loading from "../asset/Loading";
+import { pathEndPoint } from "../../../assets/menu";
+import Loading from "../../asset/Loading";
+import { Link } from "react-router-dom";
+
 import {
   useTheme,
   makeStyles,
@@ -22,18 +23,14 @@ import {
   Backdrop,
   Snackbar,
 } from "@material-ui/core";
-import "../../assets/master.css";
+import "../../../assets/master.css";
+import "../../asset/chips.css";
 
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-
-import MuiAlert from "@material-ui/lab/Alert";
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -160,49 +157,46 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableStatus = (props) => {
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const TableRequestApproved = () => {
+  const dataActReq = [
+    {
+      id: "1",
+      request_no: "123412344",
+      asset_no: "MKDACH011",
+      asset_name: "Accurate",
+      created: "02 Oct 2021",
+      description: "Meminta akses untuk accurate",
+      status: 10,
+    },
+    {
+      id: "2",
+      request_no: "12341234",
+      asset_no: "MKDPCH001",
+      asset_name: "PC lalala",
+      created: "02 Oct 2021",
+      description: "Pada saat nayalin laptop layar biru",
+      status: 10,
+    },
+  ];
+
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [dataColor, setDataColor] = useState([]);
-  const [thiscolor, setThisColor] = useState("");
-  const [statusName, setStatusName] = useState("");
-  const [color, setColor] = useState(false);
-  const colorHex = React.useRef(null);
+  const [dataArea, setDataArea] = useState([]);
+  const [dataStatus, setDataStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [statusId, setStatusId] = useState("");
+  const [areaId, setAreaId] = useState("");
+  const [areaName, setAreaName] = useState("");
+  const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
-
-  // useEffect(
-  //   function () {
-  //     setDataColor(newData.sort((a, b) => (a.id > b.id ? -1 : 1)));
-  //   },
-  //   [newData]
-  // );
-
-  // React.useEffect(function () {
-  //   async function getData() {
-  //     const request = await fetch("http://localhost:5000/api/v1/status");
-  //     const response = await request.json();
-  //     setDataColor(response.data.statuss);
-  //   }
-  //   getData();
-  // }, []);
-
   useEffect(() => {
-    setTimeout(() => {
-      getStatusList();
-    }, 3000);
-  }, [dataColor]);
-
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToast(false);
-  };
+    getStatusList();
+  }, []);
 
   const getStatusList = async () => {
     await axios
@@ -212,7 +206,23 @@ const TableStatus = (props) => {
         }/api/v1/status`
       )
       .then((response) => {
-        setDataColor(response.data.data.statuss);
+        let newStatus = response.data.data.statuss;
+        const arr_request = [...dataActReq];
+        const arr_status = [...newStatus];
+
+        var statusmap = {};
+
+        arr_status.forEach(function (status_id) {
+          statusmap[status_id.id] = status_id;
+        });
+
+        arr_request.forEach(function (request_id) {
+          request_id.status_id = statusmap[request_id.status];
+        });
+
+        let JoinStatus = arr_request;
+        setDataArea(JoinStatus);
+        console.log(JoinStatus);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -220,26 +230,8 @@ const TableStatus = (props) => {
       });
   };
 
-  const updateStatus = async (e) => {
-    e.preventDefault();
-    await axios.patch(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/status/${statusId}`,
-      {
-        status_name: statusName,
-        color_status: thiscolor,
-      }
-    );
-    setToast(true);
-    setStatusName("");
-    setThisColor("");
-    setEditModal(false);
-    setColor(false);
-  };
-
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataColor.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -250,92 +242,6 @@ const TableStatus = (props) => {
     setPage(0);
   };
 
-  function handleEdit(row) {
-    setEditModal(true);
-    setStatusId(row.id);
-    setStatusName(row.status_name);
-    setThisColor(row.color_status);
-  }
-
-  const modalClose = () => {
-    setEditModal(false);
-  };
-
-  const changeHandler = (colors) => {
-    setThisColor(colors.color);
-    colorHex.current.value = thiscolor;
-  };
-
-  function handlePick() {
-    setColor((prevSelected) => !prevSelected);
-  }
-
-  const setColorType = (event) => {
-    const colorType = event.target.value;
-    setThisColor(colorType);
-  };
-
-  const bodyModal = (
-    <>
-      <Fade in={editModal}>
-        <div className={classes.paper}>
-          <form onSubmit={updateStatus}>
-            <div className="row">
-              <div className="col-12">
-                <h3>Title Header</h3>
-              </div>
-              <div className="col-12">
-                <label htmlFor="">Status Name</label>
-                <input
-                  type="text"
-                  id="statusName"
-                  className="form-input"
-                  defaultValue={statusName}
-                  onChange={function (e) {
-                    setStatusName(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="col-1">
-                <ColorPickerPanel
-                  color={thiscolor}
-                  className={`color-pick ${color ? "active" : ""}`}
-                  enableAlpha={true}
-                  onChange={changeHandler}
-                  mode="RGB"
-                />
-                <button
-                  type="button"
-                  className="button-color"
-                  style={{ background: thiscolor }}
-                  onClick={handlePick}></button>
-              </div>
-              <div className="col-1"></div>
-              <div className="col-6">
-                <input
-                  type="text"
-                  className="form-input"
-                  ref={colorHex}
-                  value={thiscolor}
-                  onChange={setColorType}
-                />
-              </div>
-            </div>
-            <br />
-            <div className="footer-modal">
-              <button className="btn-cancel" onClick={modalClose}>
-                Cancel
-              </button>
-              <button className="btn-submit" type="submit">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </Fade>
-    </>
-  );
-
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -343,9 +249,11 @@ const TableStatus = (props) => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Status Name</StyledTableCell>
-                <StyledTableCell align="left">Color Name</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                <StyledTableCell>Request No</StyledTableCell>
+                <StyledTableCell>Asset No</StyledTableCell>
+                <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>Date Created</StyledTableCell>
+                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -354,34 +262,37 @@ const TableStatus = (props) => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataColor.slice(
+                  ? dataArea.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataColor
-                ).map((row, index) => (
+                  : dataArea
+                ).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.status_name}
+                    <TableCell component="th" scope="row">
+                      <Link to="/approval/action-request/detail">
+                        {row.request_no}
+                      </Link>
                     </TableCell>
-                    <TableCell style={{ width: 160 }} align="left">
+                    <TableCell component="th" scope="row">
+                      {row.asset_no}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.asset_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.created}
+                    </TableCell>
+
+                    <TableCell component="th" scope="row" align="center">
                       <span
-                        className={"color-name"}
-                        style={{ background: row.color_status }}></span>
-                      {row.color_status}
-                    </TableCell>
-                    <TableCell style={{ width: 100 }} align="center">
-                      <button
-                        className="btn-edit"
-                        onClick={(e) => handleEdit(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ci:edit"></span>
-                        <span className="name-btn">Edit</span>
-                      </button>
+                        class="chip"
+                        style={{
+                          background: `${row.status_id.color_status}4C`,
+                          color: `${row.status_id.color_status}FF`,
+                        }}>
+                        {capitalizeFirstLetter(row.status_id.status_name)}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -398,7 +309,7 @@ const TableStatus = (props) => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataColor.length}
+                  count={dataArea.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -414,26 +325,8 @@ const TableStatus = (props) => {
           </Table>
         </Paper>
       </TableContainer>
-      <Modal
-        open={editModal}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}>
-        {bodyModal}
-      </Modal>
-      <Snackbar
-        autoHideDuration={5000}
-        open={toast}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleClose} severity="success">
-          submit successful
-        </Alert>
-      </Snackbar>
     </>
   );
 };
 
-export default TableStatus;
+export default TableRequestApproved;

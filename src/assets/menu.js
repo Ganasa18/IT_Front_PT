@@ -9,31 +9,24 @@ export const menuData = [
   {
     id: 2,
     name: "Ticket Management",
-    icon: "carbon:inventory-management",
-    exact: true,
-    to: `/ticket`,
-  },
-  {
-    id: 3,
-    name: "Ticket Administration",
     icon: "carbon:gui-management",
     exact: true,
     // to: `/ticket-admin`,
     subMenus: [
       {
-        name: "Action Req Category",
-        to: "/ticket-admin/action-req-category",
+        name: "Action Req Status",
+        to: "/ticket-admin/action-request",
         icon: "carbon:license-maintenance-draft",
       },
       {
-        name: "Action Req SubCategory",
-        to: "/ticket-admin/action-req-subcategory",
+        name: "Facility & Access Status",
+        to: "/ticket-admin/facility-request",
         icon: "vaadin:file-tree-sub",
       },
     ],
   },
   {
-    id: 4,
+    id: 3,
     name: "Master",
     icon: "ant-design:folder-open-filled",
     exact: true,
@@ -97,17 +90,28 @@ export const menuDataUser2 = [
   },
   {
     id: 2,
-    name: "Ticket Management",
+    name: "Action Request",
     icon: "carbon:inventory-management",
     exact: true,
-    to: `/ticket`,
+    to: `/action-request`,
   },
   {
     id: 3,
-    name: "Ticket Management2",
-    icon: "carbon:inventory-management",
+    name: "Ticket Approval",
+    icon: "bi:ticket-detailed",
     exact: true,
-    to: `/ticket2`,
+    subMenus: [
+      {
+        name: "Action Req Approval",
+        to: "/approval/action-request",
+        icon: "fluent:ticket-diagonal-16-filled",
+      },
+      {
+        name: "Facility & Access Approval",
+        to: "/approval/facility-request",
+        icon: "fluent:ticket-diagonal-16-filled",
+      },
+    ],
   },
 ];
 
