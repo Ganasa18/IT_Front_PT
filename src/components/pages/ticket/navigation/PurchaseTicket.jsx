@@ -25,7 +25,7 @@ const PurchaseTicket = () => {
     <>
       <Grid item xs={12} className={classes.cardPadding}>
         <div className="card-asset-action">
-          <h3>Purhcase Information</h3>
+          <h3>Purchase Information</h3>
           <div className="row">
             <div className="col-3">
               <p className="label-asset">PR No</p>
