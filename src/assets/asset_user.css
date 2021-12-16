@@ -124,7 +124,6 @@
   position: relative;
   background: rgb(255 255 255);
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  width: 100%;
   margin-bottom: 10px;
   padding: 10px 17px;
   display: inline-block;
@@ -315,6 +314,36 @@
   left: 75%;
   transform: translate(60%, -45%);
   cursor: pointer;
+}
+
+/* Status Field */
+.card-status {
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  position: relative;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin-bottom: 10px;
+  padding: 10px 17px;
+  display: inline-block;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  column-break-inside: avoid;
+  opacity: 1;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.card-status-item {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-column-gap: 5px;
+  grid-row-gap: 20px;
 }
 
 @media only screen and (min-width: 1366px) and (max-width: 1366px) {

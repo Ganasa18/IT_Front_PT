@@ -224,7 +224,6 @@ const ActionTicketTable = () => {
 
         let JoinStatus = arr_request;
         setDataArea(JoinStatus);
-        console.log(JoinStatus);
         setIsLoading(false);
       })
       .catch((error) => {

@@ -33,21 +33,14 @@ export const menuData = [
     // to: `/master`,
     subMenus: [
       {
-        name: "Status",
-        to: "/master/status",
-        icon: "carbon:status-acknowledge",
-      },
-      { name: "Role", to: "/master/role", icon: "ci:user-check" },
-      {
-        name: "Departement",
-        to: "/master/departement",
-        icon: "bx:bx-building-house",
-      },
-      { name: "Area", to: "/master/area", icon: "fluent:status-16-filled" },
-      {
         name: "Category",
         to: "/master/category",
         icon: "dashicons:category",
+      },
+      {
+        name: "Status",
+        to: "/master/status",
+        icon: "carbon:status-acknowledge",
       },
       {
         name: "Troubleshoot",
@@ -59,6 +52,13 @@ export const menuData = [
         to: "/master/user",
         icon: "ant-design:user-add-outlined",
       },
+      {
+        name: "Departement",
+        to: "/master/departement",
+        icon: "bx:bx-building-house",
+      },
+      { name: "Area", to: "/master/area", icon: "fluent:status-16-filled" },
+      { name: "Role", to: "/master/role", icon: "ci:user-check" },
     ],
   },
 ];

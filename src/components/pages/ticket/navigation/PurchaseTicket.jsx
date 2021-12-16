@@ -28,20 +28,17 @@ const PurchaseTicket = () => {
           <h3>Purhcase Information</h3>
           <div className="row">
             <div className="col-3">
-              <p className="label-asset">Request Number</p>
+              <p className="label-asset">PR No</p>
               <p>412312312</p>
             </div>
             <div className="col-3">
-              <p className="label-asset">Asset Number</p>
-              <p>MKDLTHO01</p>
+              <p className="label-asset">Po No</p>
+              <p> - </p>
             </div>
+
             <div className="col-3">
-              <p className="label-asset">Asset Name</p>
-              <p>Laptop hp 123</p>
-            </div>
-            <div className="col-3">
-              <p className="label-asset text-center">Status</p>
-              <p className="text-center">
+              <p className="label-asset">Status</p>
+              <p className="">
                 <span
                   class="chip-action"
                   style={{
@@ -56,15 +53,16 @@ const PurchaseTicket = () => {
           <br />
           <div className="row">
             <div className="col-3">
-              <p className="label-asset">Description Of Problem</p>
-              <p>
-                Pada saat nyalain laptop, layar warna biru, ditunggu 5 menit
-                layar langsung mati
-              </p>
+              <p className="label-asset">PR Date</p>
+              <p>10 Dec 2021</p>
             </div>
             <div className="col-3">
-              <p className="label-asset">Date</p>
-              <p>10 Dec 2021</p>
+              <p className="label-asset">PO Date</p>
+              <p> - </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">Request No</p>
+              <p>43253422</p>
             </div>
             <div className="col-3"></div>
           </div>

@@ -1,14 +1,6 @@
 import React from "react";
 
-import {
-  makeStyles,
-  Grid,
-  Breadcrumbs,
-  Typography,
-  Divider,
-} from "@material-ui/core";
-
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
+import { makeStyles, Grid, Divider } from "@material-ui/core";
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
@@ -16,6 +8,9 @@ import { NavLink } from "react-router-dom";
 import InformationTicket from "./navigation/InformationTicket";
 import InventoryTicket from "./navigation/InventoryTicket";
 import PurchaseTicket from "./navigation/PurchaseTicket";
+import BreadcrumbComponent from "../../asset/BreadcrumbComponent";
+import ChatComponent from "../../asset/ChatComponent";
+import StatusButton from "../../asset/StatusButton";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -51,14 +46,19 @@ const ActionReqTicketDetail = () => {
         <>
           <div className={classes.toolbar} />
           <br />
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize="small" />}
-            aria-label="breadcrumb">
-            <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">{req_no}</Typography>
-          </Breadcrumbs>
-          {links.map(({ url, text }) => (
+
+          <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/ticket-admin/action-request/`;
+            }}
+            textSpan={"Action Request"}
+            typographyText={req_no}
+          />
+
+          {links.map(({ url, text, index }) => (
             <NavLink
+              key={index}
               to={url}
               className={"navigation-tabs"}
               activeClassName="selected">
@@ -70,66 +70,33 @@ const ActionReqTicketDetail = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <InformationTicket />
             </Grid>
-
-            <Grid item xs={4}></Grid>
-            <Grid item xs={8}>
-              <div className="card-comment">
-                <div className="card-title">
-                  <h2>Comment</h2>
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                <div className="card-status-item">
+                  <StatusButton
+                    status={"Open"}
+                    nameBtn={"Open"}
+                    colorName={"#219653"}
+                    backgroundColor={"#219653"}
+                  />
+                  <StatusButton
+                    nameBtn={"On Progress"}
+                    colorName={"#EC9108"}
+                    backgroundColor={"#EC9108"}
+                  />
+                  <StatusButton
+                    nameBtn={"Demage"}
+                    colorName={"#EB5757"}
+                    backgroundColor={"#EB5757"}
+                  />
                 </div>
-                <div className="card-body">
-                  <div className="container-chat">
-                    {/* <div className="body-chat" id="style-2">
-                  <div className="talk-bubble">
-                    <span className="user-name">Username</span>
-                    <div class="talktext">
-                      <p>
-                        Tesst asdawdawd awedagjkdawdgaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                      </p>
-                    </div>
-                    <span className="created">2 Okt 2021 | 10:33 </span>
-                  </div>
-                  <div className="talk-bubble-right">
-                    <span className="user-name">Username</span>
-                    <div class="talktext">
-                      <p>
-                        Hello Thereaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaa sdawdadw
-                      </p>
-                    </div>
-                    <span className="created">2 Okt 2021 | 10:33 </span>
-                  </div>
-                </div> */}
-
-                    {/* Empty Chat */}
-
-                    <div className="empty-chat">
-                      <div className="container">
-                        <i
-                          class="iconify icon-chat"
-                          data-icon="bi:chat-left-dots-fill"></i>
-                        <p>Waiting for comment</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <div className="row">
-                    <div className="col-10">
-                      <span
-                        className="iconify icon-attach"
-                        data-icon="akar-icons:attach"></span>
-                      <input type="text" className="input-field-comment" />
-                    </div>
-                    <div className="col-1">
-                      <button className="button-send">
-                        <i
-                          class="iconify"
-                          data-icon="fluent:send-16-filled"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <br />
               </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatComponent />
             </Grid>
           </Grid>
         </>
@@ -140,85 +107,49 @@ const ActionReqTicketDetail = () => {
         <>
           <div className={classes.toolbar} />
           <br />
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize="small" />}
-            aria-label="breadcrumb">
-            <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">{req_no}</Typography>
-          </Breadcrumbs>
-          {links.map(({ url, text }) => (
+          <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/ticket-admin/action-request/`;
+            }}
+            textSpan={"Action Request"}
+            typographyText={req_no}
+          />
+          {links.map(({ url, text, index }) => (
             <NavLink
+              key={index}
               to={url}
               className={"navigation-tabs"}
               activeClassName="selected">
               {text}
             </NavLink>
           ))}
-
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
               <InventoryTicket />
             </Grid>
-
-            <Grid item xs={4}></Grid>
-            <Grid item xs={8}>
-              <div className="card-comment">
-                <div className="card-title">
-                  <h2>Comment</h2>
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                <div className="card-status-item">
+                  <StatusButton
+                    status={"Open"}
+                    nameBtn={"Open"}
+                    colorName={"#219653"}
+                    backgroundColor={"#219653"}
+                  />
+                  <StatusButton
+                    nameBtn={"On Progress"}
+                    colorName={"#EC9108"}
+                    backgroundColor={"#EC9108"}
+                  />
                 </div>
-                <div className="card-body">
-                  <div className="container-chat">
-                    {/* <div className="body-chat" id="style-2">
-                      <div className="talk-bubble">
-                        <span className="user-name">Username</span>
-                        <div class="talktext">
-                          <p>
-                            Tesst asdawdawd awedagjkdawdgaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                          </p>
-                        </div>
-                        <span className="created">2 Okt 2021 | 10:33 </span>
-                      </div>
-                      <div className="talk-bubble-right">
-                        <span className="user-name">Username</span>
-                        <div class="talktext">
-                          <p>
-                            Hello Thereaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaa sdawdadw
-                          </p>
-                        </div>
-                        <span className="created">2 Okt 2021 | 10:33 </span>
-                      </div>
-                    </div> */}
-
-                    {/* Empty Chat */}
-
-                    <div className="empty-chat">
-                      <div className="container">
-                        <i
-                          class="iconify icon-chat"
-                          data-icon="bi:chat-left-dots-fill"></i>
-                        <p>Waiting for comment</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <div className="row">
-                    <div className="col-10">
-                      <span
-                        className="iconify icon-attach"
-                        data-icon="akar-icons:attach"></span>
-                      <input type="text" className="input-field-comment" />
-                    </div>
-                    <div className="col-1">
-                      <button className="button-send">
-                        <i
-                          class="iconify"
-                          data-icon="fluent:send-16-filled"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <br />
               </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatComponent />
             </Grid>
           </Grid>
         </>
@@ -229,85 +160,63 @@ const ActionReqTicketDetail = () => {
         <>
           <div className={classes.toolbar} />
           <br />
-          <Breadcrumbs
-            separator={<NavigateNextIcon fontSize="small" />}
-            aria-label="breadcrumb">
-            <span className={"span_crumb"}>Action Request</span>
-            <Typography color="textPrimary">{req_no}</Typography>
-          </Breadcrumbs>
-          {links.map(({ url, text }) => (
+          <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/ticket-admin/action-request/`;
+            }}
+            textSpan={"Action Request"}
+            typographyText={req_no}
+          />
+          {links.map(({ url, text, index }) => (
             <NavLink
+              key={index}
               to={url}
               className={"navigation-tabs"}
               activeClassName="selected">
               {text}
             </NavLink>
           ))}
-
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
               <PurchaseTicket />
             </Grid>
-
-            <Grid item xs={4}></Grid>
-            <Grid item xs={8}>
-              <div className="card-comment">
-                <div className="card-title">
-                  <h2>Comment</h2>
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                <div className="card-status-item">
+                  <StatusButton
+                    nameBtn={"Open"}
+                    colorName={"#219653"}
+                    backgroundColor={"#219653"}
+                  />
+                  <StatusButton
+                    nameBtn={"On Progress"}
+                    colorName={"#EC9108"}
+                    backgroundColor={"#EC9108"}
+                  />
+                  <StatusButton
+                    nameBtn={"Demage"}
+                    colorName={"#EB5757"}
+                    backgroundColor={"#EB5757"}
+                  />
+                  <StatusButton
+                    nameBtn={"Troubleshoot"}
+                    colorName={"#1653A6"}
+                    backgroundColor={"#1653A6"}
+                  />
+                  <StatusButton
+                    nameBtn={"Close"}
+                    colorName={"#EF5DA8"}
+                    backgroundColor={"#EF5DA8"}
+                  />
                 </div>
-                <div className="card-body">
-                  <div className="container-chat">
-                    {/* <div className="body-chat" id="style-2">
-                      <div className="talk-bubble">
-                        <span className="user-name">Username</span>
-                        <div class="talktext">
-                          <p>
-                            Tesst asdawdawd awedagjkdawdgaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                          </p>
-                        </div>
-                        <span className="created">2 Okt 2021 | 10:33 </span>
-                      </div>
-                      <div className="talk-bubble-right">
-                        <span className="user-name">Username</span>
-                        <div class="talktext">
-                          <p>
-                            Hello Thereaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaa sdawdadw
-                          </p>
-                        </div>
-                        <span className="created">2 Okt 2021 | 10:33 </span>
-                      </div>
-                    </div> */}
-
-                    {/* Empty Chat */}
-
-                    <div className="empty-chat">
-                      <div className="container">
-                        <i
-                          class="iconify icon-chat"
-                          data-icon="bi:chat-left-dots-fill"></i>
-                        <p>Waiting for comment</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="card-footer">
-                  <div className="row">
-                    <div className="col-10">
-                      <span
-                        className="iconify icon-attach"
-                        data-icon="akar-icons:attach"></span>
-                      <input type="text" className="input-field-comment" />
-                    </div>
-                    <div className="col-1">
-                      <button className="button-send">
-                        <i
-                          class="iconify"
-                          data-icon="fluent:send-16-filled"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <br />
               </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatComponent />
             </Grid>
           </Grid>
         </>
