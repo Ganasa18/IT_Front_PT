@@ -61,6 +61,32 @@ export const menuData = [
       { name: "Role", to: "/master/role", icon: "ci:user-check" },
     ],
   },
+  {
+    id: 4,
+    name: "Procurement & Goods",
+    icon: "ant-design:folder-open-filled",
+    exact: true,
+    // to: `/master`,
+    subMenus: [
+      {
+        name: "GR Asset",
+        to: "/gr/asset",
+        icon: "dashicons:category",
+      },
+      {
+        name: "GR History",
+        to: "/gr/history",
+        icon: "carbon:status-acknowledge",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Inventory",
+    icon: "fa-solid:clipboard-list",
+    exact: true,
+    to: "/inventory",
+  },
 ];
 
 export const menuDataUser = [

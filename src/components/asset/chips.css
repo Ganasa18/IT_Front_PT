@@ -21,3 +21,40 @@
   border: none;
   cursor: pointer;
 }
+
+.chip-container {
+  position: relative;
+}
+
+.chip-inventory-used {
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 0 0px;
+  color: #1653a6ff;
+  background: #1653a64c;
+  outline: none;
+  align-items: center;
+  text-align: center;
+  transform: rotate(0.18deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.chip-inventory-available {
+  padding: 6px 15px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 0 0px;
+  color: #219653ff;
+  background: #2196534c;
+  outline: none;
+  align-items: center;
+  text-align: center;
+  transform: rotate(0.18deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

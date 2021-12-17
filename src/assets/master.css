@@ -1243,3 +1243,45 @@ input[type="radio"] {
 .option-input.radio::after {
   border-radius: 50%;
 }
+
+/* Disposal */
+
+.display-disposal-invent {
+  display: flex;
+  justify-content: flex-end;
+  margin: 25px 45px 25px 0;
+  align-items: center;
+  position: relative;
+  top: 20px;
+}
+
+.display-disposal-invent .selected {
+  margin-right: 20px;
+}
+.display-disposal-invent .count {
+  color: #ec9108;
+  margin-right: 5px;
+}
+
+/* BUTTON INv */
+.btn-disposal-inv {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 10px 25px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-disposal-inv:hover {
+  background-color: #fbae3a75;
+}

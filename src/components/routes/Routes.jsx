@@ -17,6 +17,7 @@ import ActionApproved from "../pages/lead/ActionApproved";
 import ActionApproveDetail from "../pages/lead/ActionApproveDetail";
 import ActionTicket from "../pages/ticket/ActionTicket";
 import ActionReqTicketDetail from "../pages/ticket/ActionReqTicketDetail";
+import Inventory from "../pages/Inventory";
 
 // import Cookies from "universal-cookie";
 
@@ -51,6 +52,11 @@ const Routes = () => {
       <Route
         path="/master/troubleshoot"
         component={(props) => <Troubleshoot {...props} />}
+      />
+
+      <Route
+        path="/inventory"
+        component={(props) => <Inventory {...props} />}
       />
 
       <Route path="/profile" component={(props) => <Profile {...props} />} />
