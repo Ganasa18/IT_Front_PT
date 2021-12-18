@@ -21,6 +21,7 @@ import BreadcrumbComponent from "../../asset/BreadcrumbComponent";
 import ChatComponent from "../../asset/ChatComponent";
 import StatusButton from "../../asset/StatusButton";
 import AddIcon from "@material-ui/icons/Add";
+import GoodReceiveTicket from "./navigation/GoodReceiveTicket";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -90,6 +91,10 @@ const links = [
   },
   { url: "/ticket-admin/action-request/detail/inventory", text: " Inventory" },
   { url: "/ticket-admin/action-request/detail/purchase", text: " Purchase" },
+  {
+    url: "/ticket-admin/action-request/detail/good-receive",
+    text: "Goods Received",
+  },
 ];
 
 const ActionReqTicketDetail = () => {
@@ -113,7 +118,8 @@ const ActionReqTicketDetail = () => {
           <Button
             className={classes.cancelBtn}
             onClick={modalClose}
-            variant="outlined">
+            variant="outlined"
+          >
             Cancel
           </Button>
         </div>
@@ -142,7 +148,8 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected">
+              activeClassName="selected"
+            >
               {text}
             </NavLink>
           ))}
@@ -201,7 +208,8 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected">
+              activeClassName="selected"
+            >
               {text}
             </NavLink>
           ))}
@@ -254,7 +262,8 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected">
+              activeClassName="selected"
+            >
               {text}
             </NavLink>
           ))}
@@ -264,7 +273,8 @@ const ActionReqTicketDetail = () => {
             variant="contained"
             color="primary"
             className={classes.buttonAdd}
-            startIcon={<AddIcon />}>
+            startIcon={<AddIcon />}
+          >
             Create New
           </Button>
           <Grid container spacing={3}>
@@ -315,9 +325,64 @@ const ActionReqTicketDetail = () => {
             BackdropComponent={Backdrop}
             BackdropProps={{
               timeout: 500,
-            }}>
+            }}
+          >
             {bodyModal}
           </Modal>
+        </>
+      );
+
+    case "/ticket-admin/action-request/detail/good-receive":
+      return (
+        <>
+          <div className={classes.toolbar} />
+          <br />
+          <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/ticket-admin/action-request/`;
+            }}
+            textSpan={"Action Request"}
+            typographyText={req_no}
+          />
+          {links.map(({ url, text, index }) => (
+            <NavLink
+              key={index}
+              to={url}
+              className={"navigation-tabs"}
+              activeClassName="selected"
+            >
+              {text}
+            </NavLink>
+          ))}
+          <Grid container spacing={3}>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <GoodReceiveTicket />
+            </Grid>
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                <div className="card-status-item">
+                  <StatusButton
+                    status={"Open"}
+                    nameBtn={"Open"}
+                    colorName={"#219653"}
+                    backgroundColor={"#219653"}
+                  />
+                  <StatusButton
+                    nameBtn={"On Progress"}
+                    colorName={"#EC9108"}
+                    backgroundColor={"#EC9108"}
+                  />
+                </div>
+                <br />
+              </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatComponent />
+            </Grid>
+          </Grid>
         </>
       );
     default:

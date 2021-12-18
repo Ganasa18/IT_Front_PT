@@ -1285,3 +1285,50 @@ input[type="radio"] {
 .btn-disposal-inv:hover {
   background-color: #fbae3a75;
 }
+
+/* BUTTON GR*/
+.btn-plus {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  outline: none;
+  border: 1px solid #1653a6;
+  color: #1653a6;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-min {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  outline: none;
+  border: 1px solid #1653a6;
+  color: #1653a6;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-plus:hover,
+.btn-min:hover {
+  background-color: #1652a6;
+  color: #fff;
+}
+
+.item-count {
+  margin: 5px;
+  font-size: 14px;
+  font-weight: bold;
+}

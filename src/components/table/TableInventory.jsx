@@ -81,13 +81,15 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page">
+        aria-label="first page"
+      >
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page">
+        aria-label="previous page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -97,7 +99,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page">
+        aria-label="next page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -107,7 +110,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
+        aria-label="last page"
+      >
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -229,6 +233,8 @@ const TableInventory = () => {
       setAllSelected(false);
     }
 
+    // console.log(e);
+
     var obj = row;
     var newData = [...selectInventory, obj];
 
@@ -289,9 +295,37 @@ const TableInventory = () => {
     rowsPerPage -
     Math.min(rowsPerPage, dataInventory.length - page * rowsPerPage);
 
+  const checkValue = () => {
+    const checkbox = document.querySelectorAll("#check-value .Mui-checked");
+    const table = document.querySelectorAll("tbody #check-value");
+    const arr = [...checkbox];
+    // const arr2 = [...table];
+    // const arr = [...table];
+    var newArray = [];
+    arr.forEach((element) => {
+      const valueId = parseInt(element.children[0].children[0].value);
+      newArray.push(valueId);
+    });
+
+    var filteredArray = selectInventory.filter((i) => newArray.includes(i.id));
+    console.log(selectInventory);
+    console.log(filteredArray);
+
+    // const arrLength = arr;
+    // arr2.forEach((element) => {
+    //   console.log(checkbox);
+    //   console.log(element);
+    // });
+    // console.log(arrLength.length);
+    // for (i = 0; i < table.length; i++) {
+    //   const checkbox = document.querySelectorAll("td input[type=checkbox]");
+    //   console.log(checkbox);
+    //   // console.log(table[i]);
+    // }
+  };
+
   return (
     <>
-      {console.log(selectInventory)}
       <div className="col-12">
         <div className="card">
           <div className="display-disposal-invent">
@@ -303,13 +337,19 @@ const TableInventory = () => {
               </>
             ) : null}
 
-            <button className="btn-disposal-inv">Disposal</button>
+            <button className="btn-disposal-inv" onClick={checkValue}>
+              Disposal
+            </button>
           </div>
         </div>
       </div>
       <TableContainer className={classes.tableWidth}>
         <Paper>
-          <Table className={classes.table} aria-label="custom pagination table">
+          <Table
+            className={classes.table}
+            aria-label="custom pagination table"
+            id="Table1"
+          >
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell padding="checkbox" style={{ width: 50 }}>
@@ -340,9 +380,10 @@ const TableInventory = () => {
                     )
                   : dataInventory
                 ).map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow id="check-value" key={row.id}>
                     <TableCell padding="checkbox" style={{ width: 50 }}>
                       <Checkbox
+                        value={row.id}
                         checked={selected[row.id] || allSelected} // <-- is selected
                         onChange={toggleSelected(row)} // <-- toggle state
                       />
@@ -379,7 +420,8 @@ const TableInventory = () => {
                       <button className="btn-edit" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ci:edit"></span>
+                          data-icon="ci:edit"
+                        ></span>
                         <span className="name-btn">Edit</span>
                       </button>
                     </TableCell>

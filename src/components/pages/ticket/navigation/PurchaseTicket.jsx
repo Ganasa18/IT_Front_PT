@@ -44,7 +44,8 @@ const PurchaseTicket = () => {
                   style={{
                     background: `#EC91084C`,
                     color: `#EC9108FF`,
-                  }}>
+                  }}
+                >
                   Waiting
                 </span>
               </p>

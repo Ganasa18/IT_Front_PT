@@ -44,6 +44,7 @@ const Auth = () => {
             }, 2000);
           })
           .catch((error) => {
+            console.log(error);
             console.log(error.response.status);
             if (error.response.status === 429) {
               return setError(error.response.data);
@@ -98,7 +99,8 @@ const Auth = () => {
           <button
             className="btn-login"
             type="submit"
-            disabled={isLoading ? "disabled" : ""}>
+            disabled={isLoading ? "disabled" : ""}
+          >
             {isLoading ? (
               <>
                 <i className="iconify imgLoad" data-icon="fontelico:spin3" />

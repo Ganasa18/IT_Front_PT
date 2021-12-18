@@ -74,13 +74,15 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page">
+        aria-label="first page"
+      >
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page">
+        aria-label="previous page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -90,7 +92,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page">
+        aria-label="next page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -100,7 +103,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
+        aria-label="last page"
+      >
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -169,7 +173,7 @@ const ActionTicketTable = () => {
       asset_name: "Accurate",
       created: "02 Oct 2021",
       description: "Meminta akses untuk accurate",
-      status: 12,
+      status: 8,
       user: 2,
     },
     {
@@ -179,7 +183,7 @@ const ActionTicketTable = () => {
       asset_name: "PC lalala",
       created: "02 Oct 2021",
       description: "Pada saat nayalin laptop layar biru",
-      status: 12,
+      status: 8,
       user: 3,
     },
   ];
@@ -276,7 +280,8 @@ const ActionTicketTable = () => {
                         onClick={() =>
                           localStorage.setItem("req_no", row.request_no)
                         }
-                        to="/ticket-admin/action-request/detail/information">
+                        to="/ticket-admin/action-request/detail/information"
+                      >
                         {row.request_no}
                       </Link>
                     </TableCell>
@@ -296,7 +301,8 @@ const ActionTicketTable = () => {
                         style={{
                           background: `${row.status_id.color_status}4C`,
                           color: `${row.status_id.color_status}FF`,
-                        }}>
+                        }}
+                      >
                         {capitalizeFirstLetter(row.status_id.status_name)}
                       </span>
                     </TableCell>
@@ -304,7 +310,8 @@ const ActionTicketTable = () => {
                       <button className="btn-response" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="akar-icons:arrow-forward-thick-fill"></span>
+                          data-icon="akar-icons:arrow-forward-thick-fill"
+                        ></span>
                         <span className="name-btn">Response</span>
                       </button>
                     </TableCell>
