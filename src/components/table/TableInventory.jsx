@@ -184,19 +184,58 @@ const TableInventory = () => {
   }, []);
 
   const getInventory = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/inventory`
-      )
-      .then((response) => {
-        setDataInventory(response.data.data.inventorys);
-        setIsLoading(false);
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestTwo = await axios.get(inventory);
+    axios.all([requestOne, requestTwo]).then(
+      axios.spread((...responses) => {
+        const responseOne = responses[0];
+        const responseTwo = responses[1];
+
+        let newDataUser = responseOne.data.data.users;
+        let newDataInvent = responseTwo.data.data.inventorys;
+
+        const arr_user = [...newDataUser];
+        const arr_invent = [...newDataInvent];
+
+        var usermap = {};
+
+        arr_user.forEach(function (user_id) {
+          usermap[user_id.id] = user_id;
+        });
+
+        arr_invent.forEach(function (invent) {
+          invent.user_id = usermap[invent.used_by];
+        });
+
+        setDataInventory(arr_invent);
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    );
+
+    // await axios
+    //   .get(
+    // `${pathEndPoint[0].url}${
+    //   pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    // }/api/v1/inventory`
+    //   )
+    //   .then((response) => {
+    //     setDataInventory(response.data.data.inventorys);
+
+    //     setIsLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -398,7 +437,9 @@ const TableInventory = () => {
                       {row.type_asset}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      Rendy
+                      {row.user_id === undefined
+                        ? row.departement_name
+                        : row.user_id.username}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {calbill(row.createdAt)}

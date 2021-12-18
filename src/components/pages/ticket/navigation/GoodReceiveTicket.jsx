@@ -323,7 +323,6 @@ const GoodReceiveTicket = () => {
     const table = document.querySelectorAll("tbody #check-value");
     const arr = [...checkbox];
 
-    var newArray = [];
     arr.forEach((element) => {
       const valueId = parseInt(element.children[0].children[0].value);
       const tableValue = document.getElementsByClassName(`rowId-${valueId}`);
