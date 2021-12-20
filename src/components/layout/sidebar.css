@@ -67,7 +67,7 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  color: #333;
+  color: #1653a6;
   text-decoration: none;
 }
 
@@ -101,7 +101,6 @@
   font-size: 35px;
   line-height: 60px;
   text-align: center;
-  color: #000;
 }
 
 .sub-menu .menu-icon.active {

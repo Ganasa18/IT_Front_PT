@@ -143,16 +143,16 @@ export const menuDataUser2 = [
 
 export const pathEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "5000",
   },
 ];
 
 export const authEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "1200",
   },
 ];

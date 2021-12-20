@@ -8,11 +8,7 @@ import {
   Backdrop,
   Fade,
   Modal,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+  Divider,
 } from "@material-ui/core";
 
 import "../../assets/master.css";
@@ -22,6 +18,7 @@ import { authEndPoint, pathEndPoint } from "../../assets/menu";
 
 import Cookies from "universal-cookie";
 import TableInventory from "../table/TableInventory";
+import CreateInventory from "./inventory/CreateInventory";
 
 const cookies = new Cookies();
 
@@ -67,13 +64,24 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     position: "fixed",
     transform: "translate(-50%,-50%)",
-    top: "30%",
+    top: "45%",
     left: "50%",
     width: 850,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(4, 8, 4),
+  },
+
+  cancelBtn: {
+    color: "#EB5757",
+    border: "1px solid #EB5757",
+    width: "130px",
+    height: "40px",
+    fontSize: "13px",
+    position: "relative",
+    left: "0",
+    transform: "translate(0%, -20%)",
   },
 }));
 
@@ -88,6 +96,27 @@ const Inventory = () => {
   const modalClose = () => {
     setModalOpen(false);
   };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <h3>Create Inventory</h3>
+
+          <Divider />
+          <br />
+
+          <CreateInventory />
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalClose}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
 
   return (
     <>
@@ -133,6 +162,15 @@ const Inventory = () => {
           </div>
         </Grid>
       </Grid>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };

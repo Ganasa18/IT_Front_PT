@@ -81,15 +81,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -99,8 +97,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -110,8 +107,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -217,25 +213,9 @@ const TableInventory = () => {
         arr_invent.forEach(function (invent) {
           invent.user_id = usermap[invent.used_by];
         });
-
         setDataInventory(arr_invent);
       })
     );
-
-    // await axios
-    //   .get(
-    // `${pathEndPoint[0].url}${
-    //   pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    // }/api/v1/inventory`
-    //   )
-    //   .then((response) => {
-    //     setDataInventory(response.data.data.inventorys);
-
-    //     setIsLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -274,10 +254,10 @@ const TableInventory = () => {
 
     // console.log(e);
 
-    var obj = row;
-    var newData = [...selectInventory, obj];
+    // var obj = row;
+    // var newData = [...selectInventory, obj];
 
-    setSelectInventory(arrUnique(newData));
+    // setSelectInventory(arrUnique(newData));
 
     setSelected((selected) => ({
       ...selected,
@@ -285,17 +265,17 @@ const TableInventory = () => {
     }));
   };
 
-  function arrUnique(arr) {
-    var cleaned = [];
-    arr.forEach(function (itm) {
-      var unique = true;
-      cleaned.forEach(function (itm2) {
-        if (_.isEqual(itm, itm2)) unique = false;
-      });
-      if (unique) cleaned.push(itm);
-    });
-    return cleaned;
-  }
+  // function arrUnique(arr) {
+  //   var cleaned = [];
+  //   arr.forEach(function (itm) {
+  //     var unique = true;
+  //     cleaned.forEach(function (itm2) {
+  //       if (_.isEqual(itm, itm2)) unique = false;
+  //     });
+  //     if (unique) cleaned.push(itm);
+  //   });
+  //   return cleaned;
+  // }
 
   function calbill(date) {
     const monthNames = [
@@ -335,21 +315,28 @@ const TableInventory = () => {
     Math.min(rowsPerPage, dataInventory.length - page * rowsPerPage);
 
   const checkValue = () => {
-    const checkbox = document.querySelectorAll("#check-value .Mui-checked");
-    const table = document.querySelectorAll("tbody #check-value");
-    const arr = [...checkbox];
-    // const arr2 = [...table];
-    // const arr = [...table];
-    var newArray = [];
-    arr.forEach((element) => {
-      const valueId = parseInt(element.children[0].children[0].value);
-      newArray.push(valueId);
-    });
+    var result = Object.keys(selected).map((key) => [
+      Number(key),
+      selected[key],
+    ]);
+    const newArrDisposal = result.map((row) => ({
+      id: row[0],
+    }));
 
-    var filteredArray = selectInventory.filter((i) => newArray.includes(i.id));
-    console.log(selectInventory);
-    console.log(filteredArray);
-
+    console.log(newArrDisposal);
+    // const checkbox = document.querySelectorAll("#check-value .Mui-checked");
+    // const table = document.querySelectorAll("tbody #check-value");
+    // const arr = [...checkbox];
+    // // const arr2 = [...table];
+    // // const arr = [...table];
+    // var newArray = [];
+    // arr.forEach((element) => {
+    //   const valueId = parseInt(element.children[0].children[0].value);
+    //   newArray.push(valueId);
+    // });
+    // var filteredArray = selectInventory.filter((i) => newArray.includes(i.id));
+    // console.log(selectInventory);
+    // console.log(filteredArray);
     // const arrLength = arr;
     // arr2.forEach((element) => {
     //   console.log(checkbox);
@@ -376,9 +363,18 @@ const TableInventory = () => {
               </>
             ) : null}
 
-            <button className="btn-disposal-inv" onClick={checkValue}>
-              Disposal
-            </button>
+            {selectedCount > 0 ? (
+              <button className="btn-disposal-inv" onClick={checkValue}>
+                Disposal
+              </button>
+            ) : (
+              <button
+                className="btn-disposal-inv-disabled"
+                disabled="disabled"
+                onClick={checkValue}>
+                Disposal
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -387,8 +383,7 @@ const TableInventory = () => {
           <Table
             className={classes.table}
             aria-label="custom pagination table"
-            id="Table1"
-          >
+            id="Table1">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell padding="checkbox" style={{ width: 50 }}>
@@ -401,6 +396,7 @@ const TableInventory = () => {
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
                 <StyledTableCell>User/Dept.</StyledTableCell>
+                <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell>Used By</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
@@ -437,6 +433,9 @@ const TableInventory = () => {
                       {row.type_asset}
                     </TableCell>
                     <TableCell component="th" scope="row">
+                      {row.alias_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
                       {row.user_id === undefined
                         ? row.departement_name
                         : row.user_id.username}
@@ -461,8 +460,7 @@ const TableInventory = () => {
                       <button className="btn-edit" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ci:edit"
-                        ></span>
+                          data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
                     </TableCell>

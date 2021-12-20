@@ -384,6 +384,9 @@ a {
 .margin-top {
   margin-top: 20px;
 }
+.margin-top-2 {
+  margin-top: 40px;
+}
 
 #filesImg {
   display: none;
@@ -1028,6 +1031,11 @@ input[type="radio"] {
   position: absolute;
   opacity: 0;
 }
+
+.radio-label {
+  cursor: pointer;
+}
+
 .radio input[type="radio"] + .radio-label:before {
   content: "";
   background: #f4f4f4;
@@ -1286,6 +1294,24 @@ input[type="radio"] {
   background-color: #fbae3a75;
 }
 
+.btn-disposal-inv-disabled {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 10px 25px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #b2b2b2;
+  color: #b2b2b2;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: not-allowed;
+}
+
 /* BUTTON GR*/
 .btn-plus {
   margin: 0 5px 0 5px;
@@ -1331,4 +1357,21 @@ input[type="radio"] {
   margin: 5px;
   font-size: 14px;
   font-weight: bold;
+}
+
+/* Inventory */
+
+.form-input-inv {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.form-input-inv:focus {
+  outline: none;
 }
