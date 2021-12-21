@@ -23,7 +23,12 @@ const useStyles = makeStyles((theme) => ({
     height: "40px",
     left: "50%",
     top: "50%",
-    transform: "translate(200%, 230%)",
+    transform: "translate(200%, 120%)",
+    [theme.breakpoints.down("lg")]: {
+      width: "130px",
+      height: "40px",
+      transform: "translate(270%, 140%)",
+    },
   },
 }));
 
@@ -35,8 +40,12 @@ const CreateInventory = () => {
   const [dataSubCategory, setDataSubCategory] = useState([]);
   const [dataArea, setDataArea] = useState([]);
   const [dataTypeAsset, setDataTypeAsset] = useState([]);
-  const [typeAsset, setTypeAsset] = useState("user");
+  const [typeAsset, setTypeAsset] = useState("");
   const [aliasName, setAliasName] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [subCategoryId, setSubCategoryId] = useState(null);
+  const [areaId, setAreaId] = useState("");
+  const [partVisible, setPartVisible] = useState("");
 
   useEffect(() => {
     getCategoryList();
@@ -110,6 +119,7 @@ const CreateInventory = () => {
   };
 
   const handleCategory = async (e) => {
+    setCategoryId(e);
     await axios
       .get(
         `${pathEndPoint[0].url}${
@@ -136,6 +146,7 @@ const CreateInventory = () => {
   };
 
   const handleArea = async (e) => {
+    setAreaId(e);
     let area = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/area/${e}`;
@@ -213,219 +224,333 @@ const CreateInventory = () => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  const handleSubmit = (e) => {
+  const visiblePart = () => {
+    const fisiknon = document.querySelector('input[name="fisiknon"]:checked');
+    let visibleUnitPart = document.getElementById("hiddenParts");
+    if (fisiknon.value === "fisik") {
+      visibleUnitPart.style.display = "block";
+    } else {
+      setPartVisible("");
+      visibleUnitPart.style.display = "none";
+    }
+  };
+
+  const partValue = () => {
+    let unit_part = document.querySelector('input[name="unit_parts"]:checked');
+    setPartVisible(unit_part.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    var str = "" + 1;
-    var pad = "000";
-    var ans = pad.substring(0, pad.length - str.length) + str;
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
 
-    const fisiknon = document.querySelector(
-      'input[name="fisiknon"]:checked'
-    ).value;
-    const unit_part = document.querySelector(
-      'input[name="unit_parts"]:checked'
-    ).value;
-
-    const inventory_type = document.querySelector(
+    var nowNumber = document.querySelectorAll(".last-number");
+    const fisiknon = document.querySelector('input[name="fisiknon"]:checked');
+    // let unit_part = document.querySelector('input[name="unit_parts"]:checked');
+    let inventory_type = document.querySelector(
       'input[name="inventory_type"]:checked'
-    ).value;
+    );
+    const typeAsset = document.querySelector("#nullValue");
+    let idArea = document.querySelector("#areaId");
+    let idCategory = document.querySelector("#idCategory");
 
-    console.log(fisiknon, unit_part, inventory_type, aliasName, ans);
+    if (fisiknon === null) {
+      alert("type fisik or none select 1");
+      return;
+    }
+    if (fisiknon.value === "fisik") {
+      if (partVisible === "") {
+        alert("type unit select 1");
+        return;
+      }
+    } else {
+    }
+
+    let checkfisik = fisiknon.value === "fisik" ? "0" : "1";
+
+    if (initialRef.current.value === "") {
+      alert("Name Cannot be null");
+      return;
+    }
+
+    if (idCategory.children[0].childNodes[0].value === "") {
+      alert("Category can't be null");
+      return;
+    }
+
+    if (idArea.children[0].childNodes[0].value === "") {
+      alert("Area can't be null");
+      return;
+    }
+
+    const assetName = initialRef.current.value;
+    const code =
+      "MKD" +
+      getInitialRef.current.value +
+      aliasName +
+      checkfisik +
+      "-" +
+      nowNumber[0].textContent;
+
+    if (inventory_type === null) {
+      await axios
+        .post(inventory, {
+          asset_name: assetName,
+          asset_number: code,
+          asset_fisik_or_none: fisiknon.value,
+          category_asset: parseInt(categoryId),
+          subcategory_asset:
+            subCategoryId === null ? null : parseInt(subCategoryId),
+          initial_asset_name: getInitialRef.current.value,
+          asset_part_or_unit: partVisible,
+          area: parseInt(areaId),
+          type_asset: typeAsset.value,
+        })
+        .then((response) => {
+          console.log(response);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      return;
+    }
+
+    // console.log(fisiknon.value);
+    // console.log(inventory_type.value);
   };
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <div className="row">
-          <div className="col-6">
-            <label htmlFor="">Fisik / Non Fisik</label>
-            <div className="row">
-              <div class="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="fisik"
-                    value={"fisik"}
-                    name="fisiknon"
-                  />
-                  <label htmlFor="fisik" className="radio-label">
-                    Fisik
-                  </label>
+      <div className="wrapper-create-inv">
+        <form onSubmit={handleSubmit} id="resetForm">
+          <div className="row">
+            <div className="col-6">
+              <label className="label-inv" htmlFor="">
+                Fisik / Non Fisik
+              </label>
+              <div className="row">
+                <div class="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="fisik"
+                      value={"fisik"}
+                      name="fisiknon"
+                      onChange={visiblePart}
+                    />
+                    <label htmlFor="fisik" className="radio-label">
+                      Fisik
+                    </label>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="nonfisik"
+                      value={"nonfisik"}
+                      name="fisiknon"
+                      onChange={visiblePart}
+                    />
+                    <label htmlFor="nonfisik" className="radio-label">
+                      Non Fisik
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div className="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="nonfisik"
-                    value={"nonfisik"}
-                    name="fisiknon"
-                  />
-                  <label htmlFor="nonfisik" className="radio-label">
-                    Non Fisik
-                  </label>
-                </div>
-              </div>
+              <br />
             </div>
-            <br />
+            <div className="col-6"></div>
           </div>
-          <div className="col-6"></div>
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <label htmlFor="">Unit / Part</label>
-            <div className="row">
-              <div class="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="part"
-                    value={"part"}
-                    name="unit_parts"
-                  />
-                  <label htmlFor="part" className="radio-label">
-                    Unit
-                  </label>
+          <div className="row" id="hiddenParts">
+            <div className="col-6">
+              <label htmlFor="">Unit / Part</label>
+              <div className="row">
+                <div class="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="part"
+                      value={"unit"}
+                      name="unit_parts"
+                      onChange={partValue}
+                    />
+                    <label htmlFor="part" className="radio-label">
+                      Unit
+                    </label>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="unit"
+                      value={"part"}
+                      name="unit_parts"
+                      onChange={partValue}
+                    />
+                    <label htmlFor="unit" className="radio-label">
+                      Part
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div className="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="unit"
-                    value={"unit"}
-                    name="unit_parts"
-                  />
-                  <label htmlFor="unit" className="radio-label">
-                    Part
-                  </label>
-                </div>
-              </div>
+              <br />
             </div>
-            <br />
+            <div className="col-6"></div>
           </div>
-          <div className="col-6"></div>
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <label htmlFor="">User / Dept.</label>
-            <div className="row">
-              <div class="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="type_user"
-                    value={"user"}
-                    name="inventory_type"
-                    onClick={handleUserDepart}
-                  />
-                  <label htmlFor="type_user" className="radio-label">
-                    User
-                  </label>
+          <div className="row">
+            <div className="col-6">
+              <label htmlFor="">User / Dept.</label>
+              <div className="row">
+                <div class="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="type_user"
+                      value={"user"}
+                      name="inventory_type"
+                      onClick={handleUserDepart}
+                    />
+                    <label htmlFor="type_user" className="radio-label">
+                      User
+                    </label>
+                  </div>
+                </div>
+                <div className="col-6">
+                  <div className="radio">
+                    <input
+                      type="radio"
+                      id="type_departement"
+                      value={"departement"}
+                      name="inventory_type"
+                      onClick={handleUserDepart}
+                    />
+                    <label htmlFor="type_departement" className="radio-label">
+                      Departement
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div className="col-6">
-                <div className="radio">
-                  <input
-                    type="radio"
-                    id="type_departement"
-                    value={"departement"}
-                    name="inventory_type"
-                    onClick={handleUserDepart}
-                  />
-                  <label htmlFor="type_departement" className="radio-label">
-                    Departement
-                  </label>
-                </div>
-              </div>
+              <br />
             </div>
-            <br />
+            <div className="col-6"></div>
           </div>
-          <div className="col-6"></div>
-        </div>
-        <div className="row">
-          <div className="col-6">
-            <label htmlFor="">Asset Name</label>
-            <input
-              ref={initialRef}
-              type="text"
-              className="form-input-inv"
-              onKeyUp={handleInitial}
-            />
+          <div className="row">
+            <div className="col-6">
+              <label htmlFor="">Asset Name</label>
+              <input
+                ref={initialRef}
+                type="text"
+                className="form-input-inv"
+                onKeyUp={handleInitial}
+              />
+            </div>
+            <div className="col-6">
+              <label htmlFor="">
+                Item Initials{" "}
+                <span style={{ color: "#ec9108" }}>
+                  {" "}
+                  ( initial can be edit )
+                </span>
+              </label>
+              <input
+                type="text"
+                className="form-input-inv"
+                onInput={function (e) {
+                  getInitialRef.current.value = e.target.value.toUpperCase();
+                }}
+                ref={getInitialRef}
+              />
+            </div>
           </div>
-          <div className="col-6">
-            <label htmlFor="">Item Initials</label>
-            <input
-              type="text"
-              className="form-input-inv"
-              onInput={function (e) {
-                getInitialRef.current.value = e.target.value.toUpperCase();
-              }}
-              ref={getInitialRef}
-            />
+          <div className="row margin-top">
+            <div className="col-6">
+              <label htmlFor="roleName">Category</label>
+              <SelectSearch
+                id="idCategory"
+                options={dataCategory}
+                value={dataCategory}
+                filterOptions={fuzzySearch}
+                onChange={handleCategory}
+                search
+                placeholder="Search Category"
+              />
+            </div>
+            <div className="col-6">
+              <label htmlFor="roleName">Area</label>
+              <SelectSearch
+                id="areaId"
+                options={dataArea}
+                value={dataArea}
+                filterOptions={fuzzySearch}
+                onChange={handleArea}
+                search
+                placeholder="Search Area"
+              />
+            </div>
           </div>
-        </div>
-        <div className="row margin-top">
-          <div className="col-6">
-            <label htmlFor="roleName">Category</label>
-            <SelectSearch
-              options={dataCategory}
-              value={dataCategory}
-              filterOptions={fuzzySearch}
-              onChange={handleCategory}
-              search
-              placeholder="Search Category"
-            />
+          <div className="row margin-top-2">
+            <div className="col-6">
+              <label htmlFor="roleName">Sub Category</label>
+              <SelectSearch
+                options={dataSubCategory}
+                value={dataSubCategory}
+                filterOptions={fuzzySearch}
+                onChange={(e) => setSubCategoryId(e)}
+                search
+                placeholder="Search Sub Category"
+              />
+            </div>
+            <div className="col-6">
+              {typeAsset !== "" ? (
+                <>
+                  <label htmlFor="roleName">
+                    {capitalizeFirstLetter(typeAsset)}
+                  </label>
+                  <SelectSearch
+                    options={dataTypeAsset}
+                    value={dataTypeAsset}
+                    filterOptions={fuzzySearch}
+                    onChange={function (e) {
+                      console.log(e);
+                    }}
+                    search
+                    placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
+                  />
+                </>
+              ) : (
+                <>
+                  <label htmlFor="">Null</label>
+                  <input
+                    id="nullValue"
+                    type="text"
+                    className="form-input-inv"
+                    placeholder="Null"
+                    value={null}
+                    readOnly
+                  />
+                </>
+              )}
+            </div>
           </div>
-          <div className="col-6">
-            <label htmlFor="roleName">Area</label>
-            <SelectSearch
-              options={dataArea}
-              value={dataArea}
-              filterOptions={fuzzySearch}
-              onChange={handleArea}
-              search
-              placeholder="Search Area"
-            />
+          <div className="row">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              className={classes.btnNext}>
+              Submit
+            </Button>
           </div>
-        </div>
-        <div className="row margin-top-2">
-          <div className="col-6">
-            <label htmlFor="roleName">Sub Category</label>
-            <SelectSearch
-              options={dataSubCategory}
-              value={dataSubCategory}
-              filterOptions={fuzzySearch}
-              search
-              placeholder="Search Sub Category"
-            />
-          </div>
-          <div className="col-6">
-            <label htmlFor="roleName">{capitalizeFirstLetter(typeAsset)}</label>
-            <SelectSearch
-              options={dataTypeAsset}
-              value={dataTypeAsset}
-              filterOptions={fuzzySearch}
-              onChange={function (e) {
-                console.log(e);
-              }}
-              search
-              placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
-            />
-          </div>
-        </div>
-        <div className="row">
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            className={classes.btnNext}>
-            Submit
-          </Button>
-        </div>
-      </form>
-      <br />
-      <br />
+        </form>
+      </div>
       <br />
     </>
   );

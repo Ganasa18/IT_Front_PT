@@ -1361,6 +1361,14 @@ input[type="radio"] {
 
 /* Inventory */
 
+.last-number {
+  color: #1653a6;
+  font-size: 40px;
+  font-weight: 500;
+  position: absolute;
+  top: -28px;
+}
+
 .form-input-inv {
   width: 100%;
   padding: 12px 20px;
@@ -1374,4 +1382,16 @@ input[type="radio"] {
 
 .form-input-inv:focus {
   outline: none;
+}
+
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .wrapper-create-inv {
+    zoom: 80%;
+  }
+  .wrapper-create-inv label {
+    font-size: 0.9rem;
+  }
+  .wrapper-create-inv input {
+    font-size: 0.9rem;
+  }
 }

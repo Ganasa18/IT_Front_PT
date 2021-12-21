@@ -397,6 +397,7 @@ const TableInventory = () => {
                 <StyledTableCell>Asset Name</StyledTableCell>
                 <StyledTableCell>User/Dept.</StyledTableCell>
                 <StyledTableCell>Area</StyledTableCell>
+                <StyledTableCell>Fisik/Non</StyledTableCell>
                 <StyledTableCell>Used By</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
@@ -436,6 +437,9 @@ const TableInventory = () => {
                       {row.alias_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
+                      {row.asset_fisik_or_none}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
                       {row.user_id === undefined
                         ? row.departement_name
                         : row.user_id.username}
@@ -456,7 +460,7 @@ const TableInventory = () => {
                       </div>
                     </TableCell>
 
-                    <TableCell style={{ width: 300 }} align="center">
+                    <TableCell style={{ width: 80 }} align="center">
                       <button className="btn-edit" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"

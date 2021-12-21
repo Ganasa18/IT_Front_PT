@@ -70,7 +70,10 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(4, 8, 4),
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+    },
   },
 
   cancelBtn: {
@@ -82,12 +85,23 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     left: "0",
     transform: "translate(0%, -20%)",
+    textTransform: "capitalize",
+    [theme.breakpoints.down("lg")]: {
+      width: "115px",
+      height: "30px",
+      fontSize: "11px",
+    },
   },
 }));
 
 const Inventory = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [lastNumber, setLastNumber] = useState("");
+
+  useEffect(() => {
+    getInvLatestId();
+  }, []);
 
   const modalPop = () => {
     setModalOpen(true);
@@ -97,11 +111,42 @@ const Inventory = () => {
     setModalOpen(false);
   };
 
+  const getInvLatestId = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/latestId`;
+
+    await axios
+      .get(inventory)
+      .then((response) => {
+        var text = response.data.data.inventory[0].asset_number;
+        text = text.split("-")[1].trim();
+
+        var numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        var str = "" + numb;
+        var pad = "000";
+        var ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const bodyModal = (
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <h3>Create Inventory</h3>
+          <div className="row">
+            <div className="col-10">
+              <h3>Create Inventory</h3>
+            </div>
+            <div className="col-2">
+              <p className="last-number">{lastNumber}</p>
+            </div>
+          </div>
 
           <Divider />
           <br />
