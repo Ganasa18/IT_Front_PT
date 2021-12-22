@@ -26,6 +26,8 @@ import {
   Modal,
   Backdrop,
   Checkbox,
+  Divider,
+  Button,
 } from "@material-ui/core";
 import "../../assets/master.css";
 import IconButton from "@material-ui/core/IconButton";
@@ -34,6 +36,7 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
+import EditInventory from "../pages/inventory/EditInventory";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -153,13 +156,32 @@ const useStyles2 = makeStyles((theme) => ({
   paper: {
     position: "fixed",
     transform: "translate(-50%,-50%)",
-    top: "30%",
+    top: "45%",
     left: "50%",
     width: 850,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+    },
+  },
+  cancelBtn: {
+    color: "#EB5757",
+    border: "1px solid #EB5757",
+    width: "130px",
+    height: "40px",
+    fontSize: "13px",
+    position: "relative",
+    left: "0",
+    transform: "translate(0%, -20%)",
+    textTransform: "capitalize",
+    [theme.breakpoints.down("lg")]: {
+      width: "115px",
+      height: "30px",
+      fontSize: "11px",
+    },
   },
 }));
 
@@ -174,6 +196,8 @@ const TableInventory = () => {
   const [selected, setSelected] = useState({});
   const [dataInventory, setDataInventory] = useState([]);
   const [selectInventory, setSelectInventory] = useState([]);
+  const [editedRowData, setEditedRowData] = useState([]);
+  const [lastNumber, setLastNumber] = useState("");
 
   useEffect(() => {
     getInventory();
@@ -350,6 +374,43 @@ const TableInventory = () => {
     // }
   };
 
+  const bodyModal = (
+    <>
+      <Fade in={editModal}>
+        <div className={classes.paper}>
+          <div className="row">
+            <div className="col-10">
+              <h3>Edit Inventory</h3>
+            </div>
+            <div className="col-2">
+              <p className="last-number">{lastNumber}</p>
+            </div>
+          </div>
+
+          <Divider />
+          <br />
+          <EditInventory rowData={editedRowData} />
+
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalClose}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const editHandle = (row) => {
+    setEditedRowData(row);
+    var text = row.asset_number;
+    text = text.split("-")[1].trim();
+    setLastNumber(text);
+
+    setEditModal(true);
+  };
+
   return (
     <>
       <div className="col-12">
@@ -399,7 +460,7 @@ const TableInventory = () => {
                 <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell>Fisik/Non</StyledTableCell>
                 <StyledTableCell>Used By</StyledTableCell>
-                <StyledTableCell>Date Create</StyledTableCell>
+                <StyledTableCell align="center">Unit/Part.</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
@@ -444,8 +505,11 @@ const TableInventory = () => {
                         ? row.departement_name
                         : row.user_id.username}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {calbill(row.createdAt)}
+                    <TableCell component="th" scope="row" align="center">
+                      {row.asset_part_or_unit === ""
+                        ? " - "
+                        : row.asset_part_or_unit}
+                      {/* {calbill(row.createdAt)} */}
                     </TableCell>
 
                     <TableCell component="th" scope="row">
@@ -461,7 +525,9 @@ const TableInventory = () => {
                     </TableCell>
 
                     <TableCell style={{ width: 80 }} align="center">
-                      <button className="btn-edit" onClick={(e) => {}}>
+                      <button
+                        className="btn-edit"
+                        onClick={(e) => editHandle(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ci:edit"></span>
@@ -499,6 +565,15 @@ const TableInventory = () => {
           </Table>
         </Paper>
       </TableContainer>
+      <Modal
+        open={editModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };

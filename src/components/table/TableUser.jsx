@@ -79,15 +79,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -97,8 +95,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -108,8 +105,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -566,7 +562,7 @@ const TableUser = () => {
                 />
               </div>
               <div className="col-6">
-                <label htmlFor="roleName">Name User</label>
+                <label htmlFor="roleName">Name</label>
                 <input
                   type="text"
                   id="roleName"
@@ -650,7 +646,7 @@ const TableUser = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Username</StyledTableCell>
+                <StyledTableCell>Name</StyledTableCell>
                 <StyledTableCell>Email</StyledTableCell>
                 <StyledTableCell>No HP</StyledTableCell>
                 <StyledTableCell>Area</StyledTableCell>
@@ -680,8 +676,7 @@ const TableUser = () => {
                           query: {
                             row,
                           },
-                        }}
-                      >
+                        }}>
                         {row.username}
                       </Link>
                     </TableCell>
@@ -713,22 +708,18 @@ const TableUser = () => {
                     <TableCell style={{ width: 300 }} align="center">
                       <button
                         className="btn-edit"
-                        onClick={(e) => handleEditUser(row)}
-                      >
+                        onClick={(e) => handleEditUser(row)}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ci:edit"
-                        ></span>
+                          data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
                       <button
                         className="btn-reset"
-                        onClick={(e) => handleResetPassword(row)}
-                      >
+                        onClick={(e) => handleResetPassword(row)}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="grommet-icons:power-reset"
-                        ></span>
+                          data-icon="grommet-icons:power-reset"></span>
                         <span className="name-btn">Reset</span>
                       </button>
                       <button
@@ -738,12 +729,10 @@ const TableUser = () => {
                         className={`btn-delete ${
                           row.role_id.role_name === "admin" ? "disabled" : ""
                         } `}
-                        onClick={(e) => handleUserDelete(row)}
-                      >
+                        onClick={(e) => handleUserDelete(row)}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"
-                        ></span>
+                          data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
                     </TableCell>
@@ -784,8 +773,7 @@ const TableUser = () => {
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
-        }}
-      >
+        }}>
         {bodyModal}
       </Modal>
     </>

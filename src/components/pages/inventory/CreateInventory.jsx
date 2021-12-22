@@ -46,10 +46,14 @@ const CreateInventory = () => {
   const [subCategoryId, setSubCategoryId] = useState(null);
   const [areaId, setAreaId] = useState("");
   const [partVisible, setPartVisible] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [departementId, setDepartementId] = useState(null);
+  const [getArrUser, setGetArrUser] = useState([]);
 
   useEffect(() => {
     getCategoryList();
     getAreaList();
+    getUserList();
   }, []);
 
   const handleInitial = () => {
@@ -74,6 +78,34 @@ const CreateInventory = () => {
     var randVal = variable2 + ran;
     getInitialRef.current.value = randVal.toUpperCase();
   }
+
+  const getUserList = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const DataUser = response.data.data.users;
+        const newArrUser = DataUser.map((row) => ({
+          id: row.id,
+          uuid: row.uuid,
+          name: row.username,
+          area: row.area,
+          role: row.role,
+          departement: row.departement,
+          subdepartement: row.subdepartement,
+        }));
+
+        setGetArrUser(newArrUser);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const getCategoryList = async () => {
     await axios
@@ -309,7 +341,7 @@ const CreateInventory = () => {
           type_asset: typeAsset.value,
         })
         .then((response) => {
-          console.log(response);
+          alert(response.data.message);
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -321,8 +353,74 @@ const CreateInventory = () => {
       return;
     }
 
-    // console.log(fisiknon.value);
-    // console.log(inventory_type.value);
+    // Create For User
+
+    if (inventory_type.value === "user") {
+      await axios
+        .post(inventory, {
+          asset_name: assetName,
+          asset_number: code,
+          asset_fisik_or_none: fisiknon.value,
+          category_asset: parseInt(categoryId),
+          subcategory_asset:
+            subCategoryId === null ? null : parseInt(subCategoryId),
+          initial_asset_name: getInitialRef.current.value,
+          asset_part_or_unit: partVisible,
+          area: parseInt(areaId),
+          used_by: userId[0].id,
+          type_asset: inventory_type.value,
+          departement: userId[0].departement,
+          subdepartement: userId[0].subdepartement,
+          status_asset: true,
+        })
+        .then((response) => {
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      return;
+    }
+
+    // Create For Departement
+
+    await axios
+      .post(inventory, {
+        asset_name: assetName,
+        asset_number: code,
+        asset_fisik_or_none: fisiknon.value,
+        category_asset: parseInt(categoryId),
+        subcategory_asset:
+          subCategoryId === null ? null : parseInt(subCategoryId),
+        initial_asset_name: getInitialRef.current.value,
+        asset_part_or_unit: partVisible,
+        area: parseInt(areaId),
+        type_asset: inventory_type.value,
+        departement: parseInt(departementId),
+        status_asset: true,
+      })
+      .then((response) => {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const setUser = async (e) => {
+    console.log(e);
+    const user = [...getArrUser];
+    const idUser = user.filter((item) => item.id === e);
+    setUserId(idUser);
+  };
+
+  const setDepartement = (e) => {
+    setDepartementId(e);
   };
 
   return (
@@ -514,16 +612,25 @@ const CreateInventory = () => {
                   <label htmlFor="roleName">
                     {capitalizeFirstLetter(typeAsset)}
                   </label>
-                  <SelectSearch
-                    options={dataTypeAsset}
-                    value={dataTypeAsset}
-                    filterOptions={fuzzySearch}
-                    onChange={function (e) {
-                      console.log(e);
-                    }}
-                    search
-                    placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
-                  />
+                  {typeAsset === "user" ? (
+                    <SelectSearch
+                      options={dataTypeAsset}
+                      value={dataTypeAsset}
+                      onChange={setUser}
+                      filterOptions={fuzzySearch}
+                      search
+                      placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
+                    />
+                  ) : (
+                    <SelectSearch
+                      options={dataTypeAsset}
+                      value={dataTypeAsset}
+                      filterOptions={fuzzySearch}
+                      onChange={setDepartement}
+                      search
+                      placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
+                    />
+                  )}
                 </>
               ) : (
                 <>

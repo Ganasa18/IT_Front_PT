@@ -372,7 +372,7 @@ const User = () => {
                 />
               </div>
               <div className="col-6">
-                <label htmlFor="roleName">Name User</label>
+                <label htmlFor="roleName">Name</label>
                 <input
                   type="text"
                   id="roleName"
