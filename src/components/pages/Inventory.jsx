@@ -119,15 +119,23 @@ const Inventory = () => {
     await axios
       .get(inventory)
       .then((response) => {
-        var text = response.data.data.inventory[0].asset_number;
+        var text = response.data.data?.inventory[0]?.asset_number;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
         text = text.split("-")[1].trim();
-
-        var numb = text.match(/\d/g);
+        numb = text.match(/\d/g);
         numb = numb.join("");
         numb = parseInt(numb) + 1;
-        var str = "" + numb;
-        var pad = "000";
-        var ans = pad.substring(0, pad.length - str.length) + str;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
         setLastNumber(ans);
       })
       .catch((error) => {

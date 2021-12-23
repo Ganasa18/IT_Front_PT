@@ -3,11 +3,7 @@ import { authEndPoint, pathEndPoint } from "../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../asset/Loading";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import { Link } from "react-router-dom";
-import "../../assets/select-search.css";
 import "../asset/chips.css";
-import _ from "lodash";
 
 import {
   useTheme,
@@ -191,11 +187,9 @@ const TableInventory = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [resultJoinUser, setResultJoinUser] = useState([]);
   const [allSelected, setAllSelected] = useState(false);
   const [selected, setSelected] = useState({});
   const [dataInventory, setDataInventory] = useState([]);
-  const [selectInventory, setSelectInventory] = useState([]);
   const [editedRowData, setEditedRowData] = useState([]);
   const [lastNumber, setLastNumber] = useState("");
 
@@ -379,11 +373,11 @@ const TableInventory = () => {
       <Fade in={editModal}>
         <div className={classes.paper}>
           <div className="row">
-            <div className="col-10">
+            <div className="col-9">
               <h3>Edit Inventory</h3>
             </div>
-            <div className="col-2">
-              <p className="last-number">{lastNumber}</p>
+            <div className="col-3">
+              <p className="last-number-edit">{lastNumber}</p>
             </div>
           </div>
 
@@ -405,7 +399,7 @@ const TableInventory = () => {
   const editHandle = (row) => {
     setEditedRowData(row);
     var text = row.asset_number;
-    text = text.split("-")[1].trim();
+    // text = text.split("-")[1].trim();
     setLastNumber(text);
 
     setEditModal(true);

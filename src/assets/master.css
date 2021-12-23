@@ -1369,6 +1369,14 @@ input[type="radio"] {
   top: -28px;
 }
 
+.last-number-edit {
+  color: #1653a6;
+  font-size: 25px;
+  font-weight: 500;
+  position: absolute;
+  top: -8px;
+}
+
 .form-input-inv {
   width: 100%;
   padding: 12px 20px;
@@ -1395,4 +1403,33 @@ input[type="radio"] {
   .wrapper-create-inv input {
     font-size: 0.9rem;
   }
+}
+.container-status {
+  position: relative;
+  top: 5px;
+  right: 5px;
+}
+
+.button-change__status {
+  position: absolute;
+  left: 70px;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #1652a6;
+  color: #1653a6;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.button-change__status:hover {
+  background-color: #1653a6;
+  color: #fff;
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles, Button } from "@material-ui/core";
-
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../../assets/select-search.css";
+import Loading from "../../asset/Loading";
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import { authEndPoint, pathEndPoint } from "../../../assets/menu";
@@ -31,55 +33,258 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// const useIsMounted = () => {
+//   const isMounted = React.useRef(false);
+//   React.useEffect(() => {
+//     isMounted.current = true;
+//     return () => isMounted.current = false;
+//   }, []);
+//   return isMounted;
+// };
+
 const EditInventory = (props) => {
   const { rowData } = props;
   const classes = useStyles();
   const [dataInventory] = useState(rowData);
+  const [dataUser, setDataUser] = useState([]);
+  const [dataDepartement, setDataDepartement] = useState([]);
+  const [dataSelectUser, setDataSelectUser] = useState([]);
+  const [dataSelectDepartement, setDataSelectDepartement] = useState([]);
+  const [typeAsset, setTypeAsset] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataTypeAsset, setDataTypeAsset] = useState([]);
+  const checkUserDeptRef = React.useRef(null);
+
+  useEffect(() => {
+    if (dataUser.length === 0 || dataDepartement.length === 0) {
+      getSelectList();
+    }
+    setTimeout(() => {
+      checkSelect(rowData);
+    }, 2000);
+  });
+
+  const getSelectList = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestTwo = await axios.get(departement);
+
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          let newDataUser = responseOne.data.data.users;
+          let newDataDepartement = responseTwo.data.data.departements;
+          const new_arrUser = [...newDataUser];
+          const new_arrDepart = [...newDataDepartement];
+          const newArrUser = new_arrUser.map((row) => ({
+            value: row.id,
+            name: row.username,
+            area: row.area,
+            role: row.role,
+            departement: row.departement,
+            subdepartement: row.subdepartement,
+          }));
+
+          const newArrDepartement = new_arrDepart.map((row) => ({
+            value: row.id,
+            name: row.departement_name,
+            area: row.id_area,
+          }));
+
+          setDataUser(newArrUser);
+          setDataDepartement(newArrDepartement);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
+
+  const handleUserDepart = (e) => {
+    setTypeAsset(e.target.value);
+    const type = e.target.value;
+
+    const idArea = e.target.getAttribute("data-area");
+
+    if (type === "user") {
+      const idUser = dataUser.filter((item) => item.area === parseInt(idArea));
+      setDataTypeAsset(idUser);
+      return;
+    }
+    if (type === "departement") {
+      const idDepartement = dataDepartement.filter(
+        (item) => item.area === parseInt(idArea)
+      );
+      setDataTypeAsset(idDepartement);
+      return;
+    }
+  };
+
+  const checkSelect = (row) => {
+    if (row.type_asset !== "") {
+      if (row.type_asset === "user") {
+        const idUser = dataUser.filter((item) => item.area === row.area_pk);
+
+        if (idUser.length > 0) {
+          setDataSelectUser(idUser);
+          setIsLoading(false);
+        }
+        return;
+      }
+
+      if (row.type_asset === "departement") {
+        const idDepartement = dataDepartement.filter(
+          (item) => item.area === row.area_pk
+        );
+
+        if (idDepartement.length > 0) {
+          setDataSelectDepartement(idDepartement);
+          setIsLoading(false);
+        }
+
+        return;
+      }
+    }
+    setIsLoading(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const checkUsed = e.target[0].checked;
+    if (checkUsed === false) {
+      return alert("Status must checked used");
+    }
+
+    const checkUserDept = checkUserDeptRef.current;
+
+    const userSelect =
+      checkUserDept.children[1].children[0].children[0].children[0].checked;
+
+    const departSelect =
+      checkUserDept.children[1].children[1].children[0].children[0].checked;
+
+    if (userSelect === true || departSelect === true) {
+      alert("can submit");
+      return;
+    }
+
+    console.log("cannot submit");
+  };
+
+  const handleReset = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/updatedInvent`;
+
+    await axios
+      .patch(inventory, {
+        id: dataInventory.id,
+        type_asset: dataInventory.type_asset,
+        status_asset: false,
+      })
+      .then((response) => {
+        alert(response.data.status);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <>
       <div className="wrapper-create-inv">
-        <form action="">
+        <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-6">
               <label className="label-inv" htmlFor="">
                 Status
               </label>
 
-              <div className="row">
-                <div class="col-6">
-                  <div className="radio">
-                    <input
-                      type="radio"
-                      id="used"
-                      value={true}
-                      name="status_asset"
-                      checked={`${
-                        dataInventory.status_asset === true ? "checked" : ""
-                      }`}
-                    />
-                    <label htmlFor="used" className="radio-label">
-                      Used
-                    </label>
+              {dataInventory.type_asset !== "" ? (
+                <div className="row">
+                  <div class="col-6">
+                    <div className="radio">
+                      <input
+                        type="radio"
+                        id="used"
+                        value={true}
+                        name="status_asset"
+                        checked
+                      />
+                      <label htmlFor="used" className="radio-label">
+                        Used
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="container-status">
+                      <label htmlFor="available" className="radio-label">
+                        Available :
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="button-change__status">
+                        Changed Status
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="col-6">
-                  <div className="radio">
-                    <input
-                      type="radio"
-                      id="available"
-                      value={false}
-                      name="status_asset"
-                      checked={`${
-                        dataInventory.status_asset === false ? "checked" : ""
-                      }`}
-                    />
-                    <label htmlFor="available" className="radio-label">
-                      Available
-                    </label>
+              ) : (
+                <div className="row">
+                  <div class="col-6">
+                    <div className="radio">
+                      <input
+                        type="radio"
+                        id="used"
+                        value={true}
+                        name="status_asset"
+                      />
+                      <label htmlFor="used" className="radio-label">
+                        Used
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="container-status">
+                      <label htmlFor="available" className="radio-label">
+                        Available :
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="button-change__status">
+                        Changed Status
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
               <br />
             </div>
             <div className="col-6"></div>
@@ -216,7 +421,47 @@ const EditInventory = (props) => {
               </div>
               <div className="col-6"></div>
             </div>
-          ) : null}
+          ) : (
+            <div className="row">
+              <div className="col-6" ref={checkUserDeptRef}>
+                <label htmlFor="">User / Dept.</label>
+                <div className="row">
+                  <div class="col-6">
+                    <div className="radio">
+                      <input
+                        type="radio"
+                        id="type_user"
+                        value={"user"}
+                        name="inventory_type"
+                        data-area={dataInventory.area_pk}
+                        onChange={handleUserDepart}
+                      />
+                      <label htmlFor="type_user" className="radio-label">
+                        User
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-6">
+                    <div className="radio">
+                      <input
+                        type="radio"
+                        id="type_departement"
+                        value={"departement"}
+                        name="inventory_type"
+                        data-area={dataInventory.area_pk}
+                        onChange={handleUserDepart}
+                      />
+                      <label htmlFor="type_departement" className="radio-label">
+                        Departement
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <br />
+              </div>
+              <div className="col-6"></div>
+            </div>
+          )}
           <div className="row">
             <div className="col-6">
               <label htmlFor="">Asset Name</label>
@@ -268,11 +513,74 @@ const EditInventory = (props) => {
               />
             </div>
             <div className="col-6">
-              <label htmlFor="">User</label>
-              <input type="text" className="form-input-inv" />
+              {dataInventory.type_asset !== "" ? (
+                <>
+                  <label htmlFor="">
+                    {capitalizeFirstLetter(dataInventory.type_asset)}
+                  </label>
+                  {dataInventory.type_asset === "user" ? (
+                    <SelectSearch
+                      options={dataSelectUser}
+                      value={dataSelectUser}
+                      filterOptions={fuzzySearch}
+                      search
+                      placeholder={`Search ${capitalizeFirstLetter(
+                        dataInventory.type_asset
+                      )}`}
+                    />
+                  ) : (
+                    <SelectSearch
+                      options={dataSelectDepartement}
+                      value={dataSelectDepartement}
+                      filterOptions={fuzzySearch}
+                      search
+                      placeholder={`Search ${capitalizeFirstLetter(
+                        dataInventory.type_asset
+                      )}`}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  <label htmlFor="">
+                    {typeAsset !== ""
+                      ? capitalizeFirstLetter(typeAsset)
+                      : "Null"}
+                  </label>
+
+                  {typeAsset !== "" ? (
+                    <SelectSearch
+                      options={dataTypeAsset}
+                      value={dataTypeAsset}
+                      filterOptions={fuzzySearch}
+                      search
+                      placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
+                    />
+                  ) : (
+                    <>
+                      <input
+                        id="nullValue"
+                        type="text"
+                        className="form-input-inv"
+                        placeholder="Null"
+                        value={null}
+                        readOnly
+                      />
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </div>
-          <br />
+          <div className="row">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              className={classes.btnNext}>
+              Submit
+            </Button>
+          </div>
         </form>
       </div>
     </>

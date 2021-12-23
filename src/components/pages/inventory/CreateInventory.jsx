@@ -288,6 +288,15 @@ const CreateInventory = () => {
     let idArea = document.querySelector("#areaId");
     let idCategory = document.querySelector("#idCategory");
 
+    // Today Date
+
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, "0");
+    var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = dd + "" + mm + "" + yyyy;
+
     if (fisiknon === null) {
       alert("type fisik or none select 1");
       return;
@@ -339,9 +348,13 @@ const CreateInventory = () => {
           asset_part_or_unit: partVisible,
           area: parseInt(areaId),
           type_asset: typeAsset.value,
+          asset_po_number: "MKDPOFAKE" + today,
+          asset_pr_number: "MKDPRFAKE" + today,
+          asset_new_or_old: "old",
         })
         .then((response) => {
-          alert(response.data.message);
+          alert(response.data.status);
+
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -372,8 +385,12 @@ const CreateInventory = () => {
           departement: userId[0].departement,
           subdepartement: userId[0].subdepartement,
           status_asset: true,
+          asset_po_number: "MKDPOFAKE" + today,
+          asset_pr_number: "MKDPRFAKE" + today,
+          asset_new_or_old: "old",
         })
         .then((response) => {
+          alert(response.data.status);
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -401,8 +418,12 @@ const CreateInventory = () => {
         type_asset: inventory_type.value,
         departement: parseInt(departementId),
         status_asset: true,
+        asset_po_number: "MKDPOFAKE" + today,
+        asset_pr_number: "MKDPRFAKE" + today,
+        asset_new_or_old: "old",
       })
       .then((response) => {
+        alert(response.data.status);
         setTimeout(() => {
           window.location.reload();
         }, 1500);
