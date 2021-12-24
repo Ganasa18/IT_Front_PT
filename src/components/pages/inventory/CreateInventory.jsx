@@ -434,7 +434,7 @@ const CreateInventory = () => {
   };
 
   const setUser = async (e) => {
-    console.log(e);
+    // console.log(e);
     const user = [...getArrUser];
     const idUser = user.filter((item) => item.id === e);
     setUserId(idUser);

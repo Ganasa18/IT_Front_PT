@@ -57,7 +57,9 @@ const EditInventory = (props) => {
   const [typeAsset, setTypeAsset] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [dataTypeAsset, setDataTypeAsset] = useState([]);
+  const [userId, setUserId] = useState(null);
   const checkUserDeptRef = React.useRef(null);
+  const [departementId, setDepartementId] = useState(null);
 
   useEffect(() => {
     if (dataUser.length === 0 || dataDepartement.length === 0) {
@@ -65,7 +67,7 @@ const EditInventory = (props) => {
     }
     setTimeout(() => {
       checkSelect(rowData);
-    }, 2000);
+    }, 10000);
   });
 
   const getSelectList = async () => {
@@ -168,21 +170,119 @@ const EditInventory = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/updatedInvent`;
+
     const checkUsed = e.target[0].checked;
     if (checkUsed === false) {
       return alert("Status must checked used");
     }
 
-    const checkUserDept = checkUserDeptRef.current;
+    if (dataInventory.type_asset !== "") {
+      if (dataInventory.type_asset === "user") {
+        await axios
+          .patch(inventory, {
+            id: dataInventory.id,
+            type_asset: dataInventory.type_asset,
+            status_asset: true,
+            used_by: parseInt(userId[0].value),
+            departement: parseInt(userId[0].departement),
+            subdepartement:
+              userId[0].subdepartement !== null
+                ? userId[0].subdepartement
+                : null,
+          })
+          .then((response) => {
+            alert(response.data.status);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        await axios
+          .patch(inventory, {
+            id: dataInventory.id,
+            type_asset: dataInventory.type_asset,
+            status_asset: true,
+            used_by: null,
+            departement: parseInt(departementId),
+            subdepartement: null,
+          })
+          .then((response) => {
+            alert(response.data.status);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
 
-    const userSelect =
-      checkUserDept.children[1].children[0].children[0].children[0].checked;
+      return;
+    }
 
-    const departSelect =
-      checkUserDept.children[1].children[1].children[0].children[0].checked;
+    var userSelect = null;
+    var departSelect = null;
+
+    if (checkUserDeptRef.current !== null) {
+      const checkUserDept = checkUserDeptRef.current;
+
+      userSelect =
+        checkUserDept.children[1].children[0].children[0].children[0].checked;
+
+      departSelect =
+        checkUserDept.children[1].children[1].children[0].children[0].checked;
+    }
 
     if (userSelect === true || departSelect === true) {
-      alert("can submit");
+      if (typeAsset === "user") {
+        await axios
+          .patch(inventory, {
+            id: dataInventory.id,
+            type_asset: typeAsset,
+            status_asset: true,
+            used_by: parseInt(userId[0].value),
+            departement: parseInt(userId[0].departement),
+            subdepartement:
+              userId[0].subdepartement !== null
+                ? userId[0].subdepartement
+                : null,
+          })
+          .then((response) => {
+            alert(response.data.status);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        await axios
+          .patch(inventory, {
+            id: dataInventory.id,
+            type_asset: typeAsset,
+            status_asset: true,
+            used_by: null,
+            departement: parseInt(departementId),
+            subdepartement: null,
+          })
+          .then((response) => {
+            alert(response.data.status);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
       return;
     }
 
@@ -211,6 +311,22 @@ const EditInventory = (props) => {
       });
   };
 
+  const setRowData = async (e) => {
+    if (typeAsset === "user" || dataInventory.type_asset === "user") {
+      const idUser = dataUser.filter((item) => item.value === e);
+      setUserId(idUser);
+
+      return;
+    }
+    if (
+      typeAsset === "departement" ||
+      dataInventory.type_asset === "departement"
+    ) {
+      setDepartementId(e);
+      return;
+    }
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -220,7 +336,7 @@ const EditInventory = (props) => {
       <div className="wrapper-create-inv">
         <form onSubmit={handleSubmit}>
           <div className="row">
-            <div className="col-6">
+            <div className="col-7">
               <label className="label-inv" htmlFor="">
                 Status
               </label>
@@ -250,7 +366,7 @@ const EditInventory = (props) => {
                         type="button"
                         onClick={handleReset}
                         className="button-change__status">
-                        Changed Status
+                        Changed To Available
                       </button>
                     </div>
                   </div>
@@ -279,7 +395,7 @@ const EditInventory = (props) => {
                         type="button"
                         onClick={handleReset}
                         className="button-change__status">
-                        Changed Status
+                        Changed To Available
                       </button>
                     </div>
                   </div>
@@ -287,7 +403,7 @@ const EditInventory = (props) => {
               )}
               <br />
             </div>
-            <div className="col-6"></div>
+            <div className="col-5"></div>
           </div>
 
           <div className="row">
@@ -523,6 +639,7 @@ const EditInventory = (props) => {
                       options={dataSelectUser}
                       value={dataSelectUser}
                       filterOptions={fuzzySearch}
+                      onChange={setRowData}
                       search
                       placeholder={`Search ${capitalizeFirstLetter(
                         dataInventory.type_asset
@@ -534,6 +651,7 @@ const EditInventory = (props) => {
                       value={dataSelectDepartement}
                       filterOptions={fuzzySearch}
                       search
+                      onChange={setRowData}
                       placeholder={`Search ${capitalizeFirstLetter(
                         dataInventory.type_asset
                       )}`}
@@ -553,6 +671,7 @@ const EditInventory = (props) => {
                       options={dataTypeAsset}
                       value={dataTypeAsset}
                       filterOptions={fuzzySearch}
+                      onChange={setRowData}
                       search
                       placeholder={`Search ${capitalizeFirstLetter(typeAsset)}`}
                     />
