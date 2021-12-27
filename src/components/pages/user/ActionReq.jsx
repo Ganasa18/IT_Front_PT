@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import {
   makeStyles,
@@ -13,8 +13,16 @@ import {
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
+import SelectSearch from "react-select-search";
+import "../../../assets/select-search.css";
 import axios from "axios";
 import TableActionReq from "../../table/user/TableActionReq";
+import { authEndPoint, pathEndPoint, invEndPoint } from "../../../assets/menu";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
+const userID = cookies.get("id");
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -81,9 +89,143 @@ const handleImage = () => {
 const ActionReq = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [userData, setUserData] = useState([]);
+  const [assetUser, setAssetUser] = useState([]);
+  const searchInput = useRef();
+  const [files, setFiles] = useState(null);
+  const [descriptionValue, setDescriptionValue] = useState(null);
+  const [assetId, setAssetId] = useState(null);
+  const [lastNumber, setLastNumber] = useState("");
 
-  const modalPop = () => {
+  const handleChange = (args) => {
+    setAssetId(args);
+  };
+
+  const handleFilter = (items) => {
+    return (searchValue) => {
+      if (searchValue.length === 0) {
+        return assetUser;
+      }
+      const updatedItems = items.map((list) => {
+        const newItems = list.items.filter((item) => {
+          return item.name.toLowerCase().includes(searchValue.toLowerCase());
+        });
+        return { ...list, items: newItems };
+      });
+      return updatedItems;
+    };
+  };
+
+  useEffect(() => {
+    getUserList();
+  }, []);
+
+  const getUserList = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const DataUser = response.data.data.users;
+        var getID = DataUser.filter((item) => item.id === parseInt(userID));
+        getID = getID.map((item) => ({
+          id: item.id,
+          name: item.username,
+          role: item.role,
+          departement: item.departement,
+          subdepartement: item.subdepartement,
+          area: item.area,
+          email: item.email,
+        }));
+        setUserData(getID);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const modalPop = async () => {
     setModalOpen(true);
+
+    // Get Asset
+
+    let asset = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/getUserAsset/${userData[0].id}/${
+      userData[0].departement
+    }`;
+    await axios
+      .get(asset)
+      .then((response) => {
+        const Asset = response.data.data.inventory;
+        var filterUser = Asset.filter((item) => item.type_asset === "user");
+        var filterDepartement = Asset.filter(
+          (item) => item.type_asset === "departement"
+        );
+
+        filterUser = filterUser.map((item) => ({
+          value: item.id,
+          name: item.asset_name,
+          type_asset: item.type_asset,
+        }));
+        filterDepartement = filterDepartement.map((item) => ({
+          value: item.id,
+          name: item.asset_name,
+          type_asset: item.type_asset,
+        }));
+
+        const options = [
+          {
+            type: "group",
+            name: "User",
+            items: filterUser,
+          },
+          {
+            type: "group",
+            name: "Departement",
+            items: filterDepartement,
+          },
+        ];
+
+        setAssetUser(options);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/getLatest`;
+    // Get Last Id
+    await axios
+      .get(act_req)
+      .then((response) => {
+        var text = response.data.data?.act_req[0]?.action_req_code;
+        var numb = 0;
+
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const modalClose = () => {
@@ -97,6 +239,7 @@ const ActionReq = () => {
     if (e.target.files.length !== 0) {
       icon.style.display = "none";
       output.src = URL.createObjectURL(e.target.files[0]);
+      setFiles(e.target.files[0]);
     }
 
     output.onload = function () {
@@ -104,11 +247,51 @@ const ActionReq = () => {
     };
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const checkFile = document.getElementById("filesImg");
+
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/ticket`;
+
+    const imageFormData = new FormData();
+    if (checkFile.files.length > 0) {
+      imageFormData.append("picture_req", files);
+    }
+
+    imageFormData.append("action_req_code", `MKDAR${lastNumber}`);
+    imageFormData.append("action_req_description", descriptionValue);
+    imageFormData.append("asset_id", parseInt(assetId));
+    imageFormData.append("user_id", parseInt(userData[0].id));
+    imageFormData.append("username", userData[0].name);
+    imageFormData.append("email", userData[0].email);
+    imageFormData.append("departement_id", parseInt(userData[0].departement));
+    imageFormData.append("status_id", 10);
+
+    await axios
+      .post(act_req, imageFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // console.log(checkFile.files);
+
+    // console.log(files);
+  };
+
   const bodyModal = (
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <form>
+          <form onSubmit={handleSubmit} enctype="multipart/form-data">
             <div className="row">
               <div className="col-12">
                 <h3>Create Action Request</h3>
@@ -119,13 +302,22 @@ const ActionReq = () => {
             <div className="row margin-top">
               <div className="col-6">
                 <label htmlFor="">My Asset</label>
-                <input type="text" className="form-input" />
+                <SelectSearch
+                  ref={searchInput}
+                  options={assetUser}
+                  filterOptions={handleFilter}
+                  name="Asset"
+                  placeholder="Choose Asset"
+                  search
+                  onChange={handleChange}
+                />
               </div>
               <div className="col-6">
                 <label htmlFor="">Description Of Problem(Chronological)</label>
                 <textarea
                   className="form-input-area"
-                  id=""
+                  value={descriptionValue}
+                  onChange={(e) => setDescriptionValue(e.target.value)}
                   cols="30"
                   rows="10"></textarea>
               </div>

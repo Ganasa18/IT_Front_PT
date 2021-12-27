@@ -156,3 +156,11 @@ export const authEndPoint = [
     port: "1200",
   },
 ];
+
+export const invEndPoint = [
+  {
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
+    port: "1400",
+  },
+];

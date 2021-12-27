@@ -58,7 +58,7 @@ const CreateInventory = () => {
 
   const handleInitial = () => {
     var typingTimer; //timer identifier
-    var doneTypingInterval = 5000;
+    var doneTypingInterval = 8000;
     clearTimeout(typingTimer);
     var value = initialRef.current.value;
     var variable1 = value.substring(0, 1);
