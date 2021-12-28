@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../../assets/menu";
+import { pathEndPoint, invEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
 
@@ -31,6 +31,10 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const userID = cookies.get("id");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -162,32 +166,11 @@ function capitalizeFirstLetter(string) {
 }
 
 const TableActionReq = () => {
-  const dataActReq = [
-    {
-      id: "1",
-      request_no: "123412344",
-      asset_no: "MKDACH011",
-      asset_name: "Accurate",
-      created: "02 Oct 2021",
-      description: "Meminta akses untuk accurate",
-      status: 12,
-    },
-    {
-      id: "2",
-      request_no: "12341234",
-      asset_no: "MKDPCH001",
-      asset_name: "PC lalala",
-      created: "02 Oct 2021",
-      description: "Pada saat nayalin laptop layar biru",
-      status: 9,
-    },
-  ];
-
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [dataArea, setDataArea] = useState([]);
+  const [dataRequest, setDataRequest] = useState([]);
   const [dataStatus, setDataStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [areaId, setAreaId] = useState("");
@@ -200,38 +183,78 @@ const TableActionReq = () => {
   }, []);
 
   const getStatusList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/status`
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(inventory);
+
+    axios
+      .all([requestOne, requestTwo, requestThree])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+
+          let newDataRequest = responseOne.data.data.request_tiket;
+          let newStatus = responseTwo.data.data.statuss;
+          let newInvent = responseThree.data.data.inventorys;
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+          const arr_inventory = [...newInvent];
+
+          arr_request = arr_request.filter(
+            (item) => item.user_id === parseInt(userID)
+          );
+
+          var statusmap = {};
+
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          let JoinStatus = arr_request;
+
+          var inventmap = {};
+
+          arr_inventory.forEach(function (invent_id) {
+            inventmap[invent_id.id] = invent_id;
+          });
+
+          JoinStatus.forEach(function (request_id) {
+            request_id.invent_id = inventmap[request_id.asset_id];
+          });
+
+          let JoinInvent = JoinStatus;
+          setDataRequest(JoinInvent);
+
+          setIsLoading(false);
+        })
       )
-      .then((response) => {
-        let newStatus = response.data.data.statuss;
-        const arr_request = [...dataActReq];
-        const arr_status = [...newStatus];
-
-        var statusmap = {};
-
-        arr_status.forEach(function (status_id) {
-          statusmap[status_id.id] = status_id;
-        });
-
-        arr_request.forEach(function (request_id) {
-          request_id.status_id = statusmap[request_id.status];
-        });
-
-        let JoinStatus = arr_request;
-        setDataArea(JoinStatus);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
       });
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+    rowsPerPage -
+    Math.min(rowsPerPage, dataRequest.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -240,6 +263,51 @@ const TableActionReq = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // function convertTZ(date) {
+  //   const options = {
+  //     day: "2-digit",
+  //     month: "2-digit",
+  //     year: "2-digit",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //     timeZone: "Asia/Jakarta",
+  //   };
+  //   const formatter = new Intl.DateTimeFormat("en-US", options);
+  //   const startingDate = new Date(date);
+  //   const dateInNewTimezone = formatter.format(startingDate);
+  //   return dateInNewTimezone;
+  // }
+
+  function calbill(date) {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    var myDate = new Date(date);
+    var d = myDate.getDate();
+    var m = myDate.getMonth();
+    m += 1;
+    var y = myDate.getFullYear();
+
+    var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+    return newdate;
+  }
+
+  const storeData = (row) => {
+    localStorage.setItem("ticketData", JSON.stringify(row));
   };
 
   return (
@@ -262,24 +330,28 @@ const TableActionReq = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? dataRequest.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : dataRequest
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link to="/action-request/detail">{row.request_no}</Link>
+                      <Link
+                        onClick={() => storeData(row)}
+                        to="/action-request/detail">
+                        {row.action_req_code}
+                      </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_no}
+                      {row.invent_id.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_name}
+                      {row.invent_id.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.created}
+                      {`${calbill(row.createdAt)}`}
                     </TableCell>
 
                     <TableCell component="th" scope="row" align="center">
@@ -307,7 +379,7 @@ const TableActionReq = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={dataRequest.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

@@ -424,6 +424,7 @@ const TableUser = () => {
   };
 
   const handleSubDepartement = async (e) => {
+    setValueDepartement(e);
     await axios
       .get(
         `${pathEndPoint[0].url}${
@@ -432,6 +433,7 @@ const TableUser = () => {
       )
       .then((response) => {
         const SubDepartementList = response.data.data.subdepartement;
+        console.log(SubDepartementList);
         const newArr = SubDepartementList.map((dpt) => ({
           value: dpt.id,
           name: dpt.subdepartement_name,

@@ -343,14 +343,14 @@ const TableRole = () => {
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
-                      <button
+                      {/* <button
                         className="btn-delete"
                         onClick={(e) => handleDelete(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
-                      </button>
+                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}

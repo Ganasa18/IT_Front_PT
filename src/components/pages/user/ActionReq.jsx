@@ -89,6 +89,7 @@ const handleImage = () => {
 const ActionReq = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [allDataUser, setAllDataUser] = useState([]);
   const [userData, setUserData] = useState([]);
   const [assetUser, setAssetUser] = useState([]);
   const searchInput = useRef();
@@ -96,6 +97,7 @@ const ActionReq = () => {
   const [descriptionValue, setDescriptionValue] = useState(null);
   const [assetId, setAssetId] = useState(null);
   const [lastNumber, setLastNumber] = useState("");
+  const [leadEmail, setLeadEmail] = useState(null);
 
   const handleChange = (args) => {
     setAssetId(args);
@@ -131,6 +133,18 @@ const ActionReq = () => {
       })
       .then((response) => {
         const DataUser = response.data.data.users;
+        const AllData = DataUser.map((item) => ({
+          id: item.id,
+          name: item.username,
+          role: item.role,
+          departement: item.departement,
+          subdepartement: item.subdepartement,
+          area: item.area,
+          email: item.email,
+        }));
+
+        setAllDataUser(AllData);
+
         var getID = DataUser.filter((item) => item.id === parseInt(userID));
         getID = getID.map((item) => ({
           id: item.id,
@@ -150,6 +164,24 @@ const ActionReq = () => {
 
   const modalPop = async () => {
     setModalOpen(true);
+
+    // Get Lead User
+    const getData = allDataUser.filter(
+      (item) => item.departement === userData[0].departement && item.role === 3
+    );
+
+    const getDataAdmin = allDataUser.filter((item) => item.role === 1);
+
+    if (getData.length > 0) {
+      setLeadEmail(getData[0].email);
+      if (userData[0].role === 3) {
+        var arr = [];
+        getDataAdmin.forEach((x) => arr.push(x.email));
+        setLeadEmail(arr);
+      }
+    } else {
+      setLeadEmail("it@markindo.co.id");
+    }
 
     // Get Asset
 
@@ -250,6 +282,22 @@ const ActionReq = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const checkFile = document.getElementById("filesImg");
+    const urlHost = window.location.origin;
+
+    if (assetId === null) {
+      alert("Please Select 1 Asset");
+      return;
+    }
+
+    if (descriptionValue === null) {
+      alert("Please Fill Description");
+      return;
+    }
+
+    if (descriptionValue.length < 10) {
+      alert("Please Fill Description Min 10 Character");
+      return;
+    }
 
     let act_req = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
@@ -267,7 +315,9 @@ const ActionReq = () => {
     imageFormData.append("username", userData[0].name);
     imageFormData.append("email", userData[0].email);
     imageFormData.append("departement_id", parseInt(userData[0].departement));
-    imageFormData.append("status_id", 10);
+    imageFormData.append("status_id", userData[0].role === 3 ? 12 : 10);
+    imageFormData.append("lead", leadEmail);
+    imageFormData.append("url", urlHost);
 
     await axios
       .post(act_req, imageFormData, {
@@ -276,7 +326,10 @@ const ActionReq = () => {
         },
       })
       .then((response) => {
-        console.log(response);
+        alert(response.data.status);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       })
       .catch((error) => {
         console.log(error);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   makeStyles,
@@ -28,17 +28,50 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function calbill(date) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  var myDate = new Date(date);
+  var d = myDate.getDate();
+  var m = myDate.getMonth();
+  m += 1;
+  var y = myDate.getFullYear();
+
+  var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+  return newdate;
+}
+
 const ActionReqDetail = () => {
   const classes = useStyles();
+  const dataStorage = localStorage.getItem("ticketData");
+  const parseObject = JSON.parse(dataStorage);
+  const [dataRequest] = useState(parseObject);
+
   return (
     <>
+      {console.log(dataRequest)}
       <div className={classes.toolbar} />
       <br />
       <Breadcrumbs
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb">
         <span className={"span_crumb"}>Action Request</span>
-        <Typography color="textPrimary">412312312</Typography>
+        <Typography color="textPrimary">
+          {dataRequest.action_req_code}
+        </Typography>
       </Breadcrumbs>
       <Grid container spacing={3}>
         <Grid item xs={12} className={classes.cardPadding}>
@@ -46,15 +79,15 @@ const ActionReqDetail = () => {
             <div className="row">
               <div className="col-3">
                 <p className="label-asset">Request Number</p>
-                <p>412312312</p>
+                <p>{dataRequest.action_req_code}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Asset Number</p>
-                <p>MKDLTHO01</p>
+                <p>{dataRequest.invent_id.asset_number}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Asset Name</p>
-                <p>Laptop hp 123</p>
+                <p>{dataRequest.invent_id.asset_name}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset text-center">Status</p>
@@ -62,10 +95,10 @@ const ActionReqDetail = () => {
                   <span
                     class="chip-action"
                     style={{
-                      background: `#EC91084C`,
-                      color: `#EC9108FF`,
+                      background: `${dataRequest.status_id.color_status}4C`,
+                      color: `${dataRequest.status_id.color_status}FF`,
                     }}>
-                    Waiting
+                    {dataRequest.status_id.status_name}
                   </span>
                 </p>
               </div>
@@ -74,14 +107,11 @@ const ActionReqDetail = () => {
             <div className="row">
               <div className="col-3">
                 <p className="label-asset">Description Of Problem</p>
-                <p>
-                  Pada saat nyalain laptop, layar warna biru, ditunggu 5 menit
-                  layar langsung mati
-                </p>
+                <p>{dataRequest.action_req_description}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Date</p>
-                <p>10 Dec 2021</p>
+                <p>{`${calbill(dataRequest.createdAt)}`}</p>
               </div>
               <div className="col-3"></div>
             </div>
