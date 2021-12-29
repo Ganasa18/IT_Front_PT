@@ -37,6 +37,7 @@ const Auth = () => {
               cookies.set("id", response.data.data.user.id);
               cookies.set("uuid", response.data.data.user.uuid);
               cookies.set("role", response.data.data.user.role);
+              cookies.set("departement", response.data.data.user.departement);
             }
             setIsLoading(true);
             setTimeout(() => {
@@ -99,8 +100,7 @@ const Auth = () => {
           <button
             className="btn-login"
             type="submit"
-            disabled={isLoading ? "disabled" : ""}
-          >
+            disabled={isLoading ? "disabled" : ""}>
             {isLoading ? (
               <>
                 <i className="iconify imgLoad" data-icon="fontelico:spin3" />

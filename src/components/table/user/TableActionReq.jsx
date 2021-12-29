@@ -169,13 +169,8 @@ const TableActionReq = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [editModal, setEditModal] = useState(false);
   const [dataRequest, setDataRequest] = useState([]);
-  const [dataStatus, setDataStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [areaId, setAreaId] = useState("");
-  const [areaName, setAreaName] = useState("");
-  const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
 
   useEffect(() => {

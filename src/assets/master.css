@@ -327,8 +327,8 @@ a {
   padding: 10px 10px;
   margin: 10px 0 20px 0px;
   display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #c1c1c1;
+  border-radius: 5px;
   box-sizing: border-box;
   font-size: 13px;
   resize: none;
@@ -1432,4 +1432,20 @@ input[type="radio"] {
 .button-change__status:hover {
   background-color: #1653a6;
   color: #fff;
+}
+
+/* Approval */
+.comment-pop-title {
+  color: #333333;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 120%;
+}
+
+.comment-pop-title-2 {
+  color: #333333;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 120%;
+  margin-bottom: 4px;
 }

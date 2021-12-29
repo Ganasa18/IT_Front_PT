@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../../assets/menu";
+import { pathEndPoint, invEndPoint, authEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
 
@@ -31,6 +31,12 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
+const userID = cookies.get("id");
+const DepartementID = cookies.get("departement");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -161,77 +167,168 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TableRequestApproved = () => {
-  const dataActReq = [
-    {
-      id: "1",
-      request_no: "123412344",
-      asset_no: "MKDACH011",
-      asset_name: "Accurate",
-      created: "02 Oct 2021",
-      description: "Meminta akses untuk accurate",
-      status: 10,
-    },
-    {
-      id: "2",
-      request_no: "12341234",
-      asset_no: "MKDPCH001",
-      asset_name: "PC lalala",
-      created: "02 Oct 2021",
-      description: "Pada saat nayalin laptop layar biru",
-      status: 10,
-    },
+function calbill(date) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
+  var myDate = new Date(date);
+  var d = myDate.getDate();
+  var m = myDate.getMonth();
+  m += 1;
+  var y = myDate.getFullYear();
+
+  var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+  return newdate;
+}
+
+const storeData = (row) => {
+  localStorage.setItem("ticketData", JSON.stringify(row));
+};
+
+const TableRequestApproved = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [editModal, setEditModal] = useState(false);
-  const [dataArea, setDataArea] = useState([]);
-  const [dataStatus, setDataStatus] = useState(null);
+  const [userData, setUserData] = useState([]);
+  const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [areaId, setAreaId] = useState("");
-  const [areaName, setAreaName] = useState("");
-  const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
   useEffect(() => {
     getStatusList();
   }, []);
 
   const getStatusList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/status`
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const requestTwo = await axios.get(act_req);
+    const requestThree = await axios.get(status);
+    const requestFour = await axios.get(inventory);
+
+    axios
+      .all([requestOne, requestTwo, requestThree, requestFour])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+
+          let newDataUser = responseOne.data.data.users;
+          let newDataRequest = responseTwo.data.data.request_tiket;
+          let newStatus = responseThree.data.data.statuss;
+          let newInvent = responseFour.data.data.inventorys;
+
+          var getID = newDataUser.filter(
+            (item) => item.id === parseInt(userID)
+          );
+          getID = getID.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+          }));
+          setUserData(getID);
+
+          const getUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+          }));
+
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+          const arr_inventory = [...newInvent];
+
+          arr_request = arr_request.filter(
+            (item) =>
+              parseInt(item.departement_id) === parseInt(DepartementID) &&
+              parseInt(item.user_id) !== parseInt(userID) &&
+              parseInt(item.status_id) === 10
+          );
+
+          var statusmap = {};
+
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          let JoinStatus = arr_request;
+
+          var inventmap = {};
+
+          arr_inventory.forEach(function (invent_id) {
+            inventmap[invent_id.id] = invent_id;
+          });
+
+          JoinStatus.forEach(function (request_id) {
+            request_id.invent_id = inventmap[request_id.asset_id];
+          });
+
+          let JoinInvent = JoinStatus;
+          // setDataRequest(JoinInvent);
+
+          var usermap = {};
+          getUser.forEach(function (id_user) {
+            usermap[id_user.id] = id_user;
+          });
+
+          JoinInvent.forEach(function (request_id) {
+            request_id.id_user = usermap[request_id.user_id];
+          });
+
+          setDataRequest(JoinInvent);
+          setIsLoading(false);
+        })
       )
-      .then((response) => {
-        let newStatus = response.data.data.statuss;
-        const arr_request = [...dataActReq];
-        const arr_status = [...newStatus];
-
-        var statusmap = {};
-
-        arr_status.forEach(function (status_id) {
-          statusmap[status_id.id] = status_id;
-        });
-
-        arr_request.forEach(function (request_id) {
-          request_id.status_id = statusmap[request_id.status];
-        });
-
-        let JoinStatus = arr_request;
-        setDataArea(JoinStatus);
-        console.log(JoinStatus);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
       });
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+    rowsPerPage -
+    Math.min(rowsPerPage, dataRequest.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -262,26 +359,28 @@ const TableRequestApproved = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? dataRequest.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : dataRequest
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link to="/approval/action-request/detail">
-                        {row.request_no}
+                      <Link
+                        onClick={() => storeData(row)}
+                        to="/approval/action-request/detail">
+                        {row.action_req_code}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_no}
+                      {row.invent_id.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_name}
+                      {row.invent_id.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.created}
+                      {`${calbill(row.createdAt)}`}
                     </TableCell>
 
                     <TableCell component="th" scope="row" align="center">
@@ -309,7 +408,7 @@ const TableRequestApproved = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={dataRequest.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
