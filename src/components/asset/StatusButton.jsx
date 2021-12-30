@@ -41,9 +41,12 @@ const StatusButton = (styleProps) => {
     backgroundColor: styleProps.backgroundColor,
   };
   const classes = useStyles(props);
+  const req_no = localStorage.getItem("req_no");
+
   return (
     <>
       <button
+        onClick={() => alert(styleProps.idStatus)}
         className={`${
           styleProps.status === styleProps.nameBtn
             ? classes.rootActive

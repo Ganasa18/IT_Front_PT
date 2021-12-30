@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
   makeStyles,
@@ -12,6 +12,8 @@ import {
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
+import { pathEndPoint, invEndPoint } from "../../../assets/menu";
+import axios from "axios";
 import { NavLink } from "react-router-dom";
 import InformationTicket from "./navigation/InformationTicket";
 import InventoryTicket from "./navigation/InventoryTicket";
@@ -101,6 +103,79 @@ const ActionReqTicketDetail = () => {
   const classes = useStyles();
   const req_no = localStorage.getItem("req_no");
   const [modalOpen, setModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [statusBtn, setStatusBtn] = useState([]);
+  const [ticketData, setTicketData] = useState([]);
+
+  useEffect(() => {
+    getTicket();
+    getStatus();
+  }, []);
+
+  const getTicket = async () => {
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(status);
+
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          let newDataRequest = responseOne.data.data.request_tiket;
+          let newStatus = responseTwo.data.data.statuss;
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+
+          arr_request = arr_request.filter(
+            (item) => item.action_req_code === req_no
+          );
+
+          var statusmap = {};
+
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          setTicketData(arr_request);
+          console.log(arr_request);
+
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
+
+  const getStatus = async () => {
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    axios
+      .get(status)
+      .then((response) => {
+        let newStatus = response.data.data.statuss;
+        setStatusBtn(newStatus);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const modalPop = () => {
     setModalOpen(true);
@@ -118,8 +193,7 @@ const ActionReqTicketDetail = () => {
           <Button
             className={classes.cancelBtn}
             onClick={modalClose}
-            variant="outlined"
-          >
+            variant="outlined">
             Cancel
           </Button>
         </div>
@@ -148,8 +222,7 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected"
-            >
+              activeClassName="selected">
               {text}
             </NavLink>
           ))}
@@ -162,24 +235,35 @@ const ActionReqTicketDetail = () => {
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
-                <div className="card-status-item">
-                  <StatusButton
-                    status={"Open"}
-                    nameBtn={"Open"}
-                    colorName={"#219653"}
-                    backgroundColor={"#219653"}
-                  />
-                  <StatusButton
-                    nameBtn={"On Progress"}
-                    colorName={"#EC9108"}
-                    backgroundColor={"#EC9108"}
-                  />
-                  <StatusButton
-                    nameBtn={"Demage"}
-                    colorName={"#EB5757"}
-                    backgroundColor={"#EB5757"}
-                  />
-                </div>
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter(
+                        (row) =>
+                          row.id !== 1 &&
+                          row.id !== 7 &&
+                          row.id !== 10 &&
+                          row.id !== 13 &&
+                          row.id !== 14 &&
+                          row.id !== 15
+                      )
+                      .map((row) => (
+                        <StatusButton
+                          idStatus={row.id}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                        />
+                      ))}
+                  </div>
+                )}
+
                 <br />
               </div>
             </Grid>
@@ -208,8 +292,7 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected"
-            >
+              activeClassName="selected">
               {text}
             </NavLink>
           ))}
@@ -221,19 +304,36 @@ const ActionReqTicketDetail = () => {
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
-                <div className="card-status-item">
-                  <StatusButton
-                    status={"Open"}
-                    nameBtn={"Open"}
-                    colorName={"#219653"}
-                    backgroundColor={"#219653"}
-                  />
-                  <StatusButton
-                    nameBtn={"On Progress"}
-                    colorName={"#EC9108"}
-                    backgroundColor={"#EC9108"}
-                  />
-                </div>
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter(
+                        (row) =>
+                          row.id !== 1 &&
+                          row.id !== 7 &&
+                          row.id !== 10 &&
+                          row.id !== 13 &&
+                          row.id !== 14 &&
+                          row.id !== 15
+                      )
+                      .map((row) => (
+                        <StatusButton
+                          Onclick={function () {
+                            alert(row.id);
+                          }}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                        />
+                      ))}
+                  </div>
+                )}
                 <br />
               </div>
             </Grid>
@@ -262,8 +362,7 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected"
-            >
+              activeClassName="selected">
               {text}
             </NavLink>
           ))}
@@ -273,8 +372,7 @@ const ActionReqTicketDetail = () => {
             variant="contained"
             color="primary"
             className={classes.buttonAdd}
-            startIcon={<AddIcon />}
-          >
+            startIcon={<AddIcon />}>
             Create New
           </Button>
           <Grid container spacing={3}>
@@ -285,33 +383,34 @@ const ActionReqTicketDetail = () => {
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
-                <div className="card-status-item">
-                  <StatusButton
-                    nameBtn={"Open"}
-                    colorName={"#219653"}
-                    backgroundColor={"#219653"}
-                  />
-                  <StatusButton
-                    nameBtn={"On Progress"}
-                    colorName={"#EC9108"}
-                    backgroundColor={"#EC9108"}
-                  />
-                  <StatusButton
-                    nameBtn={"Demage"}
-                    colorName={"#EB5757"}
-                    backgroundColor={"#EB5757"}
-                  />
-                  <StatusButton
-                    nameBtn={"Troubleshoot"}
-                    colorName={"#1653A6"}
-                    backgroundColor={"#1653A6"}
-                  />
-                  <StatusButton
-                    nameBtn={"Close"}
-                    colorName={"#EF5DA8"}
-                    backgroundColor={"#EF5DA8"}
-                  />
-                </div>
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter(
+                        (row) =>
+                          row.id !== 1 &&
+                          row.id !== 7 &&
+                          row.id !== 10 &&
+                          row.id !== 13 &&
+                          row.id !== 14 &&
+                          row.id !== 15
+                      )
+                      .map((row) => (
+                        <StatusButton
+                          idStatus={row.id}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                        />
+                      ))}
+                  </div>
+                )}
                 <br />
               </div>
             </Grid>
@@ -325,8 +424,7 @@ const ActionReqTicketDetail = () => {
             BackdropComponent={Backdrop}
             BackdropProps={{
               timeout: 500,
-            }}
-          >
+            }}>
             {bodyModal}
           </Modal>
         </>
@@ -350,8 +448,7 @@ const ActionReqTicketDetail = () => {
               key={index}
               to={url}
               className={"navigation-tabs"}
-              activeClassName="selected"
-            >
+              activeClassName="selected">
               {text}
             </NavLink>
           ))}
@@ -363,19 +460,29 @@ const ActionReqTicketDetail = () => {
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
-                <div className="card-status-item">
-                  <StatusButton
-                    status={"Open"}
-                    nameBtn={"Open"}
-                    colorName={"#219653"}
-                    backgroundColor={"#219653"}
-                  />
-                  <StatusButton
-                    nameBtn={"On Progress"}
-                    colorName={"#EC9108"}
-                    backgroundColor={"#EC9108"}
-                  />
-                </div>
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter((row) => [13, 14, 15].includes(row.id))
+                      .sort((a, b) => (a.id > b.id ? 1 : -1))
+                      .map((row) => (
+                        <StatusButton
+                          Onclick={function () {
+                            alert(row.id);
+                          }}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                        />
+                      ))}
+                  </div>
+                )}
                 <br />
               </div>
             </Grid>

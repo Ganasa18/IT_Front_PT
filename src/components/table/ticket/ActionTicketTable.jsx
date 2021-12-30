@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../../assets/menu";
+import { pathEndPoint, invEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
 
@@ -74,15 +74,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -92,8 +90,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -103,8 +100,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -164,40 +160,38 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const ActionTicketTable = () => {
-  const dataActReq = [
-    {
-      id: "1",
-      request_no: "123412344",
-      asset_no: "MKDACH011",
-      asset_name: "Accurate",
-      created: "02 Oct 2021",
-      description: "Meminta akses untuk accurate",
-      status: 8,
-      user: 2,
-    },
-    {
-      id: "2",
-      request_no: "12341234",
-      asset_no: "MKDPCH001",
-      asset_name: "PC lalala",
-      created: "02 Oct 2021",
-      description: "Pada saat nayalin laptop layar biru",
-      status: 8,
-      user: 3,
-    },
+function calbill(date) {
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
+  var myDate = new Date(date);
+  var d = myDate.getDate();
+  var m = myDate.getMonth();
+  m += 1;
+  var y = myDate.getFullYear();
+
+  var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+  return newdate;
+}
+
+const ActionTicketTable = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [editModal, setEditModal] = useState(false);
-  const [dataArea, setDataArea] = useState([]);
-  const [dataStatus, setDataStatus] = useState(null);
+  const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [areaId, setAreaId] = useState("");
-  const [areaName, setAreaName] = useState("");
-  const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
 
   useEffect(() => {
@@ -205,38 +199,77 @@ const ActionTicketTable = () => {
   }, []);
 
   const getStatusList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/status`
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(inventory);
+
+    axios
+      .all([requestOne, requestTwo, requestThree])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+
+          let newDataRequest = responseOne.data.data.request_tiket;
+          let newStatus = responseTwo.data.data.statuss;
+          let newInvent = responseThree.data.data.inventorys;
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+          const arr_inventory = [...newInvent];
+
+          arr_request = arr_request.filter((item) => item.status_id !== 10);
+
+          var statusmap = {};
+
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          let JoinStatus = arr_request;
+
+          var inventmap = {};
+
+          arr_inventory.forEach(function (invent_id) {
+            inventmap[invent_id.id] = invent_id;
+          });
+
+          JoinStatus.forEach(function (request_id) {
+            request_id.invent_id = inventmap[request_id.asset_id];
+          });
+
+          let JoinInvent = JoinStatus;
+
+          setDataRequest(JoinInvent);
+
+          setIsLoading(false);
+        })
       )
-      .then((response) => {
-        let newStatus = response.data.data.statuss;
-        const arr_request = [...dataActReq];
-        const arr_status = [...newStatus];
-
-        var statusmap = {};
-
-        arr_status.forEach(function (status_id) {
-          statusmap[status_id.id] = status_id;
-        });
-
-        arr_request.forEach(function (request_id) {
-          request_id.status_id = statusmap[request_id.status];
-        });
-
-        let JoinStatus = arr_request;
-        setDataArea(JoinStatus);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
       });
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+    rowsPerPage -
+    Math.min(rowsPerPage, dataRequest.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -268,31 +301,30 @@ const ActionTicketTable = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? dataRequest.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : dataRequest
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <Link
                         onClick={() =>
-                          localStorage.setItem("req_no", row.request_no)
+                          localStorage.setItem("req_no", row.action_req_code)
                         }
-                        to="/ticket-admin/action-request/detail/information"
-                      >
-                        {row.request_no}
+                        to="/ticket-admin/action-request/detail/information">
+                        {row.action_req_code}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_no}
+                      {row.invent_id.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_name}
+                      {row.invent_id.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.created}
+                      {`${calbill(row.createdAt)}`}
                     </TableCell>
 
                     <TableCell component="th" scope="row" align="center">
@@ -301,19 +333,35 @@ const ActionTicketTable = () => {
                         style={{
                           background: `${row.status_id.color_status}4C`,
                           color: `${row.status_id.color_status}FF`,
-                        }}
-                      >
+                        }}>
                         {capitalizeFirstLetter(row.status_id.status_name)}
                       </span>
                     </TableCell>
-                    <TableCell align="center" component="th" scope="row">
-                      <button className="btn-response" onClick={(e) => {}}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="akar-icons:arrow-forward-thick-fill"
-                        ></span>
-                        <span className="name-btn">Response</span>
-                      </button>
+
+                    <TableCell
+                      align="center"
+                      component="th"
+                      scope="row"
+                      width={150}>
+                      {row.status_id.id === 12 ? (
+                        <button className="btn-response" onClick={(e) => {}}>
+                          <span
+                            class="iconify icon-btn"
+                            data-icon="akar-icons:arrow-forward-thick-fill"></span>
+                          <span className="name-btn">Response</span>
+                        </button>
+                      ) : row.status_id.id === 10 ||
+                        row.status_id.id === 11 ||
+                        row.status_id.id === 7 ? null : (
+                        <button
+                          className="btn-response-changed"
+                          onClick={(e) => {}}>
+                          <span
+                            class="iconify icon-btn"
+                            data-icon="grommet-icons:power-reset"></span>
+                          <span className="name-btn">Change Status</span>
+                        </button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -330,7 +378,7 @@ const ActionTicketTable = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={dataRequest.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

@@ -225,6 +225,10 @@ const PersistentDrawer = (props) => {
     } else {
       setMenuDatas(menuDataUser2);
     }
+
+    // document.addEventListener("contextmenu", (e) => {
+    //   e.preventDefault();
+    // });
   }, []);
 
   // const checkUser = () => {

@@ -4,3 +4,10 @@
   left: 50%;
   transform: translate(-25%, -50%);
 }
+
+.loading-container-request {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-25%, -50%);
+}

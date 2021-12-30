@@ -51,18 +51,18 @@ const useStyles = makeStyles((theme) => ({
 
 function calbill(date) {
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
     "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   var myDate = new Date(date);
@@ -330,7 +330,9 @@ const ActionApproveDetail = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Description Of Problem</p>
-                <p>{dataRequest.action_req_description}</p>
+                <p className="wrap-paraf">
+                  {dataRequest.action_req_description}
+                </p>
               </div>
             </div>
           </div>

@@ -1000,6 +1000,49 @@ input[type="radio"] {
   position: absolute;
 }
 
+.btn-response-changed {
+  margin: 0 5px 0 5px;
+  color: #ec9108;
+  padding: 15px 65px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: transparent;
+  color: #fff;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-response-changed.disabled {
+  cursor: not-allowed;
+}
+
+.btn-response-changed:hover {
+  background-color: #ec91082f;
+}
+
+.btn-response-changed .icon-btn {
+  color: #ec9108;
+  left: 8px;
+  bottom: 8px;
+  position: absolute;
+  font-size: 15px;
+}
+
+.btn-response-changed .name-btn {
+  color: #ec9108;
+  right: 8px;
+  bottom: 4px;
+  position: absolute;
+}
+
 .navigation-tabs {
   width: 80px;
   height: 24px;
@@ -1448,4 +1491,12 @@ input[type="radio"] {
   font-size: 14px;
   line-height: 120%;
   margin-bottom: 4px;
+}
+
+/* Ticket */
+.wrap-paraf {
+  display: block; /* or inline-block */
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow: hidden;
 }
