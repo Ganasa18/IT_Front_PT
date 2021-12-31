@@ -150,8 +150,6 @@ const ActionReqTicketDetail = () => {
           });
 
           setTicketData(arr_request);
-          console.log(arr_request);
-
           setIsLoading(false);
         })
       )

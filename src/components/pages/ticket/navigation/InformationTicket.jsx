@@ -63,6 +63,24 @@ function calbill(date) {
   return newdate;
 }
 
+function fadeIn(el, time) {
+  el.style.opacity = 0;
+
+  var last = +new Date();
+  var tick = function () {
+    el.style.opacity = +el.style.opacity + (new Date() - last) / time;
+    el.style.display = "block";
+    last = +new Date();
+
+    if (+el.style.opacity < 1) {
+      (window.requestAnimationFrame && requestAnimationFrame(tick)) ||
+        setTimeout(tick, 16);
+    }
+  };
+
+  tick();
+}
+
 const InformationTicket = () => {
   const classes = useStyles();
   const req_no = localStorage.getItem("req_no");
@@ -255,9 +273,7 @@ const InformationTicket = () => {
           });
 
           // Result
-
           setTicketData(JoinUser);
-          console.log(JoinUser);
           setIsLoading();
         })
       )
@@ -274,6 +290,36 @@ const InformationTicket = () => {
       </>
     );
   }
+
+  const viewImg = () => {
+    // alert("view");
+    // console.log(ticketData[0].picture_req);
+    const pop = document.querySelector(".popimg");
+    fadeIn(pop, 1000);
+
+    const popImg = document.querySelector(".pop_upcontent img");
+    setTimeout(() => {
+      popImg.style.display = "block";
+    }, 1500);
+    popImg.setAttribute(
+      "src",
+      `${invEndPoint[0].url}${
+        invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+      }/${ticketData[0].picture_req}`
+    );
+
+    const closePop = document.querySelector(".closepop");
+    closePop.style.display = "block";
+  };
+
+  const closeImg = () => {
+    const pop = document.querySelector(".popimg");
+    pop.style.display = "none";
+    const popImg = document.querySelector(".pop_upcontent img");
+    popImg.style.display = "none";
+    const closePop = document.querySelector(".closepop");
+    closePop.style.display = "none";
+  };
 
   return (
     <>
@@ -333,6 +379,43 @@ const InformationTicket = () => {
                 </div>
               </>
             ) : null}
+          </div>
+          <br />
+          <div className="row">
+            <div className="col-3">
+              <p className="label-asset">Attachment</p>
+              <p>
+                {ticketData[0].picture_req !== null ? (
+                  <>
+                    <button className="attachment-view" onClick={viewImg}>
+                      view
+                    </button>
+                    <div class="popimg"></div>
+                    <div class="pop_upcontent">
+                      <img id="idimgcontent" alt="img" />
+                      <span class="closepop" onClick={closeImg}>
+                        Close
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <button className="attachment-view-disabled">view</button>
+                )}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">Troubleshoot</p>
+              <p>Kerusakan pada RAM</p>
+              <p className="wrap-paraf">
+                RAM kurang kencang jadi layar hitam, dan sudah dibetulkan
+              </p>
+            </div>
+            <div className="col-2">
+              <p className="label-asset">Close Remark</p>
+              <p className="wrap-paraf">
+                RAM kurang kencang jadi layar hitam, dan sudah dibetulkan
+              </p>
+            </div>
           </div>
         </div>
       </Grid>
