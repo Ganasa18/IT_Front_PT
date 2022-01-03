@@ -311,6 +311,8 @@ const PersistentDrawer = (props) => {
         cookies.remove("token", { path: "/" });
         cookies.remove("uuid", { path: "/" });
         cookies.remove("role", { path: "/" });
+        cookies.remove("id", { path: "/" });
+        cookies.remove("departement", { path: "/" });
         setUserLogin([]);
         setTimeout(() => {
           window.location.assign("/");

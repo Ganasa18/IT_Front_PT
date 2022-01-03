@@ -302,6 +302,7 @@ const TableActionReq = () => {
   }
 
   const storeData = (row) => {
+    localStorage.setItem("req_no", row.action_req_code);
     localStorage.setItem("ticketData", JSON.stringify(row));
   };
 
