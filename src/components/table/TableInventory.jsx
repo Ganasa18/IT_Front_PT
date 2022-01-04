@@ -24,6 +24,7 @@ import {
   Checkbox,
   Divider,
   Button,
+  Grid,
 } from "@material-ui/core";
 import "../../assets/master.css";
 import IconButton from "@material-ui/core/IconButton";
@@ -33,6 +34,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
 import EditInventory from "../pages/inventory/EditInventory";
+import InputDisposal from "./disposal/InputDisposal";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -163,6 +165,21 @@ const useStyles2 = makeStyles((theme) => ({
       transform: "translate(-50%,-45%)",
     },
   },
+  paperDisposal: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "45%",
+    left: "50%",
+    width: 1200,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+      width: 1000,
+    },
+  },
   cancelBtn: {
     color: "#EB5757",
     border: "1px solid #EB5757",
@@ -186,12 +203,14 @@ const TableInventory = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [allSelected, setAllSelected] = useState(false);
   const [selected, setSelected] = useState({});
   const [dataInventory, setDataInventory] = useState([]);
   const [editedRowData, setEditedRowData] = useState([]);
   const [lastNumber, setLastNumber] = useState("");
+  const [selectedDisposal, setSelectedDisposal] = useState([]);
+  const [modalDisposal, setModalDisposal] = useState(false);
 
   useEffect(() => {
     getInventory();
@@ -232,6 +251,7 @@ const TableInventory = () => {
           invent.user_id = usermap[invent.used_by];
         });
         setDataInventory(arr_invent);
+        setIsLoading(false);
       })
     );
   };
@@ -247,6 +267,10 @@ const TableInventory = () => {
 
   const modalClose = () => {
     setEditModal(false);
+  };
+
+  const modalHandleDisposal = () => {
+    setModalDisposal((prevSelected) => !prevSelected);
   };
 
   const toggleAllSelected = (e) => {
@@ -333,15 +357,19 @@ const TableInventory = () => {
     Math.min(rowsPerPage, dataInventory.length - page * rowsPerPage);
 
   const checkValue = () => {
-    var result = Object.keys(selected).map((key) => [
-      Number(key),
-      selected[key],
-    ]);
-    const newArrDisposal = result.map((row) => ({
-      id: row[0],
-    }));
+    setModalDisposal((prevSelected) => !prevSelected);
 
-    console.log(newArrDisposal);
+    // var result = Object.keys(selected).map((key) => [
+    //   Number(key),
+    //   selected[key],
+    // ]);
+    const newArrDisposal = Object.keys(selected).map((key) => Number(key));
+    var newInvent = [...dataInventory];
+    newInvent = newInvent.filter((row) => newArrDisposal.includes(row.id));
+    setSelectedDisposal(newInvent);
+
+    // console.log(newArrDisposal);
+
     // const checkbox = document.querySelectorAll("#check-value .Mui-checked");
     // const table = document.querySelectorAll("tbody #check-value");
     // const arr = [...checkbox];
@@ -388,6 +416,31 @@ const TableInventory = () => {
           <Button
             className={classes.cancelBtn}
             onClick={modalClose}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyDisposal = (
+    <>
+      <Fade in={modalDisposal}>
+        <div className={classes.paperDisposal}>
+          <div className="row">
+            <div className="col-12">
+              <h3>Disposal Asset</h3>
+            </div>
+          </div>
+          <Divider />
+          <br />
+          <Grid container spacing={3}>
+            <InputDisposal dataDisposal={selectedDisposal} />
+          </Grid>
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalHandleDisposal}
             variant="outlined">
             Cancel
           </Button>
@@ -567,6 +620,15 @@ const TableInventory = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalDisposal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyDisposal}
       </Modal>
     </>
   );

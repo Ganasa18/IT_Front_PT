@@ -160,11 +160,12 @@
 }
 
 .input-field-comment {
-  color: #a5a1a1;
+  color: #000000;
   display: block;
   width: 100%;
   border: none;
   border-radius: 5px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   outline: none;
   padding: 20px 80px 20px 20px;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
@@ -181,6 +182,20 @@
   box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   color: #1653a6;
+  font-size: 20px;
+}
+
+.button-send-disbled {
+  position: absolute;
+  width: 80px;
+  height: 48px;
+  cursor: not-allowed;
+  border: none;
+  top: 25px;
+  background: #ffffff;
+  box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  color: #999999;
   font-size: 20px;
 }
 
@@ -307,6 +322,7 @@
 }
 
 .icon-attach {
+  color: #ec9108;
   font-size: 25px;
   position: absolute;
   top: 50%;
@@ -376,16 +392,18 @@
   left: 15%;
   bottom: 5px;
   cursor: pointer;
+  opacity: 0.9;
 }
 
 .img-message:hover {
-  opacity: 0.8;
+  opacity: 0.5;
 }
 
 @media only screen and (min-width: 1366px) and (max-width: 1366px) {
   .img-message {
     width: 135px;
     height: 100px;
+    bottom: 15px;
   }
 }
 

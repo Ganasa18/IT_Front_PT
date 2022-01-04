@@ -1314,6 +1314,61 @@ input[type="radio"] {
   margin-right: 5px;
 }
 
+.wrapper_dispos__status {
+  position: absolute;
+  top: 50%;
+  transform: translateY(40%);
+}
+
+/* Radio Disposal */
+
+.radio-disposal {
+  margin: 0.8rem;
+}
+
+.radio-disposal input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-disposal {
+  cursor: pointer;
+  margin-top: 25px;
+}
+
+.radio-disposal input[type="radio"] + .radio-label:before {
+  content: "";
+  background: #f4f4f4;
+  border-radius: 100%;
+  border: 1px solid #b4b4b4;
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  position: relative;
+  top: -0.2em;
+  margin-right: 1.3em;
+  vertical-align: top;
+  cursor: pointer;
+  text-align: center;
+  transition: all 250ms ease;
+}
+.radio-disposal input[type="radio"]:checked + .radio-label:before {
+  background-color: #3197ee;
+  box-shadow: inset 0 0 0 4px #f4f4f4;
+}
+.radio-disposal input[type="radio"]:focus + .radio-label:before {
+  outline: none;
+  border-color: #3197ee;
+}
+.radio-disposal input[type="radio"]:disabled + .radio-label:before {
+  box-shadow: inset 0 0 0 4px #f4f4f4;
+  border-color: #b4b4b4;
+  background: #b4b4b4;
+}
+.radio-disposal input[type="radio"] + .radio-label:empty:before {
+  margin-right: 0;
+}
+
 /* BUTTON INv */
 .btn-disposal-inv {
   margin: 0 5px 0 5px;

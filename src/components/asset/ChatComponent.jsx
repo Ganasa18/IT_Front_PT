@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
 import "../asset/chips.css";
-import { pathEndPoint, invEndPoint } from "../../assets/menu";
+import { authEndPoint, invEndPoint } from "../../assets/menu";
 import axios from "axios";
 import Loading from "./Loading";
 import Cookies from "universal-cookie";
@@ -11,6 +11,7 @@ import { makeStyles } from "@material-ui/core";
 
 const cookies = new Cookies();
 const userID = cookies.get("id");
+const token = cookies.get("token");
 
 const useStyles = makeStyles((theme) => ({
   iconAttach: (props) => ({
@@ -24,6 +25,14 @@ const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     color: "#e95d5d",
     marginLeft: "5px",
+  },
+
+  paddingImg: {
+    position: "relative",
+    bottom: "20px",
+    left: "12%",
+    width: "270px",
+    height: "150px",
   },
 
   btnWrapper: {
@@ -100,6 +109,8 @@ const ChatComponent = () => {
   const [image, setImage] = useState(null);
   const [file, setFile] = useState(null);
   const [colorIcon, setColorIcon] = useState("#ec9108");
+  const [userData, setUserData] = useState([]);
+  const [checkInput, setCheckInput] = useState(false);
   const props = {
     colorName: colorIcon,
   };
@@ -110,6 +121,7 @@ const ChatComponent = () => {
     setTimeout(() => {
       getComment();
     }, 10000);
+    getUser();
   }, [commentData]);
 
   const closeImg = () => {
@@ -141,15 +153,78 @@ const ChatComponent = () => {
       });
   };
 
-  const handleSubmit = (e) => {
+  const getUser = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const usersData = response.data.data.users;
+        let filterUser = usersData.filter(
+          (item) => item.id === parseInt(userID)
+        );
+        filterUser = filterUser.map((row) => ({
+          user_id: row.id,
+          username: row.username,
+        }));
+        setUserData(filterUser);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(chatValue);
+    if (!file && !chatValue) {
+      return;
+    }
+
+    const checkFile = document.getElementById("filesImg");
+
+    let message_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/message-req/messagePost`;
+
+    const imageFormData = new FormData();
+    if (checkFile.files.length > 0) {
+      imageFormData.append("message_pic", file);
+    }
+
+    imageFormData.append("action_req_code", `${req_no}`);
+    imageFormData.append("id_user", parseInt(userData[0].user_id));
+    imageFormData.append("user_name", `${userData[0].username}`);
+    imageFormData.append(
+      "message_desc",
+      `${chatValue === null ? null : chatValue}`
+    );
+
+    await axios
+      .post(message_req, imageFormData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        setChatValue("");
+        setFile(null);
+        setColorIcon("#ec9108");
+        setTimeout(() => {
+          getComment();
+        }, 1500);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleImage = (row) => {
     setImage(row);
-    console.log(image);
     const imagePop = document.querySelector(".popimg");
     imagePop.style.display = "block";
     const popImg = document.querySelector(".pop_upcontent img");
@@ -173,11 +248,21 @@ const ChatComponent = () => {
   function handleChangeImg(e) {
     setFile(e.target.files[0]);
     setColorIcon("#219653");
+    setCheckInput(true);
   }
 
   const removeImage = () => {
+    const checkFile = document.getElementById("filesImg");
+    checkFile.value = "";
     setFile(null);
     setColorIcon("#ec9108");
+    setCheckInput(false);
+  };
+
+  const setInput = (e) => {
+    setChatValue(e.target.value);
+    console.log(chatValue.length);
+    setCheckInput(true);
   };
 
   return (
@@ -204,16 +289,20 @@ const ChatComponent = () => {
                         }`}>
                         <span className="user-name">{row.user_name}</span>
                         <div class="talktext">
-                          <p>{row.message_desc}</p>
+                          <p>
+                            {row.message_desc !== "null"
+                              ? row.message_desc
+                              : ""}
+                          </p>
                         </div>
                         <span className="created">
-                          {`${calbill(row.createdAt)}`} |{" "}
+                          {`${calbill(row.createdAt)}`} |
                           {`${timeZone(row.createdAt)}`}
                         </span>
 
                         {row.message_pic !== null ? (
                           <img
-                            className="img-message"
+                            className={`img-message`}
                             src={`${invEndPoint[0].url}${
                               invEndPoint[0].port !== ""
                                 ? ":" + invEndPoint[0].port
@@ -276,11 +365,14 @@ const ChatComponent = () => {
                   type="text"
                   className="input-field-comment"
                   value={chatValue}
-                  onChange={(e) => setChatValue(e.target.value)}
+                  onChange={setInput}
                 />
               </div>
               <div className="col-1">
-                <button className="button-send">
+                <button
+                  className={`${
+                    checkInput ? "button-send" : "button-send-disbled"
+                  }`}>
                   <i class="iconify" data-icon="fluent:send-16-filled"></i>
                 </button>
               </div>
