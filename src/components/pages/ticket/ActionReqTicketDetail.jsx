@@ -243,7 +243,10 @@ const ActionReqTicketDetail = () => {
                           row.id !== 10 &&
                           row.id !== 13 &&
                           row.id !== 14 &&
-                          row.id !== 15
+                          row.id !== 15 &&
+                          row.id !== 16 &&
+                          row.id !== 17 &&
+                          row.id !== 18
                       )
                       .map((row) => (
                         <StatusButton
@@ -312,7 +315,10 @@ const ActionReqTicketDetail = () => {
                           row.id !== 10 &&
                           row.id !== 13 &&
                           row.id !== 14 &&
-                          row.id !== 15
+                          row.id !== 15 &&
+                          row.id !== 16 &&
+                          row.id !== 17 &&
+                          row.id !== 18
                       )
                       .map((row) => (
                         <StatusButton
@@ -391,7 +397,10 @@ const ActionReqTicketDetail = () => {
                           row.id !== 10 &&
                           row.id !== 13 &&
                           row.id !== 14 &&
-                          row.id !== 15
+                          row.id !== 15 &&
+                          row.id !== 16 &&
+                          row.id !== 17 &&
+                          row.id !== 18
                       )
                       .map((row) => (
                         <StatusButton
