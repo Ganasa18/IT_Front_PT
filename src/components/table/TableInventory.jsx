@@ -358,17 +358,21 @@ const TableInventory = () => {
 
   const checkValue = () => {
     setModalDisposal((prevSelected) => !prevSelected);
-
-    // var result = Object.keys(selected).map((key) => [
-    //   Number(key),
-    //   selected[key],
-    // ]);
-    const newArrDisposal = Object.keys(selected).map((key) => Number(key));
-    var newInvent = [...dataInventory];
+    var result = Object.keys(selected).map((key) => [
+      Number(key),
+      selected[key],
+    ]);
+    // const newArrDisposal = Object.keys(selected)
+    //   .map((key) => Number(key))
+    //
+    result = result.filter((key) => key[1] !== false);
+    result = result.map((key) => ({
+      id: key[0],
+    }));
+    const newArrDisposal = Object.values(result).map((key) => key.id);
+    var newInvent = dataInventory;
     newInvent = newInvent.filter((row) => newArrDisposal.includes(row.id));
     setSelectedDisposal(newInvent);
-
-    // console.log(newArrDisposal);
 
     // const checkbox = document.querySelectorAll("#check-value .Mui-checked");
     // const table = document.querySelectorAll("tbody #check-value");

@@ -20,6 +20,8 @@ import ActionReqTicketDetail from "../pages/ticket/ActionReqTicketDetail";
 import Inventory from "../pages/Inventory";
 
 import Cookies from "universal-cookie";
+import Disposal from "../pages/Disposal";
+import DisposalDetail from "../table/disposal/DisposalDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -112,6 +114,29 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <Inventory {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/disposal-assets"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <Disposal {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        path="/disposal-assets/detail"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <DisposalDetail {...props} />
           ) : (
             <Redirect to="/" />
           )

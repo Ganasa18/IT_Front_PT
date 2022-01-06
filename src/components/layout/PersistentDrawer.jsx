@@ -31,7 +31,12 @@ import classNames from "classnames";
 import logo from "../../assets/new_logo.png";
 // import user from "../../assets/img.jpg";
 import "../../assets/master.css";
-import { menuData, menuDataUser, menuDataUser2 } from "../../assets/menu.js";
+import {
+  menuData,
+  menuDataUser,
+  menuDataUser2,
+  menuDataUser3,
+} from "../../assets/menu.js";
 import { BrowserRouter } from "react-router-dom";
 import Cookies from "universal-cookie";
 const cookies = new Cookies();
@@ -222,6 +227,8 @@ const PersistentDrawer = (props) => {
       setMenuDatas(menuData);
     } else if (roleUser === "2") {
       setMenuDatas(menuDataUser);
+    } else if (roleUser === "4") {
+      setMenuDatas(menuDataUser3);
     } else {
       setMenuDatas(menuDataUser2);
     }

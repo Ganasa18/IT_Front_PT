@@ -1369,7 +1369,46 @@ input[type="radio"] {
   margin-right: 0;
 }
 
-/* BUTTON INv */
+.btn-download-pdf {
+  margin: 0 6px 0 5px;
+  color: #fff;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  left: 10%;
+  transform: translateX(50%);
+}
+
+.btn-download-pdf:hover {
+  background-color: #ec9108;
+  color: #fff;
+  border: transparent;
+}
+
+.btn-download-pdf .icon-btn {
+  left: 4px;
+  top: 8px;
+  position: absolute;
+  font-size: 18px;
+}
+
+.btn-download-pdf .name-btn {
+  margin-left: 10px;
+}
+
+/* BUTTON INV */
 .btn-disposal-inv {
   margin: 0 5px 0 5px;
   color: rgba(0, 0, 0, 0.87);

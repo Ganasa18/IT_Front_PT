@@ -15,6 +15,8 @@ import {
   TablePagination,
   TableRow,
   Button,
+  Snackbar,
+  Typography,
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import { pathEndPoint } from "../../../assets/menu";
@@ -24,6 +26,10 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import axios from "axios";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -159,6 +165,13 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
+// function formatDisposal(date) {
+//   var year = date.getFullYear().toString();
+//   var month = (date.getMonth() + 101).toString().substring(1);
+//   var day = (date.getDate() + 100).toString().substring(1);
+//   return "DSP" + year + month + day;
+// }
+
 const InputDisposal = ({ dataDisposal }) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
@@ -167,9 +180,20 @@ const InputDisposal = ({ dataDisposal }) => {
   const [nameDisposal, setNameDisposal] = useState("");
   const [descriptionDisposal, setDescriptionDisposal] = useState("");
   const [statusDisposal, setStatusDisposal] = useState([]);
+  const [toast, setToast] = useState(false);
+  const [lastNumber, setLastNumber] = useState("");
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   useEffect(() => {
     getStatusList();
+    getDisLatestId();
   }, []);
 
   const handleChangePage = (event, newPage) => {
@@ -200,6 +224,37 @@ const InputDisposal = ({ dataDisposal }) => {
       });
   };
 
+  const getDisLatestId = async () => {
+    let disposal = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/disposal/latestId`;
+
+    await axios
+      .get(disposal)
+      .then((response) => {
+        var text = response.data.data?.disposal[0]?.disposal_code;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const emptyRows =
     rowsPerPage -
     Math.min(rowsPerPage, selectDisposal.length - page * rowsPerPage);
@@ -224,9 +279,46 @@ const InputDisposal = ({ dataDisposal }) => {
       return;
     }
 
-    console.log(nameDisposal);
-    console.log(descriptionDisposal);
-    console.log(statusdis.value);
+    // console.log(nameDisposal);
+    // console.log(descriptionDisposal);
+    // console.log(statusdis.value);
+    const codeDis = "MKDDSP" + lastNumber;
+    const status_aprove = 10;
+    // console.log(codeDis);
+
+    selectDisposal.forEach((el) => {
+      axios.post(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/disposal/`,
+        {
+          disposal_code: codeDis,
+          disposal_name: nameDisposal,
+          disposal_desc: descriptionDisposal,
+          item_no: el.asset_number,
+          item_name: el.asset_name,
+          type_asset: el.type_asset,
+          area_asset: el.area_name + "-" + el.alias_name,
+          status_disposal: statusdis.value,
+          status_approval: status_aprove,
+        }
+      );
+
+      // Updated Status
+      axios.patch(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/inventory/updated-status/${el.id}/disposal/`,
+        {
+          disposal: true,
+        }
+      );
+    });
+
+    setToast(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
 
   return (
@@ -374,6 +466,15 @@ const InputDisposal = ({ dataDisposal }) => {
       <br />
       <br />
       <br />
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };

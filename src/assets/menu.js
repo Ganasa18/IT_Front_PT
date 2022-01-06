@@ -87,6 +87,13 @@ export const menuData = [
     exact: true,
     to: "/inventory",
   },
+  {
+    id: 6,
+    name: "Disposal Asset",
+    icon: "fluent:delete-dismiss-28-filled",
+    exact: true,
+    to: `/disposal-assets`,
+  },
 ];
 
 export const menuDataUser = [
@@ -138,6 +145,31 @@ export const menuDataUser2 = [
         icon: "fluent:ticket-diagonal-16-filled",
       },
     ],
+  },
+];
+
+export const menuDataUser3 = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: "mdi:desktop-mac-dashboard",
+    exact: true,
+    to: `/`,
+  },
+  {
+    id: 2,
+    name: "Procurement Approval",
+    icon: "bi:cart-fill",
+    exact: true,
+    to: `/procurement-approval`,
+  },
+
+  {
+    id: 3,
+    name: "Disposal Asset Approval",
+    icon: "fluent:delete-dismiss-28-filled",
+    exact: true,
+    to: `/disposal-asset-approval`,
   },
 ];
 
