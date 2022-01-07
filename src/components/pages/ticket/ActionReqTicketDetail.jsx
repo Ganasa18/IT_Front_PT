@@ -75,14 +75,18 @@ const useStyles = makeStyles((theme) => ({
 
   paper: {
     position: "fixed",
-    transform: "translate(-50%,-50%)",
-    top: "40%",
+    transform: "translate(-50%,-60%)",
+    top: "54%",
     left: "50%",
-    width: 950,
+    width: 1200,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 6, 3),
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+      width: 1000,
+    },
   },
 }));
 
@@ -187,7 +191,7 @@ const ActionReqTicketDetail = () => {
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <CreateTicketPurchase />
+          <CreateTicketPurchase dataTicket={ticketData} />
           <Button
             className={classes.cancelBtn}
             onClick={modalClose}

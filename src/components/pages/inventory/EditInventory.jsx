@@ -123,9 +123,7 @@ const EditInventory = (props) => {
   const handleUserDepart = (e) => {
     setTypeAsset(e.target.value);
     const type = e.target.value;
-
     const idArea = e.target.getAttribute("data-area");
-
     if (type === "user") {
       const idUser = dataUser.filter((item) => item.area === parseInt(idArea));
       setDataTypeAsset(idUser);

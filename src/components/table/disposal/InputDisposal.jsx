@@ -286,6 +286,11 @@ const InputDisposal = ({ dataDisposal }) => {
     const status_aprove = 10;
     // console.log(codeDis);
 
+    if (selectDisposal.length === 0) {
+      alert("cannot submit empty asset");
+      return;
+    }
+
     selectDisposal.forEach((el) => {
       axios.post(
         `${pathEndPoint[0].url}${
