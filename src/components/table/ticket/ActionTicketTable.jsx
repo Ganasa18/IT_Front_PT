@@ -280,6 +280,10 @@ const ActionTicketTable = () => {
     setPage(0);
   };
 
+  const saveStorage = (row) => {
+    localStorage.setItem("req_no", row.action_req_code);
+  };
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -310,9 +314,7 @@ const ActionTicketTable = () => {
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <Link
-                        onClick={() =>
-                          localStorage.setItem("req_no", row.action_req_code)
-                        }
+                        onClick={() => saveStorage(row)}
                         to="/ticket-admin/action-request/detail/information">
                         {row.action_req_code}
                       </Link>

@@ -280,10 +280,12 @@ const PurchaseTicket = () => {
     return (
       <>
         <Grid item xs={12} className={classes.cardPadding}>
-          <div className="card-asset-action">
+          <div className="card-asset-action ">
             <h3>Purchase Information</h3>
-            <div className="row">
-              <span class="iconify" data-icon="clarity:pencil-solid"></span>
+            <div className="flex-item-direction">
+              <span
+                class="iconify icon-direction"
+                data-icon="clarity:pencil-solid"></span>
               <p>No Data</p>
             </div>
           </div>

@@ -90,22 +90,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const links = [
-  {
-    url: "/ticket-admin/action-request/detail/information",
-    text: " Information",
-  },
-  { url: "/ticket-admin/action-request/detail/inventory", text: " Inventory" },
-  { url: "/ticket-admin/action-request/detail/purchase", text: " Purchase" },
-  {
-    url: "/ticket-admin/action-request/detail/good-receive",
-    text: "Goods Received",
-  },
-];
-
 const ActionReqTicketDetail = () => {
   const classes = useStyles();
   const req_no = localStorage.getItem("req_no");
+
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [statusBtn, setStatusBtn] = useState([]);
@@ -180,12 +168,32 @@ const ActionReqTicketDetail = () => {
   };
 
   const modalPop = () => {
-    setModalOpen(true);
+    if (ticketData[0].status_id.id === 8) {
+      setModalOpen(true);
+      return;
+    }
+    alert("must changed status damaged first");
   };
 
   const modalClose = () => {
     setModalOpen(false);
   };
+
+  let links = [
+    {
+      url: "/ticket-admin/action-request/detail/information",
+      text: " Information",
+    },
+    {
+      url: "/ticket-admin/action-request/detail/inventory",
+      text: " Inventory",
+    },
+    { url: "/ticket-admin/action-request/detail/purchase", text: " Purchase" },
+    {
+      url: "/ticket-admin/action-request/detail/good-receive",
+      text: "Goods Received",
+    },
+  ];
 
   const bodyModal = (
     <>
@@ -218,16 +226,22 @@ const ActionReqTicketDetail = () => {
             textSpan={"Action Request"}
             typographyText={req_no}
           />
-
-          {links.map(({ url, text, index }) => (
-            <NavLink
-              key={index}
-              to={url}
-              className={"navigation-tabs"}
-              activeClassName="selected">
-              {text}
-            </NavLink>
-          ))}
+          {isLoading
+            ? null
+            : links.map(({ url, text, index }) => (
+                <NavLink
+                  key={index}
+                  to={url}
+                  className={`navigation-tabs${
+                    ticketData[0].status_id.id !== 13 &&
+                    text === "Goods Received"
+                      ? "-disabled"
+                      : ""
+                  }`}
+                  activeClassName="selected">
+                  {text}
+                </NavLink>
+              ))}
 
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
@@ -264,8 +278,10 @@ const ActionReqTicketDetail = () => {
                           nameBtn={row.status_name}
                           colorName={row.color_status}
                           backgroundColor={row.color_status}
+                          data={ticketData[0]}
                         />
                       ))}
+                    {console.log(ticketData)}
                   </div>
                 )}
 
@@ -296,7 +312,7 @@ const ActionReqTicketDetail = () => {
             <NavLink
               key={index}
               to={url}
-              className={"navigation-tabs"}
+              className={`navigation-tabs`}
               activeClassName="selected">
               {text}
             </NavLink>
@@ -326,9 +342,7 @@ const ActionReqTicketDetail = () => {
                       )
                       .map((row) => (
                         <StatusButton
-                          Onclick={function () {
-                            alert(row.id);
-                          }}
+                          idStatus={row.id}
                           status={`${
                             ticketData[0].status_id.status_name ===
                             row.status_name
@@ -338,6 +352,7 @@ const ActionReqTicketDetail = () => {
                           nameBtn={row.status_name}
                           colorName={row.color_status}
                           backgroundColor={row.color_status}
+                          data={ticketData[0]}
                         />
                       ))}
                   </div>
@@ -418,6 +433,7 @@ const ActionReqTicketDetail = () => {
                           nameBtn={row.status_name}
                           colorName={row.color_status}
                           backgroundColor={row.color_status}
+                          data={ticketData[0]}
                         />
                       ))}
                   </div>
@@ -478,9 +494,7 @@ const ActionReqTicketDetail = () => {
                       .sort((a, b) => (a.id > b.id ? 1 : -1))
                       .map((row) => (
                         <StatusButton
-                          Onclick={function () {
-                            alert(row.id);
-                          }}
+                          idStatus={row.id}
                           status={`${
                             ticketData[0].status_id.status_name ===
                             row.status_name
@@ -490,6 +504,7 @@ const ActionReqTicketDetail = () => {
                           nameBtn={row.status_name}
                           colorName={row.color_status}
                           backgroundColor={row.color_status}
+                          data={ticketData[0]}
                         />
                       ))}
                   </div>
