@@ -171,7 +171,7 @@ const useStyles2 = makeStyles((theme) => ({
     padding: theme.spacing(2, 4, 3),
   },
   paperTble: {
-    height: "580px",
+    height: "480px",
   },
   buttonAdd: {
     [theme.breakpoints.up("xl")]: {
@@ -196,73 +196,101 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableAssetUser = () => {
+const TableAssetUser = (props) => {
+  const { dataUser } = props;
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(4);
+  const [rowsPerPage, setRowsPerPage] = useState(3);
   //   const [dataArea, setDataArea] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [allSelected, setAllSelected] = useState(false);
   const [selected, setSelected] = useState({});
+  const [dataAsset, setDataAsset] = useState([]);
 
-  const dataArea = [
-    {
-      id: "1",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-    {
-      id: "2",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-    {
-      id: "3",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-    {
-      id: "4",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-    {
-      id: "5",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-    {
-      id: "6",
-      asset_no: "123444",
-      asset_name: "Macbook",
-      unit_part: "part",
-      category: "Hardware",
-      sub_category: "Laptop",
-    },
-  ];
+  useEffect(() => {
+    getAssetUser();
+  }, []);
+
+  console.log(dataUser);
+  // const dataArea = [
+  //   {
+  //     id: "1",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  //   {
+  //     id: "2",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  //   {
+  //     id: "3",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  //   {
+  //     id: "4",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  //   {
+  //     id: "5",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  //   {
+  //     id: "6",
+  //     asset_no: "123444",
+  //     asset_name: "Macbook",
+  //     unit_part: "part",
+  //     category: "Hardware",
+  //     sub_category: "Laptop",
+  //   },
+  // ];
+
+  const getAssetUser = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+    await axios
+      .get(inventory)
+      .then((response) => {
+        let filterAsset = response.data.data.inventorys;
+
+        filterAsset = filterAsset.filter(
+          (item) => item.used_by === dataUser.user_id
+        );
+
+        setDataAsset(filterAsset);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const toggleAllSelected = (e) => {
     const { checked } = e.target;
     setAllSelected(checked);
 
-    dataArea &&
+    dataAsset &&
       setSelected(
-        dataArea.reduce(
+        dataAsset.reduce(
           (selected, { id }) => ({
             ...selected,
             [id]: checked,
@@ -285,9 +313,9 @@ const TableAssetUser = () => {
 
   const selectedCount = Object.values(selected).filter(Boolean).length;
 
-  const isAllSelected = selectedCount === dataArea.length;
+  const isAllSelected = selectedCount === dataAsset.length;
 
-  const isIndeterminate = selectedCount && selectedCount !== dataArea.length;
+  const isIndeterminate = selectedCount && selectedCount !== dataAsset.length;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -299,7 +327,7 @@ const TableAssetUser = () => {
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, dataAsset.length - page * rowsPerPage);
 
   return (
     <>
@@ -363,11 +391,11 @@ const TableAssetUser = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? dataAsset.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : dataAsset
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell padding="checkbox" style={{ width: 50 }}>
@@ -377,26 +405,26 @@ const TableAssetUser = () => {
                       />
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_no}
+                      {row.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.unit_part}
+                      {row.asset_part_or_unit}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.category}
+                      {row.category_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.sub_category}
+                      {row.subcategory_name}
                     </TableCell>
                     <TableCell align="center">
-                      <button className="btn-edit" onClick={(e) => {}}>
+                      <button className="btn-delete" onClick={(e) => {}}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ci:edit"></span>
-                        <span className="name-btn">Edit</span>
+                          data-icon="ant-design:delete-fill"></span>
+                        <span className="name-btn">Delete</span>
                       </button>
                     </TableCell>
                   </TableRow>
@@ -412,9 +440,9 @@ const TableAssetUser = () => {
             <TableFooter className={classes.posPagination}>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                  rowsPerPageOptions={[3]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={dataAsset.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

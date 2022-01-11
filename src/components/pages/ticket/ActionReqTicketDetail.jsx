@@ -232,11 +232,13 @@ const ActionReqTicketDetail = () => {
                 <NavLink
                   key={index}
                   to={url}
-                  className={`navigation-tabs${
-                    ticketData[0].status_id.id !== 13 &&
-                    text === "Goods Received"
-                      ? "-disabled"
-                      : ""
+                  className={`${
+                    ticketData[0].status_id.id === 13 ||
+                    ticketData[0].status_id.id === 14
+                      ? "navigation-tabs"
+                      : text === "Goods Received"
+                      ? "navigation-tabs-disabled"
+                      : "navigation-tabs"
                   }`}
                   activeClassName="selected">
                   {text}
@@ -308,18 +310,27 @@ const ActionReqTicketDetail = () => {
             textSpan={"Action Request"}
             typographyText={req_no}
           />
-          {links.map(({ url, text, index }) => (
-            <NavLink
-              key={index}
-              to={url}
-              className={`navigation-tabs`}
-              activeClassName="selected">
-              {text}
-            </NavLink>
-          ))}
+          {isLoading
+            ? null
+            : links.map(({ url, text, index }) => (
+                <NavLink
+                  key={index}
+                  to={url}
+                  className={`${
+                    ticketData[0].status_id.id === 13 ||
+                    ticketData[0].status_id.id === 14
+                      ? "navigation-tabs"
+                      : text === "Goods Received"
+                      ? "navigation-tabs-disabled"
+                      : "navigation-tabs"
+                  }`}
+                  activeClassName="selected">
+                  {text}
+                </NavLink>
+              ))}
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
-              <InventoryTicket />
+              <InventoryTicket dataTicket={ticketData[0]} />
             </Grid>
             <Grid item xs={4}>
               <div className="card-status">
@@ -380,15 +391,24 @@ const ActionReqTicketDetail = () => {
             textSpan={"Action Request"}
             typographyText={req_no}
           />
-          {links.map(({ url, text, index }) => (
-            <NavLink
-              key={index}
-              to={url}
-              className={"navigation-tabs"}
-              activeClassName="selected">
-              {text}
-            </NavLink>
-          ))}
+          {isLoading
+            ? null
+            : links.map(({ url, text, index }) => (
+                <NavLink
+                  key={index}
+                  to={url}
+                  className={`${
+                    ticketData[0].status_id.id === 13 ||
+                    ticketData[0].status_id.id === 14
+                      ? "navigation-tabs"
+                      : text === "Goods Received"
+                      ? "navigation-tabs-disabled"
+                      : "navigation-tabs"
+                  }`}
+                  activeClassName="selected">
+                  {text}
+                </NavLink>
+              ))}
 
           <Button
             onClick={modalPop}
@@ -400,7 +420,7 @@ const ActionReqTicketDetail = () => {
           </Button>
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
-              <PurchaseTicket />
+              <PurchaseTicket dataTicket={ticketData[0]} />
             </Grid>
             <Grid item xs={4}>
               <div className="card-status">

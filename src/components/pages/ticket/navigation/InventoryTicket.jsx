@@ -23,15 +23,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const InventoryTicket = () => {
+const InventoryTicket = ({ dataTicket }) => {
   const classes = useStyles();
+
   return (
     <>
       <Grid item xs={12} className={classes.cardPadding}>
-        <TableAssetUser />
+        <TableAssetUser dataUser={dataTicket} />
       </Grid>
       <Grid item xs={12} className={classes.cardPadding}>
-        <TableUserDepartementAsset />
+        <TableUserDepartementAsset dataUser={dataTicket} />
       </Grid>
     </>
   );

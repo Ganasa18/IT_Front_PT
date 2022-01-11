@@ -263,6 +263,8 @@ const PurchaseTicket = () => {
           setDataPR(arr_request);
           setListReq(jsonList);
 
+          console.log(arr_request);
+
           setIsLoading(false);
         })
       )
@@ -361,7 +363,6 @@ const TablePurchaseList = ({ listData }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [listPurchase] = useState(listData);
-  console.log(listPurchase);
 
   const emptyRows =
     rowsPerPage -

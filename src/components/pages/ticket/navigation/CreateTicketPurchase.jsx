@@ -23,7 +23,7 @@ import "../../../../assets/asset_user.css";
 import "../.././../asset/chips.css";
 import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../../../assets/select-search.css";
-import { pathEndPoint } from "../../../../assets/menu";
+import { pathEndPoint, prEndPoint, invEndPoint } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -226,9 +226,11 @@ const CreateTicketPurchase = ({ dataTicket }) => {
   const [description, setDescription] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [lastNumber, setLastNumber] = useState("");
 
   useEffect(() => {
     getCategoryList();
+    getPrLatestId();
   }, []);
 
   const getCategoryList = async () => {
@@ -246,6 +248,37 @@ const CreateTicketPurchase = ({ dataTicket }) => {
         }));
 
         setDataCategory(newArrCategory);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getPrLatestId = async () => {
+    let pr = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/getLatest`;
+
+    await axios
+      .get(pr)
+      .then((response) => {
+        var text = response.data.data?.pr_req[0]?.purchase_req_code;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
       })
       .catch((error) => {
         console.log(error);
@@ -332,17 +365,41 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     setTodos(filteredDisposal);
   }
 
-  const submitPR = () => {
+  const submitPR = async () => {
+    let pr = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req`;
+
+    let ar = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/updated-ticket-status/${dataReq[0].action_req_code}`;
+
     if (todos.length === 0) {
       alert("cannot empty list");
       return;
     }
     const jsonString = JSON.stringify(todos);
-    // console.log(todos);
-    console.log(dataReq[0].action_req_code);
-    console.log(dataReq[0].user_id);
-    console.log(dataReq[0].status_id);
-    console.log(jsonString);
+
+    // console.log("MKDPR" + lastNumber);
+    // console.log(dataReq[0].action_req_code);
+    // console.log(dataReq[0].user_id);
+    // console.log(dataReq[0].status_id);
+    // console.log(jsonString);
+
+    await axios.post(pr, {
+      action_req_code: dataReq[0].action_req_code,
+      purchase_req_code: "MKDPR" + lastNumber,
+      status_id: 10,
+      request_list: jsonString,
+    });
+
+    await axios.patch(ar, {
+      status_id: 19,
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -369,6 +426,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       <br />
       <div className={`row ${classes.positionPaper}`}>
         <div className="col-6">
+          {console.log(dataReq)}
           <label htmlFor="">User/Dept.</label>
           <div className="row">
             <div class="col-5">

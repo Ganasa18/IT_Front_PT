@@ -106,13 +106,28 @@ const StatusButton = (styleProps) => {
       return;
     }
 
-    if (data.status_id.id === 9 && button.innerHTML === "damaged") {
+    if (
+      (data.status_id.id === 9 && button.innerHTML === "damaged") ||
+      button.innerHTML === "purchase"
+    ) {
       button.setAttribute("disabled", true);
       button.style.cursor = "not-allowed";
       return;
     }
 
-    if (data.status_id.id === 8) {
+    if (data.status_id.id === 15 && button.innerHTML === "closed") {
+      button.setAttribute("disabled", false);
+      button.style.cursor = "pointer";
+      return;
+    }
+
+    if (
+      data.status_id.id === 8 ||
+      data.status_id.id === 13 ||
+      data.status_id.id === 14 ||
+      data.status_id.id === 15 ||
+      data.status_id.id === 19
+    ) {
       button.setAttribute("disabled", true);
       button.style.cursor = "not-allowed";
       return;
