@@ -405,15 +405,21 @@ const InformationTicket = () => {
             </div>
             <div className="col-3">
               <p className="label-asset">Troubleshoot</p>
-              <p>Kerusakan pada RAM</p>
+              <p>
+                {ticketData[0].trouble_title
+                  ? ticketData[0].trouble_title
+                  : "-"}
+              </p>
               <p className="wrap-paraf">
-                RAM kurang kencang jadi layar hitam, dan sudah dibetulkan
+                {ticketData[0].trouble_detail
+                  ? ticketData[0].trouble_detail
+                  : "-"}
               </p>
             </div>
             <div className="col-2">
               <p className="label-asset">Close Remark</p>
               <p className="wrap-paraf">
-                RAM kurang kencang jadi layar hitam, dan sudah dibetulkan
+                {ticketData[0].close_remark ? ticketData[0].close_remark : "-"}
               </p>
             </div>
           </div>

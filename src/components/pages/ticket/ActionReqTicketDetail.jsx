@@ -501,7 +501,7 @@ const ActionReqTicketDetail = () => {
           ))}
           <Grid container spacing={3}>
             <Grid item xs={12} className={classes.cardPadding}>
-              <GoodReceiveTicket />
+              <GoodReceiveTicket dataTicket={ticketData[0]} />
             </Grid>
             <Grid item xs={4}>
               <div className="card-status">

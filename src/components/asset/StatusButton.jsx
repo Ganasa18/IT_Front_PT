@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
+import { pathEndPoint, prEndPoint, invEndPoint } from "../../assets/menu";
 import {
   makeStyles,
   Modal,
@@ -9,6 +10,7 @@ import {
   Button,
   Divider,
 } from "@material-ui/core";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   root: (props) => ({
@@ -79,8 +81,14 @@ const StatusButton = (styleProps) => {
   const [modalOpen2, setModalOpen2] = useState(false);
   const [modalOpenDefault, setModalOpenDefault] = useState(false);
   const [buttonType, setButtonType] = useState("");
+  const [idRequest, setIdRequest] = useState(null);
+  const [idStatus, setIdStatus] = useState(null);
+  const [troubleTitle, setTroubleTitle] = useState("");
+  const [remark, setRemark] = useState("");
 
   const statusChange = async (props, data) => {
+    setIdStatus(props);
+    setIdRequest(data.action_req_code);
     if (buttonType === "troubleshoot") {
       setModalOpen2(true);
       return;
@@ -90,10 +98,14 @@ const StatusButton = (styleProps) => {
       return;
     }
 
+    if (buttonType === "damaged") {
+      alert("damaged");
+      return;
+    }
     setModalOpenDefault(true);
 
     // console.log(props, data);
-    const button = document.querySelector(`#buttonCheck-${props}`);
+    // const button = document.querySelector(`#buttonCheck-${props}`);
   };
 
   const disbledButton = async (props, data) => {
@@ -106,27 +118,123 @@ const StatusButton = (styleProps) => {
       return;
     }
 
-    if (
-      (data.status_id.id === 9 && button.innerHTML === "damaged") ||
-      button.innerHTML === "purchase"
-    ) {
-      button.setAttribute("disabled", true);
-      button.style.cursor = "not-allowed";
+    if (data.status_id.id === 4) {
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
       return;
     }
 
-    if (data.status_id.id === 15 && button.innerHTML === "closed") {
-      button.setAttribute("disabled", false);
-      button.style.cursor = "pointer";
+    if (data.status_id.id === 12) {
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      return;
+    }
+
+    if (data.status_id.id === 9) {
+      if (button.innerHTML === "damaged") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      return;
+    }
+
+    if (data.status_id.id === 13) {
+      if (button.innerHTML === "troubleshoot") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "damaged") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "on progress") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "closed") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      return;
+    }
+
+    if (data.status_id.id === 14) {
+      if (button.innerHTML === "troubleshoot") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "damaged") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "on progress") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "closed") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "in order") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      return;
+    }
+
+    if (data.status_id.id === 15) {
+      if (button.innerHTML === "troubleshoot") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "damaged") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      if (button.innerHTML === "on progress") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "in order") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
       return;
     }
 
     if (
       data.status_id.id === 8 ||
-      data.status_id.id === 13 ||
-      data.status_id.id === 14 ||
-      data.status_id.id === 15 ||
-      data.status_id.id === 19
+      data.status_id.id === 19 ||
+      data.status_id.id === 11
     ) {
       button.setAttribute("disabled", true);
       button.style.cursor = "not-allowed";
@@ -140,6 +248,41 @@ const StatusButton = (styleProps) => {
     setModalOpenDefault(false);
   };
 
+  const submitStatus = async () => {
+    let ticket = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/updated-ticket-status/${idRequest}`;
+
+    await axios
+      .patch(ticket, {
+        status_id: idStatus,
+        trouble_title: troubleTitle,
+        trouble_detail: buttonType === "troubleshoot" ? remark : null,
+        close_remark: buttonType === "closed" ? remark : null,
+      })
+      .then((response) => {
+        alert(response.data.status);
+        setTimeout(() => {
+          setIdRequest(null);
+          setIdStatus(null);
+          setTroubleTitle("");
+          setRemark("");
+          window.location.reload();
+        }, 1000);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // console.log(idStatus);
+    // console.log(idRequest);
+  };
+
+  const submitTrouble = async () => {
+    console.log(troubleTitle);
+    console.log(remark);
+  };
+
   const bodyModalDefault = (
     <>
       <Fade in={modalOpenDefault}>
@@ -151,7 +294,7 @@ const StatusButton = (styleProps) => {
             <button className="btn-cancel" onClick={modalClose}>
               Cancel
             </button>
-            <button className="btn-submit" type="submit">
+            <button className="btn-submit" onClick={submitStatus}>
               Submit
             </button>
           </div>
@@ -177,7 +320,9 @@ const StatusButton = (styleProps) => {
                 className="form-input-area"
                 placeholder="Comment here... "
                 cols="30"
-                rows="10"></textarea>
+                rows="10"
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}></textarea>
             </div>
           </div>
           <br />
@@ -185,7 +330,7 @@ const StatusButton = (styleProps) => {
             <button className="btn-cancel" onClick={modalClose}>
               Cancel
             </button>
-            <button className="btn-submit" type="submit">
+            <button className="btn-submit" onClick={submitStatus}>
               Submit
             </button>
           </div>
@@ -207,7 +352,12 @@ const StatusButton = (styleProps) => {
               <p className="comment-pop-title-2">What’s the problem?</p>
             </div>
             <div className="col-12">
-              <input type="text" className="form-input" />
+              <input
+                type="text"
+                className="form-input"
+                value={troubleTitle}
+                onChange={(e) => setTroubleTitle(e.target.value)}
+              />
             </div>
             <div className="col-12">
               <p className="comment-pop-title-2">Remark</p>
@@ -217,7 +367,9 @@ const StatusButton = (styleProps) => {
                 className="form-input-area"
                 placeholder="Comment here... "
                 cols="30"
-                rows="10"></textarea>
+                rows="10"
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}></textarea>
             </div>
           </div>
           <br />
@@ -225,7 +377,7 @@ const StatusButton = (styleProps) => {
             <button className="btn-cancel" onClick={modalClose}>
               Cancel
             </button>
-            <button className="btn-submit" type="submit">
+            <button className="btn-submit" onClick={submitStatus}>
               Submit
             </button>
           </div>
@@ -238,6 +390,7 @@ const StatusButton = (styleProps) => {
     <>
       <button
         id={`buttonCheck-${styleProps.idStatus}`}
+        // onClick={() => alert(styleProps.idStatus)}
         onClick={() => statusChange(styleProps.idStatus, styleProps.data)}
         onMouseEnter={() => disbledButton(styleProps.idStatus, styleProps.data)}
         className={`${
