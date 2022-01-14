@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { pathEndPoint, authEndPoint, prEndPoint } from "../../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint, invEndPoint, authEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
+import "../../asset/chips.css";
 import { Link } from "react-router-dom";
-
 import {
   useTheme,
   makeStyles,
@@ -18,25 +18,13 @@ import {
   TableRow,
   Paper,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Snackbar,
 } from "@material-ui/core";
 import "../../../assets/master.css";
-import "../../asset/chips.css";
-
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import Cookies from "universal-cookie";
-
-const cookies = new Cookies();
-const token = cookies.get("token");
-const userID = cookies.get("id");
-const DepartementID = cookies.get("departement");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -163,10 +151,6 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function calbill(date) {
   const monthNames = [
     "Jan",
@@ -193,130 +177,58 @@ function calbill(date) {
   return newdate;
 }
 
-const storeData = (row) => {
-  localStorage.setItem("ticketData", JSON.stringify(row));
-};
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
-const TableRequestApproved = () => {
+const TableProcurement = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [userData, setUserData] = useState([]);
-  const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState(false);
+  const [dataPR, setDataPR] = useState([]);
+
   useEffect(() => {
-    getStatusList();
+    getPRList();
+    return () => {
+      setDataPR([]); // This worked for me
+    };
   }, []);
 
-  const getStatusList = async () => {
-    let user = `${authEndPoint[0].url}${
-      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-    }/api/v1/auth/`;
-
-    let act_req = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/`;
+  const getPRList = async () => {
+    let pr = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req`;
 
     let status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/status`;
 
-    let inventory = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/inventory`;
-
-    const requestOne = await axios.get(user, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const requestTwo = await axios.get(act_req);
-    const requestThree = await axios.get(status);
-    const requestFour = await axios.get(inventory);
+    const requestOne = await axios.get(pr);
+    const requestTwo = await axios.get(status);
 
     axios
-      .all([requestOne, requestTwo, requestThree, requestFour])
+      .all([requestOne, requestTwo])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          const responseThree = responses[2];
-          const responseFour = responses[3];
-
-          let newDataUser = responseOne.data.data.users;
-          let newDataRequest = responseTwo.data.data.request_tiket;
-          let newStatus = responseThree.data.data.statuss;
-          let newInvent = responseFour.data.data.inventorys;
-
-          var getID = newDataUser.filter(
-            (item) => item.id === parseInt(userID)
-          );
-          getID = getID.map((item) => ({
-            id: item.id,
-            name: item.username,
-            role: item.role,
-            departement: item.departement,
-            subdepartement: item.subdepartement,
-            area: item.area,
-            email: item.email,
-          }));
-          setUserData(getID);
-
-          const getUser = newDataUser.map((item) => ({
-            id: item.id,
-            name: item.username,
-            role: item.role,
-            departement: item.departement,
-            subdepartement: item.subdepartement,
-            area: item.area,
-            email: item.email,
-          }));
-
-          var arr_request = [...newDataRequest];
+          let newDataRequest = responseOne.data.data.request_purchase;
+          let newStatus = responseTwo.data.data.statuss;
           const arr_status = [...newStatus];
-          const arr_inventory = [...newInvent];
-
-          arr_request = arr_request.filter(
-            (item) =>
-              parseInt(item.departement_id) === parseInt(DepartementID) &&
-              parseInt(item.user_id) !== parseInt(userID) &&
-              parseInt(item.status_id) === 10
-          );
+          const arr_request = [...newDataRequest];
 
           var statusmap = {};
 
           arr_status.forEach(function (status_id) {
             statusmap[status_id.id] = status_id;
           });
-
           arr_request.forEach(function (request_id) {
             request_id.status_id = statusmap[request_id.status_id];
           });
 
-          let JoinStatus = arr_request;
-
-          var inventmap = {};
-
-          arr_inventory.forEach(function (invent_id) {
-            inventmap[invent_id.id] = invent_id;
-          });
-
-          JoinStatus.forEach(function (request_id) {
-            request_id.invent_id = inventmap[request_id.asset_id];
-          });
-
-          let JoinInvent = JoinStatus;
-          // setDataRequest(JoinInvent);
-
-          var usermap = {};
-          getUser.forEach(function (id_user) {
-            usermap[id_user.id] = id_user;
-          });
-
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_user = usermap[request_id.user_id];
-          });
-
-          setDataRequest(JoinInvent);
+          console.log(newDataRequest);
+          setDataPR(newDataRequest);
           setIsLoading(false);
         })
       )
@@ -327,8 +239,7 @@ const TableRequestApproved = () => {
   };
 
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, dataRequest.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, dataPR.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -339,6 +250,15 @@ const TableRequestApproved = () => {
     setPage(0);
   };
 
+  const storeData = (row) => {
+    localStorage.setItem("req_no", row.action_req_code);
+    localStorage.setItem("ticketData", JSON.stringify(row));
+  };
+
+  const storePurchase = (row) => {
+    localStorage.setItem("ticketData", JSON.stringify(row));
+  };
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -346,10 +266,11 @@ const TableRequestApproved = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
+                <StyledTableCell>PR No</StyledTableCell>
+                <StyledTableCell>Create by</StyledTableCell>
                 <StyledTableCell>Request No</StyledTableCell>
-                <StyledTableCell>Asset No</StyledTableCell>
-                <StyledTableCell>Asset Name</StyledTableCell>
-                <StyledTableCell>Date Created</StyledTableCell>
+                <StyledTableCell>Request For</StyledTableCell>
+                <StyledTableCell>PR Date</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -359,30 +280,36 @@ const TableRequestApproved = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataRequest.slice(
+                  ? dataPR.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataRequest
+                  : dataPR
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <Link
+                        onClick={() => storePurchase(row)}
+                        to="procurement-approval/request/approve">
+                        {row.purchase_req_code}
+                      </Link>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.created_by}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <Link
                         onClick={() => storeData(row)}
-                        to="/approval/action-request/detail">
+                        to="procurement-approval/request/detail">
                         {row.action_req_code}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.invent_id.asset_number}
+                      {row.request_by}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.invent_id.asset_name}
+                      {calbill(row.createdAt)}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {`${calbill(row.createdAt)}`}
-                    </TableCell>
-
                     <TableCell component="th" scope="row" align="center">
                       <span
                         className="chip"
@@ -408,7 +335,7 @@ const TableRequestApproved = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataRequest.length}
+                  count={dataPR.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -428,4 +355,4 @@ const TableRequestApproved = () => {
   );
 };
 
-export default TableRequestApproved;
+export default TableProcurement;

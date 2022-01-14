@@ -1723,3 +1723,16 @@ input[type="radio"] {
   font-size: 14px;
   color: #c1c1c1;
 }
+
+/* Purchase Approve*/
+
+.resend {
+  color: #1653a6;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.resend:hover {
+  color: #1652a6bd;
+  cursor: pointer;
+}

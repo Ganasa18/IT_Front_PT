@@ -16,6 +16,7 @@ import {
   TableRow,
   useTheme,
   withStyles,
+  Snackbar,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import "../../../../assets/master.css";
@@ -23,7 +24,12 @@ import "../../../../assets/asset_user.css";
 import "../.././../asset/chips.css";
 import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../../../assets/select-search.css";
-import { pathEndPoint, prEndPoint, invEndPoint } from "../../../../assets/menu";
+import {
+  authEndPoint,
+  pathEndPoint,
+  prEndPoint,
+  invEndPoint,
+} from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -31,6 +37,16 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import axios from "axios";
 import AddIcon from "@material-ui/icons/Add";
+import Cookies from "universal-cookie";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+const cookies = new Cookies();
+const token = cookies.get("token");
+const userId = cookies.get("id");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -227,11 +243,53 @@ const CreateTicketPurchase = ({ dataTicket }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(2);
   const [lastNumber, setLastNumber] = useState("");
+  const [toast, setToast] = useState(false);
+  const [createdBy, setCreatedBy] = useState("");
+  const [requestBy, setRequestBy] = useState("");
 
   useEffect(() => {
+    checkRequest();
     getCategoryList();
     getPrLatestId();
   }, []);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
+
+  const checkRequest = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const AlldataUser = response.data.data.users;
+        const remapData = AlldataUser.map((row) => ({
+          id: row.id,
+          username: row.username,
+          email: row.email,
+        }));
+
+        const dataUser = remapData.filter(
+          (row) => row.id === dataReq[0].user_id
+        );
+        const dataAdmin = remapData.filter(
+          (row) => row.id === parseInt(userId)
+        );
+        setRequestBy(dataUser[0].username);
+        setCreatedBy(dataAdmin[0].username);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const getCategoryList = async () => {
     await axios
@@ -384,6 +442,8 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     // console.log(dataReq[0].action_req_code);
     // console.log(dataReq[0].user_id);
     // console.log(dataReq[0].status_id);
+    // console.log(createdBy);
+    // console.log(requestBy);
     // console.log(jsonString);
 
     await axios.post(pr, {
@@ -391,12 +451,14 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       purchase_req_code: "MKDPR" + lastNumber,
       status_id: 10,
       request_list: jsonString,
+      request_by: requestBy,
+      created_by: createdBy,
     });
 
     await axios.patch(ar, {
       status_id: 19,
     });
-
+    setToast(true);
     setTimeout(() => {
       window.location.reload();
     }, 2000);
@@ -426,7 +488,6 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       <br />
       <div className={`row ${classes.positionPaper}`}>
         <div className="col-6">
-          {console.log(dataReq)}
           <label htmlFor="">User/Dept.</label>
           <div className="row">
             <div class="col-5">
@@ -644,6 +705,15 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       <br />
       <br />
       <br />
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };

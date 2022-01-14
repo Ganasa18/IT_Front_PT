@@ -211,7 +211,6 @@ const TableAssetUser = (props) => {
     getAssetUser();
   }, []);
 
-  console.log(dataUser);
   // const dataArea = [
   //   {
   //     id: "1",
@@ -272,9 +271,15 @@ const TableAssetUser = (props) => {
       .then((response) => {
         let filterAsset = response.data.data.inventorys;
 
-        filterAsset = filterAsset.filter(
-          (item) => item.used_by === dataUser.user_id
-        );
+        if (dataUser.user_id !== undefined) {
+          filterAsset = filterAsset.filter(
+            (item) => item.used_by === dataUser.user_id
+          );
+        } else {
+          filterAsset = filterAsset.filter(
+            (item) => item.used_by === dataUser.id
+          );
+        }
 
         setDataAsset(filterAsset);
         setIsLoading(false);

@@ -308,7 +308,7 @@ const ActionApproveDetail = () => {
                 <p className="label-asset text-center">Status</p>
                 <p className="text-center">
                   <span
-                    class="chip-action"
+                    className="chip-action"
                     style={{
                       background: `${dataRequest.status_id.color_status}4C`,
                       color: `${dataRequest.status_id.color_status}FF`,

@@ -221,11 +221,20 @@ const TableUserDepartementAsset = (props) => {
       .then((response) => {
         let filterAsset = response.data.data.inventorys;
 
-        filterAsset = filterAsset.filter(
-          (item) =>
-            item.departement === dataUser.departement_id &&
-            item.type_asset !== "user"
-        );
+        if (dataUser.departement_id !== undefined) {
+          filterAsset = filterAsset.filter(
+            (item) =>
+              item.departement === dataUser.departement_id &&
+              item.type_asset !== "user"
+          );
+        } else {
+          filterAsset = filterAsset.filter(
+            (item) =>
+              item.departement === dataUser.departement &&
+              item.type_asset !== "user"
+          );
+        }
+        console.log(dataUser);
 
         setDataAsset(filterAsset);
         setIsLoading(false);

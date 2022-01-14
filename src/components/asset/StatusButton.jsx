@@ -98,10 +98,10 @@ const StatusButton = (styleProps) => {
       return;
     }
 
-    if (buttonType === "damaged") {
-      alert("damaged");
-      return;
-    }
+    // if (buttonType === "damaged") {
+    //   alert("damaged");
+    //   return;
+    // }
     setModalOpenDefault(true);
 
     // console.log(props, data);

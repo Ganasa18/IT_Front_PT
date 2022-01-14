@@ -374,7 +374,7 @@ const PersistentDrawer = (props) => {
                 </h3>
                 <ul>
                   <li>
-                    <i class="iconify iconMenu" data-icon="gg:profile"></i>
+                    <i className="iconify iconMenu" data-icon="gg:profile"></i>
                     <button
                       onClick={() =>
                         (window.location.href = `${
@@ -385,7 +385,7 @@ const PersistentDrawer = (props) => {
                     </button>
                   </li>
                   <li>
-                    <i class="iconify iconMenu" data-icon="uil:signout"></i>
+                    <i className="iconify iconMenu" data-icon="uil:signout"></i>
                     <button onClick={handleLogOut}>Log Out</button>
                   </li>
                 </ul>

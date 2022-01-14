@@ -22,6 +22,9 @@ import Inventory from "../pages/Inventory";
 import Cookies from "universal-cookie";
 import Disposal from "../pages/Disposal";
 import DisposalDetail from "../table/disposal/DisposalDetail";
+import Procurement from "../pages/manager/Procurement";
+import RequestDetail from "../pages/manager/RequestDetail";
+import RequestApprove from "../pages/manager/RequestApprove";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -198,6 +201,40 @@ const Routes = () => {
           )
         }
       />
+
+      <Route
+        exact
+        path="/procurement-approval"
+        component={(props) =>
+          parseInt(roleUser) === 4 ? (
+            <Procurement {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        path="/procurement-approval/request/detail"
+        component={(props) =>
+          parseInt(roleUser) === 4 ? (
+            <RequestDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        path="/procurement-approval/request/approve"
+        component={(props) =>
+          parseInt(roleUser) === 4 ? (
+            <RequestApprove {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
       <Route component={NotFound} />
     </Switch>
   );

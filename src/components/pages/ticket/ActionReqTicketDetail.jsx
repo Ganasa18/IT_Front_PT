@@ -283,7 +283,6 @@ const ActionReqTicketDetail = () => {
                           data={ticketData[0]}
                         />
                       ))}
-                    {console.log(ticketData)}
                   </div>
                 )}
 

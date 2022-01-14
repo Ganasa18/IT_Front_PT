@@ -352,7 +352,7 @@ const TableActionReq = () => {
 
                     <TableCell component="th" scope="row" align="center">
                       <span
-                        class="chip"
+                        className="chip"
                         style={{
                           background: `${row.status_id.color_status}4C`,
                           color: `${row.status_id.color_status}FF`,

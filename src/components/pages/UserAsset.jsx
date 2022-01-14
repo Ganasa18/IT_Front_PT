@@ -108,17 +108,19 @@ const UserAsset = (props) => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Sub Departement</p>
-                <p>{userData.subdepart_id.name}</p>
+                <p>
+                  {!userData.subdepart_id ? "null" : userData.subdepart_id.name}
+                </p>
               </div>
             </div>
           </div>
         </Grid>
         <br />
         <Grid item xs={12}>
-          <TableAssetUser />
+          <TableAssetUser dataUser={userData} />
         </Grid>
         <Grid item xs={12}>
-          <TableUserDepartementAsset />
+          <TableUserDepartementAsset dataUser={userData} />
         </Grid>
       </Grid>
     </>

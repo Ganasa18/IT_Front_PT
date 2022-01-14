@@ -105,23 +105,26 @@ const ChatComponent = () => {
   const [chatValue, setChatValue] = useState(null);
   const req_no = localStorage.getItem("req_no");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingInput, setIsLoadingInput] = useState(true);
   const [commentData, setCommentData] = useState([]);
   const [image, setImage] = useState(null);
   const [file, setFile] = useState(null);
   const [colorIcon, setColorIcon] = useState("#ec9108");
   const [userData, setUserData] = useState([]);
   const [checkInput, setCheckInput] = useState(false);
+  const [checkStatusData, setCheckStatusData] = useState([]);
+
   const props = {
     colorName: colorIcon,
   };
   const classes = useStyles(props);
 
   useEffect(() => {
-    // getComment();
     setTimeout(() => {
       getComment();
     }, 10000);
     getUser();
+    checkStatus();
   }, [commentData]);
 
   const closeImg = () => {
@@ -147,6 +150,26 @@ const ChatComponent = () => {
         );
         setCommentData(filterMessage);
         setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const checkStatus = async () => {
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req`;
+
+    await axios
+      .get(act_req)
+      .then((response) => {
+        const messageData = response.data.data.request_tiket;
+        let filterMessage = messageData.filter(
+          (item) => item.action_req_code === req_no
+        );
+        setCheckStatusData(filterMessage);
+        setIsLoadingInput(false);
       })
       .catch((error) => {
         console.log(error);
@@ -261,7 +284,7 @@ const ChatComponent = () => {
 
   const setInput = (e) => {
     setChatValue(e.target.value);
-    console.log(chatValue.length);
+    // console.log(chatValue.length);
     setCheckInput(true);
   };
 
@@ -330,55 +353,57 @@ const ChatComponent = () => {
             )}
           </div>
         </div>
-        <div className="card-footer">
-          <form onSubmit={handleSubmit}>
-            <div className="row">
-              <div className="col-10">
-                <div className={classes.btnWrapper}>
-                  <div onClick={ImageInput}>
-                    <i
-                      data-icon="akar-icons:attach"
-                      className={`iconify ${classes.iconAttach}`}></i>
-                  </div>
-                  {file !== null ? (
-                    <div onClick={removeImage}>
+        {isLoadingInput ? null : checkStatusData[0].status_id !== 11 ? (
+          <div className="card-footer">
+            <form onSubmit={handleSubmit}>
+              <div className="row">
+                <div className="col-10">
+                  <div className={classes.btnWrapper}>
+                    <div onClick={ImageInput}>
                       <i
-                        data-icon="akar-icons:cross"
-                        className={`iconify ${classes.iconClose}`}></i>
+                        data-icon="akar-icons:attach"
+                        className={`iconify ${classes.iconAttach}`}></i>
                     </div>
-                  ) : null}
+                    {file !== null ? (
+                      <div onClick={removeImage}>
+                        <i
+                          data-icon="akar-icons:cross"
+                          className={`iconify ${classes.iconClose}`}></i>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <label
+                    for="filesImg"
+                    id="imgFile"
+                    style={{ opacity: "0" }}></label>
+                  <input
+                    accept="image/jpg,image/png,image/jpeg"
+                    type="file"
+                    className="image-req"
+                    id="filesImg"
+                    onChange={handleChangeImg.bind(this)}
+                  />
+
+                  <input
+                    type="text"
+                    className="input-field-comment"
+                    value={chatValue}
+                    onChange={setInput}
+                  />
                 </div>
-
-                <label
-                  for="filesImg"
-                  id="imgFile"
-                  style={{ opacity: "0" }}></label>
-                <input
-                  accept="image/jpg,image/png,image/jpeg"
-                  type="file"
-                  className="image-req"
-                  id="filesImg"
-                  onChange={handleChangeImg.bind(this)}
-                />
-
-                <input
-                  type="text"
-                  className="input-field-comment"
-                  value={chatValue}
-                  onChange={setInput}
-                />
+                <div className="col-1">
+                  <button
+                    className={`${
+                      checkInput ? "button-send" : "button-send-disbled"
+                    }`}>
+                    <i class="iconify" data-icon="fluent:send-16-filled"></i>
+                  </button>
+                </div>
               </div>
-              <div className="col-1">
-                <button
-                  className={`${
-                    checkInput ? "button-send" : "button-send-disbled"
-                  }`}>
-                  <i class="iconify" data-icon="fluent:send-16-filled"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        ) : null}
       </div>
       <div className="popimg"></div>
       <div class="pop_upcontent">

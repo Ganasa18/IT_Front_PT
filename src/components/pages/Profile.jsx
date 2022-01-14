@@ -118,15 +118,16 @@ const Profile = () => {
           const userNow = userProp.find((item) => item.id === parseInt(userId));
 
           const userArea = newDataArea.find((item) => item.id === userNow.area);
+
           const userDepartement = newDataDepartement.find(
             (item) => item.id === userNow.departement
           );
+
           const userSubDepartement = newDataSubDepartement.find(
             (item) => item.id === userNow.subdepartement
           );
-          const userRole = newDataRole.find(
-            (item) => item.id === userNow.subdepartement
-          );
+
+          const userRole = newDataRole.find((item) => item.id === userNow.role);
 
           const userData = [
             {
