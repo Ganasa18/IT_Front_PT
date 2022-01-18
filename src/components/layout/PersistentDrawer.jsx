@@ -36,6 +36,7 @@ import {
   menuDataUser,
   menuDataUser2,
   menuDataUser3,
+  menuDataUser4,
 } from "../../assets/menu.js";
 import { BrowserRouter } from "react-router-dom";
 import Cookies from "universal-cookie";
@@ -225,12 +226,14 @@ const PersistentDrawer = (props) => {
     }
     if (roleUser === "1") {
       setMenuDatas(menuData);
-    } else if (roleUser === "2") {
-      setMenuDatas(menuDataUser);
+    } else if (roleUser === "3") {
+      setMenuDatas(menuDataUser2);
     } else if (roleUser === "4") {
       setMenuDatas(menuDataUser3);
+    } else if (roleUser === "5") {
+      setMenuDatas(menuDataUser4);
     } else {
-      setMenuDatas(menuDataUser2);
+      setMenuDatas(menuDataUser);
     }
 
     // document.addEventListener("contextmenu", (e) => {

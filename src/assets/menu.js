@@ -173,6 +173,31 @@ export const menuDataUser3 = [
   },
 ];
 
+export const menuDataUser4 = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: "mdi:desktop-mac-dashboard",
+    exact: true,
+    to: `/`,
+  },
+  {
+    id: 2,
+    name: "Incoming PR",
+    icon: "bi:cart-fill",
+    exact: true,
+    to: `/in-coming-pr`,
+  },
+
+  {
+    id: 3,
+    name: "Purchase Done",
+    icon: "bi:cart-fill",
+    exact: true,
+    to: `/purchase-done`,
+  },
+];
+
 export const pathEndPoint = [
   {
     url: "http://192.168.101.48",

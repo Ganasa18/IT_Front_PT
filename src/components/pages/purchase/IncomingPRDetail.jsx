@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { invEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
+import {
+  invEndPoint,
+  authEndPoint,
+  pathEndPoint,
+  prEndPoint,
+} from "../../../assets/menu";
 import Loading from "../../asset/Loading";
-import { Redirect } from "react-router-dom";
 import {
   makeStyles,
   Grid,
@@ -15,7 +19,6 @@ import {
   TableFooter,
   TablePagination,
   TableRow,
-  Paper,
   withStyles,
   useTheme,
   Toolbar,
@@ -24,11 +27,10 @@ import {
   Modal,
   Divider,
   Snackbar,
+  Paper,
 } from "@material-ui/core";
+
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-import "../../../assets/master.css";
-import "../../../assets/asset_user.css";
-import "../../asset/chips.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 import IconButton from "@material-ui/core/IconButton";
@@ -36,16 +38,14 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import "../../../assets/master.css";
+import "../../../assets/asset_user.css";
+import "../../asset/chips.css";
 import Cookies from "universal-cookie";
-import MuiAlert from "@material-ui/lab/Alert";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 const cookies = new Cookies();
-const token = cookies.get("token");
 const userID = cookies.get("id");
+const token = cookies.get("token");
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     transform: "translate(-50%,-50%)",
     top: "35%",
     left: "50%",
-    width: 950,
+    width: 650,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
@@ -208,17 +208,6 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-function generateOTP() {
-  // Declare a digits variable
-  // which stores all digits
-  var digits = "0123456789";
-  let OTP = "";
-  for (let i = 0; i < 6; i++) {
-    OTP += digits[Math.floor(Math.random() * 10)];
-  }
-  return OTP;
-}
-
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -248,305 +237,140 @@ function calbill(date) {
   var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
   return newdate;
 }
-const RequestApprove = () => {
+
+const IncomingPRDetail = () => {
   const classes = useStyles();
   const dataStorage = localStorage.getItem("ticketData");
-  const parseObject = JSON.parse(dataStorage);
+  const purchaseData = JSON.parse(dataStorage);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingOTP, setIsLoadingOTP] = useState(true);
-  const [dataRequest, setDataRequest] = useState([]);
+  const [userInfo, setUserInfo] = useState([]);
+  const [infoRequest, setInfoRequest] = useState([]);
   const [purchaseList, setPurchaseList] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [dataUser, setDataUser] = useState([]);
-  const [inputOTP, setInputOTP] = useState("");
-  const [timer, setTimer] = useState(null);
-  const [buttonAllow, setButtonAllow] = useState(false);
-  const [comment, setComment] = useState("");
-  const [toast, setToast] = useState(false);
 
   useEffect(() => {
-    getInfoPR();
-    getInfoUser();
+    getDataInfo();
   }, []);
 
-  const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setToast(false);
-  };
-
-  const handleOtp = (e) => {
-    const Otp = document.querySelector("#OtpNumber");
-    const otpNow = localStorage.getItem("otp");
-
-    setButtonAllow(false);
-    if (timer) {
-      clearTimeout(timer);
-      setTimer(null);
-    }
-    setTimer(
-      setTimeout(() => {
-        setInputOTP(e);
-        // console.log(Otp.classList);
-        // console.log(otpNow);
-        if (e !== otpNow) {
-          if (Otp.classList[1] !== undefined) {
-            Otp.classList.remove("success");
-          }
-          Otp.classList.add("fail");
-          return;
-        }
-        if (Otp.classList[1] !== undefined) {
-          Otp.classList.remove("fail");
-        }
-
-        setButtonAllow(true);
-        Otp.classList.add("success");
-        console.log(e);
-      }, 3000)
-    );
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // localStorage.removeItem("otp");
-    // alert("remove otp");
-    if (comment.length < 10) {
-      alert("musth have 10 character minimal");
-      return;
-    }
-
-    const dataUpdated = {
-      purchase: parseObject.purchase_req_code,
-      director_name: dataUser[0].username,
-      director_note: comment,
-      status_id: 7,
-    };
-    let approve_pr = `${prEndPoint[0].url}${
-      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
-    }/api/v1/purchase-req/approve-pr`;
-    const origin = window.location.origin;
-
-    await axios
-      .patch(approve_pr, dataUpdated)
-      .then((response) => {
-        console.log(response);
-        setToast(true);
-        setTimeout(() => {
-          window.location.href = `${origin}/procurement-approval`;
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleModal = async () => {
-    const otpNum = generateOTP();
-
-    localStorage.setItem("otp", otpNum);
-
-    let numberOTP = localStorage.getItem("otp");
-
-    const urlHost = window.location.origin;
-    const email = dataUser[0].email;
-    const username = dataUser[0].username;
-    const purchase = parseObject.action_req_code;
-    const request = parseObject.purchase_req_code;
-
-    setModalOpen(true);
-
-    let otp = `${prEndPoint[0].url}${
-      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
-    }/api/v1/purchase-req/otp`;
-
-    await axios
-      .post(otp, {
-        number: numberOTP,
-        url: urlHost,
-        email: email,
-        username: username,
-        purchase: purchase,
-        request: request,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const resendOTP = async () => {
-    const otpNum = generateOTP();
-    localStorage.setItem("otp", otpNum);
-    let numberOTP = localStorage.getItem("otp");
-    const urlHost = window.location.origin;
-    const email = dataUser[0].email;
-    const username = dataUser[0].username;
-    const purchase = parseObject.action_req_code;
-    const request = parseObject.purchase_req_code;
-
-    let otp = `${prEndPoint[0].url}${
-      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
-    }/api/v1/purchase-req/otp`;
-
-    await axios
-      .post(otp, {
-        number: numberOTP,
-        url: urlHost,
-        email: email,
-        username: username,
-        purchase: purchase,
-        request: request,
-      })
-      .then((response) => {
-        console.log(response);
-        alert("success resend");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const getInfoPR = async () => {
+  const getDataInfo = async () => {
     let act_req = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
     }/api/v1/action-req/`;
-    await axios
-      .get(act_req)
-      .then((response) => {
-        let newDataRequest = response.data.data.request_tiket;
 
-        newDataRequest = newDataRequest.map((item) => ({
-          id: item.id,
-          action_req_code: item.action_req_code,
-          req_created: item.createdAt,
-          user_id: item.user_id,
-        }));
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
 
-        newDataRequest = newDataRequest.filter(
-          (item) => item.action_req_code === parseObject.action_req_code
-        );
-        setDataRequest(newDataRequest);
-
-        let jsonList = JSON.parse(parseObject.request_list);
-        setPurchaseList(jsonList);
-
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
-  const getInfoUser = async () => {
     let user = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
     }/api/v1/auth/`;
 
-    await axios
-      .get(user, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        let newDataUser = response.data.data.users;
-        newDataUser = newDataUser.map((row) => ({
-          id: row.id,
-          username: row.username,
-          email: row.email,
-        }));
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
 
-        newDataUser = newDataUser.filter(
-          (item) => item.id === parseInt(userID)
-        );
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
 
-        setDataUser(newDataUser);
-        setIsLoadingOTP(false);
-      })
-      .catch((error) => {
-        console.error(error);
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(inventory);
+    const requestThree = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
+
+    axios
+      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+          const responseFive = responses[4];
+
+          let newDataRequest = responseOne.data.data.request_tiket;
+          let newDataInventory = responseTwo.data.data.inventorys;
+          let newDataUser = responseThree.data.data.users;
+          let newDataDepartement = responseFour.data.data.departements;
+          let newDataSubDepartement = responseFive.data.data.subdepartements;
+
+          newDataUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          let arr_request = [...newDataRequest];
+          const arr_inventory = [...newDataInventory];
+
+          arr_request = arr_request.filter(
+            (item) => item.action_req_code === purchaseData.action_req_code
+          );
+
+          newDataUser = newDataUser.filter(
+            (item) => item.id === parseInt(arr_request[0].user_id)
+          );
+
+          var inventmap = {};
+
+          arr_inventory.forEach(function (invent_id) {
+            inventmap[invent_id.id] = invent_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.invent_id = inventmap[request_id.asset_id];
+          });
+
+          let arr_user = [...newDataUser];
+          let arr_departement = [...newDataDepartement];
+          let arr_subdepartement = [...newDataSubDepartement];
+
+          var usermap = {};
+
+          arr_departement.forEach(function (id_departement_user) {
+            usermap[id_departement_user.id] = id_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_departement_user = usermap[request_id.departement];
+          });
+
+          arr_subdepartement.forEach(function (id_sub_departement_user) {
+            usermap[id_sub_departement_user.id] = id_sub_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_sub_departement_user =
+              usermap[request_id.subdepartement];
+          });
+
+          let jsonList = JSON.parse(purchaseData.request_list);
+
+          console.log(arr_request);
+          console.log(arr_user);
+          console.log(jsonList);
+          setInfoRequest(arr_request);
+          setUserInfo(arr_user);
+          setPurchaseList(jsonList);
+
+          //   localStorage.setItem("userId", arr_request[0].user_id);
+          //   setInfoRequest(arr_request);
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
       });
   };
-
-  const bodyModal = (
-    <>
-      <Fade in={modalOpen}>
-        <div className={classes.paper}>
-          <div className="row">
-            <div className="col-12">
-              <h3>Approve Purchase</h3>
-            </div>
-          </div>
-          <Divider />
-          <br />
-          <form onSubmit={handleSubmit}>
-            <div className="row">
-              <div className="col-5">
-                <p style={{ fontWeight: "bold" }}>Submit OTP</p>
-                <p style={{ fontWeight: "300" }}>
-                  Check your mail to know the OTP
-                </p>
-                {isLoadingOTP ? null : (
-                  <p style={{ fontWeight: "300" }}>{dataUser[0].email}</p>
-                )}
-
-                <input
-                  type="text"
-                  id="OtpNumber"
-                  className="form-input-otp"
-                  placeholder="OTP..."
-                  maxLength="6"
-                  autoComplete="off"
-                  onChange={(e) => handleOtp(e.target.value)}
-                />
-                <small>
-                  Not send yet ?
-                  <span className="resend" onClick={resendOTP}>
-                    {" "}
-                    Resend
-                  </span>
-                </small>
-              </div>
-              <div className="col-1">
-                {/* <span
-                  className={`iconify iconFail`}
-                  data-icon="ant-design:close-circle-outlined"></span> */}
-              </div>
-              <div className="col-6">
-                <label style={{ fontWeight: "bold" }}>Leave Comment</label>
-                <textarea
-                  className="form-input-area"
-                  placeholder="Comment here... "
-                  cols="30"
-                  rows="10"
-                  onChange={(e) => setComment(e.target.value)}></textarea>
-              </div>
-            </div>
-            <br />
-            <div className="footer-modal">
-              <button className="btn-cancel" onClick={handleModalClose}>
-                Cancel
-              </button>
-              <button
-                className={`btn-submit ${buttonAllow ? "" : "disabled"}`}
-                disabled={`${buttonAllow ? "" : "disabled"}`}
-                type="submit">
-                Approve
-              </button>
-            </div>
-          </form>
-          <br />
-        </div>
-      </Fade>
-    </>
-  );
 
   if (isLoading) {
     return <Loading />;
@@ -559,13 +383,13 @@ const RequestApprove = () => {
       <Breadcrumbs
         onClick={function () {
           const origin = window.location.origin;
-          window.location.href = `${origin}/procurement-approval`;
+          window.location.href = `${origin}/in-coming-pr`;
         }}
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb">
-        <span className={"span_crumb"}>Action Request</span>
+        <span className={"span_crumb"}>Incoming PR</span>
         <Typography color="textPrimary">
-          {parseObject.action_req_code}
+          {purchaseData.purchase_req_code}
         </Typography>
       </Breadcrumbs>
       <Grid container spacing={3}>
@@ -573,63 +397,78 @@ const RequestApprove = () => {
           <div className="card-asset-action">
             <div className="flex-card">
               <h3>Information</h3>
-              {parseObject.status_id.id === 10 && (
-                <>
-                  <div className="button-approve">
-                    <button
-                      type="button"
-                      onClick={handleModal}
-                      className="approve-btn">
-                      Approve
-                    </button>
-                    <button type="button" className="deny-btn">
-                      Deny
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
             <div className="row">
               <div className="col-3">
-                <p className="label-asset">PR Number</p>
-                <p>{parseObject.purchase_req_code}</p>
+                <p className="label-asset">Request Number</p>
+                <p>{purchaseData.action_req_code}</p>
               </div>
               <div className="col-3">
-                <p className="label-asset">PR Date</p>
-                <p>{calbill(parseObject.createdAt)}</p>
+                <p className="label-asset">Department</p>
+                <p>{userInfo[0].id_departement_user.departement_name}</p>
               </div>
               <div className="col-3">
-                <p className="label-asset">Request Name</p>
-                <p>{capitalizeFirstLetter(parseObject.request_by)}</p>
-              </div>
-              <div className="col-3">
-                <p className="label-asset text-center">Status</p>
-                <p className="text-center">
-                  <span
-                    className="chip-action"
-                    style={{
-                      background: `${parseObject.status_id.color_status}4C`,
-                      color: `${parseObject.status_id.color_status}FF`,
-                    }}>
-                    {capitalizeFirstLetter(parseObject.status_id.status_name)}
-                  </span>
-                </p>
+                <p className="label-asset">Request Date</p>
+                <p>{calbill(infoRequest[0].createdAt)}</p>
               </div>
             </div>
             <br />
             <div className="row">
               <div className="col-3">
+                <p className="label-asset">Request Name</p>
+                <p>{capitalizeFirstLetter(purchaseData.request_by)}</p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Sub Department</p>
+                <p>{userInfo[0].id_sub_departement_user.subdepartement_name}</p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Comment</p>
+                <p className="wrap-paraf">{purchaseData.director_note}</p>
+              </div>
+            </div>
+          </div>
+        </Grid>
+        <Grid item xs={12} className={classes.cardPadding}>
+          <div className="card-asset-action">
+            <div className="flex-card">
+              <h3>Admin</h3>
+            </div>
+            <div className="row">
+              <div className="col-3">
                 <p className="label-asset">Create By</p>
-                <p>{capitalizeFirstLetter(parseObject.created_by)}</p>
+                <p>{capitalizeFirstLetter(purchaseData.created_by)}</p>
               </div>
               <div className="col-3">
-                <p className="label-asset">Request No</p>
-                <p>{capitalizeFirstLetter(parseObject.action_req_code)}</p>
+                <p className="label-asset">PR No</p>
+                <p>{purchaseData.purchase_req_code}</p>
               </div>
               <div className="col-3">
-                <p className="label-asset">Request Date</p>
-                <p className="wrap-paraf">
-                  {calbill(dataRequest[0].req_created)}
+                <p className="label-asset">PR Date</p>
+                <p>{calbill(purchaseData.createdAt)}</p>
+              </div>
+            </div>
+          </div>
+        </Grid>
+
+        <Grid item xs={12} className={classes.cardPadding}>
+          <div className="card-asset-action">
+            <div className="flex-card">
+              <h3>Assent</h3>
+            </div>
+            <div className="row">
+              <div className="col-3">
+                <p className="label-asset">Assent By</p>
+                <p>{capitalizeFirstLetter(purchaseData.director_name)}</p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Date Assent</p>
+                <p>{calbill(purchaseData.approveAt)}</p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Status</p>
+                <p>
+                  {capitalizeFirstLetter(purchaseData.status_id.status_name)}
                 </p>
               </div>
             </div>
@@ -638,25 +477,32 @@ const RequestApprove = () => {
         <Grid item xs={12} className={classes.cardPadding}>
           <TablePurchaseList listData={purchaseList} />
         </Grid>
+        <Grid item xs={6} className={classes.cardPadding}>
+          <div className="card-asset-action">
+            <div className="flex-card">
+              <h3>Input Po No</h3>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                <input type="text" className="form-input" />
+              </div>
+            </div>
+            <br />
+            <div className="row">
+              <div className="col-4">
+                <button className="btn-submit">Submit</button>
+              </div>
+              <div className="col-1"></div>
+              <div className="col-7">
+                <span
+                  class="iconify iconSuccess"
+                  data-icon="clarity:success-standard-solid"></span>
+                <span className="text-po-submit">PO No success to submit</span>
+              </div>
+            </div>
+          </div>
+        </Grid>
       </Grid>
-      <Modal
-        open={modalOpen}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}>
-        {bodyModal}
-      </Modal>
-      <Snackbar
-        autoHideDuration={5000}
-        open={toast}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleClose} severity="success">
-          submit successful
-        </Alert>
-      </Snackbar>
     </>
   );
 };
@@ -785,4 +631,4 @@ const TablePurchaseList = ({ listData }) => {
   );
 };
 
-export default RequestApprove;
+export default IncomingPRDetail;

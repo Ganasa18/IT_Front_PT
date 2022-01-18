@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { pathEndPoint, prEndPoint } from "../../../assets/menu";
+import { pathEndPoint, authEndPoint, prEndPoint } from "../../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../../asset/Loading";
@@ -181,7 +181,7 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TableProcurement = () => {
+const TableIncomingPR = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -214,6 +214,11 @@ const TableProcurement = () => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
           let newDataRequest = responseOne.data.data.request_purchase;
+
+          newDataRequest = newDataRequest.filter(
+            (item) => item.status_id === 7
+          );
+
           let newStatus = responseTwo.data.data.statuss;
           const arr_status = [...newStatus];
           const arr_request = [...newDataRequest];
@@ -227,7 +232,6 @@ const TableProcurement = () => {
             request_id.status_id = statusmap[request_id.status_id];
           });
 
-          console.log(newDataRequest);
           setDataPR(newDataRequest);
           setIsLoading(false);
         })
@@ -236,6 +240,10 @@ const TableProcurement = () => {
         // react on errors.
         console.error(errors);
       });
+  };
+
+  const storePurchase = (row) => {
+    localStorage.setItem("ticketData", JSON.stringify(row));
   };
 
   const emptyRows =
@@ -250,15 +258,6 @@ const TableProcurement = () => {
     setPage(0);
   };
 
-  const storeData = (row) => {
-    localStorage.setItem("req_no", row.action_req_code);
-    localStorage.setItem("ticketData", JSON.stringify(row));
-  };
-
-  const storePurchase = (row) => {
-    localStorage.setItem("ticketData", JSON.stringify(row));
-  };
-
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -267,11 +266,10 @@ const TableProcurement = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>PR No</StyledTableCell>
+                <StyledTableCell>PO No</StyledTableCell>
                 <StyledTableCell>Create by</StyledTableCell>
-                <StyledTableCell>Request No</StyledTableCell>
                 <StyledTableCell>Request For</StyledTableCell>
                 <StyledTableCell>PR Date</StyledTableCell>
-                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -289,36 +287,24 @@ const TableProcurement = () => {
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       <Link
-                        onClick={() => storePurchase(row)}
-                        to="procurement-approval/request/approve">
+                        to="/in-coming-pr/detail"
+                        onClick={() => storePurchase(row)}>
                         {row.purchase_req_code}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.created_by}
+                      {row.purchase_prder_code
+                        ? row.purchase_prder_code
+                        : " - "}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      <Link
-                        onClick={() => storeData(row)}
-                        to="procurement-approval/request/detail">
-                        {row.action_req_code}
-                      </Link>
+                      {row.created_by}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.request_by}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {calbill(row.createdAt)}
-                    </TableCell>
-                    <TableCell component="th" scope="row" align="center">
-                      <span
-                        className="chip"
-                        style={{
-                          background: `${row.status_id.color_status}4C`,
-                          color: `${row.status_id.color_status}FF`,
-                        }}>
-                        {capitalizeFirstLetter(row.status_id.status_name)}
-                      </span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -355,4 +341,4 @@ const TableProcurement = () => {
   );
 };
 
-export default TableProcurement;
+export default TableIncomingPR;

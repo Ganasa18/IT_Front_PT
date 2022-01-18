@@ -399,6 +399,9 @@ const TablePurchaseList = ({ listData }) => {
               <StyledTableCell>Sub Category</StyledTableCell>
               <StyledTableCell>Description</StyledTableCell>
               <StyledTableCell>QTY</StyledTableCell>
+              <StyledTableCell align="center" np>
+                Attachment
+              </StyledTableCell>
             </TableRow>
           </TableHead>
 
@@ -428,6 +431,25 @@ const TablePurchaseList = ({ listData }) => {
                 </TableCell>
                 <TableCell component="th" scope="row">
                   {row.qty}
+                </TableCell>
+                <TableCell component="th" scope="row" align="center">
+                  {row.img_name ? (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="download-attch"
+                      href={`${prEndPoint[0].url}${
+                        prEndPoint[0].port !== ""
+                          ? ":" + prEndPoint[0].port
+                          : ""
+                      }/public/image/purchase/${row.img_name
+                        .split(".")
+                        .slice(0, -1)
+                        .join(".")}${".jpeg"}`}
+                      download>
+                      download
+                    </a>
+                  ) : null}
                 </TableCell>
               </TableRow>
             ))}

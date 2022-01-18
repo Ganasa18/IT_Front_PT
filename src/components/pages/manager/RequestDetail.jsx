@@ -265,7 +265,7 @@ const RequestDetail = () => {
         }}
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb">
-        <span className={"span_crumb"}>Action Request</span>
+        <span className={"span_crumb"}>Procurement Approval</span>
         <Typography color="textPrimary">{req_no}</Typography>
       </Breadcrumbs>
       <Grid container spacing={3}>

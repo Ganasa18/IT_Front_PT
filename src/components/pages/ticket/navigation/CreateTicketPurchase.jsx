@@ -167,7 +167,7 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     left: "100%",
     top: "50%",
-    transform: "translate(-110%,100%)",
+    transform: "translate(-110%,180%)",
 
     "&:hover": {
       backgroundColor: "#1653A6",
@@ -377,6 +377,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
 
   const handleTodo = () => {
     const typeasset = document.querySelector('input[name="userdpt"]:checked');
+    const checkFile = document.querySelector(".form-input-purchase");
 
     if (assetName === "") {
       alert("name can't be empty");
@@ -398,6 +399,27 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       return;
     }
 
+    if (checkFile.files.length === 0) {
+      alert("image must included");
+      return;
+    }
+
+    if (checkFile.files[0]) {
+      const file = checkFile.files[0];
+
+      if (file.size > 1048576) {
+        alert("File size must under 1MiB!");
+        return;
+      }
+
+      var pattern = /image-*/;
+
+      if (!file.type.match(pattern)) {
+        alert("only image");
+        return;
+      }
+    }
+
     const data = {
       id: generateId(),
       type_asset: typeasset.value,
@@ -406,6 +428,8 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       qty: quantity,
       category: category,
       subcategory: subCategory,
+      attachment: checkFile.files[0],
+      img_name: checkFile.files[0].name,
     };
 
     setTodos([...todos, data]);
@@ -413,6 +437,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       setAssetName("");
       setDescription("");
       setQuantity(0);
+      checkFile.value = null;
     }, 1000);
   };
 
@@ -427,6 +452,10 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     let pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req`;
+
+    let pr_img = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/upload-img`;
 
     let ar = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
@@ -445,6 +474,27 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     // console.log(createdBy);
     // console.log(requestBy);
     // console.log(jsonString);
+    // console.log(JSON.parse(jsonString));
+    // console.log(todos);
+
+    todos.forEach(function (item) {
+      const imageFormData = new FormData();
+      imageFormData.append("attachment", item.attachment);
+      (async () => {
+        await axios
+          .post(pr_img, imageFormData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })();
+    });
 
     await axios.post(pr, {
       action_req_code: dataReq[0].action_req_code,
@@ -557,7 +607,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
           <textarea
             className="form-input-area"
             cols="30"
-            rows="10"
+            rows="8"
             value={description}
             onChange={(e) => setDescription(e.target.value)}></textarea>
         </div>
@@ -576,6 +626,8 @@ const CreateTicketPurchase = ({ dataTicket }) => {
               placeholder="Search Category"
             />
           </div>
+          <div className="col-2"></div>
+          <div className="col-5"></div>
         </div>
         <br />
         <br />
@@ -591,8 +643,21 @@ const CreateTicketPurchase = ({ dataTicket }) => {
               placeholder="Search Sub Category"
             />
           </div>
+          <div className="col-2"></div>
+          <div className="col-5">
+            <div className="position-attach">
+              <label htmlFor="">Attachment</label>
+              <input
+                accept="image/jpg,image/png,image/jpeg"
+                type="file"
+                className="form-input-purchase"
+              />
+            </div>
+          </div>
         </div>
       </div>
+      <br />
+      <br />
       <div className="row">
         <Button
           onClick={handleTodo}
@@ -620,6 +685,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
                   <StyledTableCell>Sub Category</StyledTableCell>
                   <StyledTableCell>Description</StyledTableCell>
                   <StyledTableCell>QTY</StyledTableCell>
+                  <StyledTableCell align="center">Attachment</StyledTableCell>
                   <StyledTableCell align="center">Action</StyledTableCell>
                 </TableRow>
               </TableHead>
@@ -650,6 +716,14 @@ const CreateTicketPurchase = ({ dataTicket }) => {
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.qty}
+                    </TableCell>
+                    <TableCell component="th" scope="row" align="center">
+                      <a
+                        className="download-attch"
+                        href={`${URL.createObjectURL(row.attachment)}`}
+                        download>
+                        download
+                      </a>
                     </TableCell>
                     <TableCell style={{ width: 100 }} align="center">
                       <button

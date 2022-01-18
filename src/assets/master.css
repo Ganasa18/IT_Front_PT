@@ -310,6 +310,10 @@ a {
   font-size: 13px;
 }
 
+.form-input:focus {
+  outline: none;
+}
+
 .form-input-select {
   width: 80%;
   height: 50px;
@@ -921,6 +925,10 @@ input[type="radio"] {
   text-transform: capitalize;
   cursor: pointer;
   position: relative;
+}
+
+.btn-submit.disabled {
+  cursor: not-allowed;
 }
 
 .btn-submit:hover {
@@ -1735,4 +1743,102 @@ input[type="radio"] {
 .resend:hover {
   color: #1652a6bd;
   cursor: pointer;
+}
+
+.form-input-otp {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.form-input-otp.fail {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid rgb(202, 16, 16);
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.form-input-otp.success {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid #3ca56a;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.form-input-otp:focus {
+  outline: none;
+}
+
+.iconFail {
+  color: #a61616;
+  font-size: 25px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-550%, 50%);
+}
+
+.iconSuccess {
+  color: #3ca56a;
+  font-size: 25px;
+}
+
+.text-po-submit {
+  font-size: 15px;
+  position: relative;
+  top: -6px;
+  left: 6px;
+}
+
+.form-input-purchase {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 10px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.position-attach {
+  position: relative;
+  left: 3%;
+}
+
+.download-attch {
+  margin: 0 6px 0 8px;
+  color: #fff;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.download-attch:hover {
+  background-color: #ec9108;
+  color: #fff;
 }
