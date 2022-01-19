@@ -164,10 +164,22 @@ const useStyles2 = makeStyles((theme) => ({
     overflowX: "auto",
   },
 
+  // posPagination: {
+  //   display: "flex",
+  //   alignItems: "left",
+  //   padding: "0px",
+  // },
+
   posPagination: {
-    display: "flex",
-    alignItems: "left",
-    padding: "0px",
+    position: "absolute",
+    [theme.breakpoints.up("xl")]: {
+      right: "30px",
+      marginTop: "-50px",
+    },
+    [theme.breakpoints.down("lg")]: {
+      right: "30px",
+      marginTop: "-50px",
+    },
   },
 
   tableWidth: {
@@ -246,6 +258,10 @@ const IncomingPRDetail = () => {
   const [userInfo, setUserInfo] = useState([]);
   const [infoRequest, setInfoRequest] = useState([]);
   const [purchaseList, setPurchaseList] = useState([]);
+  const [inputPoNumber1, setInputPoNumber1] = useState("");
+  const [inputPoNumber2, setInputPoNumber2] = useState("");
+  const [inputPoNumber3, setInputPoNumber3] = useState("");
+  const [inputPoNumber4, setInputPoNumber4] = useState("");
 
   useEffect(() => {
     getDataInfo();
@@ -351,18 +367,14 @@ const IncomingPRDetail = () => {
             request_id.id_sub_departement_user =
               usermap[request_id.subdepartement];
           });
-
           let jsonList = JSON.parse(purchaseData.request_list);
 
-          console.log(arr_request);
-          console.log(arr_user);
-          console.log(jsonList);
+          // console.log(arr_request);
+          // console.log(arr_user);
+          // console.log(jsonList);
           setInfoRequest(arr_request);
           setUserInfo(arr_user);
           setPurchaseList(jsonList);
-
-          //   localStorage.setItem("userId", arr_request[0].user_id);
-          //   setInfoRequest(arr_request);
           setIsLoading(false);
         })
       )
@@ -371,6 +383,13 @@ const IncomingPRDetail = () => {
         console.error(errors);
       });
   };
+
+  // const handlePO = (e) => {
+  //   let value = e.target.value;
+  //   value = value.toUpperCase();
+  //   setInputPoNumber(value);
+  //   console.log(value);
+  // };
 
   if (isLoading) {
     return <Loading />;
@@ -484,7 +503,55 @@ const IncomingPRDetail = () => {
             </div>
             <div className="row">
               <div className="col-12">
-                <input type="text" className="form-input" />
+                <div className="row">
+                  <div className="col-2">
+                    <input
+                      placeholder="PO..."
+                      type="text"
+                      className="form-input-po"
+                      value={inputPoNumber1}
+                      maxLength="3"
+                      onChange={(e) =>
+                        setInputPoNumber1(e.target.value.toUpperCase())
+                      }
+                    />
+                  </div>
+                  <div className="col-2">
+                    <input
+                      placeholder="PO..."
+                      type="text"
+                      className="form-input-po"
+                      value={inputPoNumber2}
+                      maxLength="3"
+                      onChange={(e) =>
+                        setInputPoNumber2(e.target.value.toUpperCase())
+                      }
+                    />
+                  </div>
+                  <div className="col-3">
+                    <input
+                      placeholder="PO..."
+                      type="text"
+                      className="form-input-po"
+                      value={inputPoNumber3}
+                      maxLength="4"
+                      onChange={(e) =>
+                        setInputPoNumber3(e.target.value.toUpperCase())
+                      }
+                    />
+                  </div>
+                  <div className="col-5">
+                    <input
+                      placeholder="PO..."
+                      type="text"
+                      className="form-input-po"
+                      value={inputPoNumber4}
+                      onChange={(e) =>
+                        setInputPoNumber4(e.target.value.toUpperCase())
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <br />
@@ -494,10 +561,10 @@ const IncomingPRDetail = () => {
               </div>
               <div className="col-1"></div>
               <div className="col-7">
-                <span
-                  class="iconify iconSuccess"
+                {/* <span
+                  className="iconify iconSuccess"
                   data-icon="clarity:success-standard-solid"></span>
-                <span className="text-po-submit">PO No success to submit</span>
+                <span className="text-po-submit">PO No success to submit</span> */}
               </div>
             </div>
           </div>
@@ -525,6 +592,25 @@ const TablePurchaseList = ({ listData }) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  // Download Image
+
+  function forceDownload(url, fileName) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function () {
+      var urlCreator = window.URL || window.webkitURL;
+      var imageUrl = urlCreator.createObjectURL(this.response);
+      var tag = document.createElement("a");
+      tag.href = imageUrl;
+      tag.download = fileName;
+      document.body.appendChild(tag);
+      tag.click();
+      document.body.removeChild(tag);
+    };
+    xhr.send();
+  }
 
   return (
     <TableContainer className={classes.tableWidth}>
@@ -561,7 +647,7 @@ const TablePurchaseList = ({ listData }) => {
               : listPurchase
             ).map((row) => (
               <TableRow key={row.id}>
-                <TableCell style={{ width: 550 }} component="th" scope="row">
+                <TableCell style={{ width: 250 }} component="th" scope="row">
                   {row.asset_name}
                 </TableCell>
                 <TableCell component="th" scope="row">
@@ -581,22 +667,42 @@ const TablePurchaseList = ({ listData }) => {
                 </TableCell>
                 <TableCell component="th" scope="row" align="center">
                   {row.img_name ? (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
                       className="download-attch"
-                      href={`${prEndPoint[0].url}${
-                        prEndPoint[0].port !== ""
-                          ? ":" + prEndPoint[0].port
-                          : ""
-                      }/public/image/purchase/${row.img_name
-                        .split(".")
-                        .slice(0, -1)
-                        .join(".")}${".jpeg"}`}
-                      download>
+                      onClick={() =>
+                        forceDownload(
+                          `${prEndPoint[0].url}${
+                            prEndPoint[0].port !== ""
+                              ? ":" + prEndPoint[0].port
+                              : ""
+                          }/public/image/purchase/${row.img_name
+                            .split(".")
+                            .slice(0, -1)
+                            .join(".")}${".jpeg"}`,
+                          `${row.img_name
+                            .split(".")
+                            .slice(0, -1)
+                            .join(".")}${".jpeg"}`
+                        )
+                      }>
                       download
-                    </a>
-                  ) : null}
+                    </button>
+                  ) : // <a
+                  //   target="_blank"
+                  //   rel="noopener noreferrer"
+                  //   className="download-attch"
+                  //   href={`${prEndPoint[0].url}${
+                  //     prEndPoint[0].port !== ""
+                  //       ? ":" + prEndPoint[0].port
+                  //       : ""
+                  //   }/public/image/purchase/${row.img_name
+                  //     .split(".")
+                  //     .slice(0, -1)
+                  //     .join(".")}${".jpeg"}`}
+                  //   download={`image.jpeg`}>
+                  //   download
+                  // </a>
+                  null}
                 </TableCell>
               </TableRow>
             ))}

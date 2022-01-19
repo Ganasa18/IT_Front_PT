@@ -671,6 +671,10 @@ a {
   border-radius: 5px;
   background-color: transparent;
   color: #1653a6;
+  position: relative;
+  top: 5%;
+  left: 5%;
+  transform: translate(54%, 35%);
 }
 .input-create-element:hover {
   background-color: #4b6079;
@@ -1841,4 +1845,19 @@ input[type="radio"] {
 .download-attch:hover {
   background-color: #ec9108;
   color: #fff;
+}
+
+.form-input-po {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 5px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 13px;
+}
+
+.form-input-po:focus {
+  outline: none;
 }

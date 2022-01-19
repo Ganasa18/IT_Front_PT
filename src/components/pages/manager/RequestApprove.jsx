@@ -164,10 +164,22 @@ const useStyles2 = makeStyles((theme) => ({
     overflowX: "auto",
   },
 
+  // posPagination: {
+  //   display: "flex",
+  //   alignItems: "left",
+  //   padding: "0px",
+  // },
+
   posPagination: {
-    display: "flex",
-    alignItems: "left",
-    padding: "0px",
+    position: "absolute",
+    [theme.breakpoints.up("xl")]: {
+      right: "30px",
+      marginTop: "-50px",
+    },
+    [theme.breakpoints.down("lg")]: {
+      right: "30px",
+      marginTop: "-50px",
+    },
   },
 
   tableWidth: {
@@ -680,6 +692,24 @@ const TablePurchaseList = ({ listData }) => {
     setPage(0);
   };
 
+  // Download Image
+  function forceDownload(url, fileName) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function () {
+      var urlCreator = window.URL || window.webkitURL;
+      var imageUrl = urlCreator.createObjectURL(this.response);
+      var tag = document.createElement("a");
+      tag.href = imageUrl;
+      tag.download = fileName;
+      document.body.appendChild(tag);
+      tag.click();
+      document.body.removeChild(tag);
+    };
+    xhr.send();
+  }
+
   return (
     <TableContainer className={classes.tableWidth}>
       <Paper>
@@ -715,7 +745,7 @@ const TablePurchaseList = ({ listData }) => {
               : listPurchase
             ).map((row) => (
               <TableRow key={row.id}>
-                <TableCell style={{ width: 550 }} component="th" scope="row">
+                <TableCell style={{ width: 250 }} component="th" scope="row">
                   {row.asset_name}
                 </TableCell>
                 <TableCell component="th" scope="row">
@@ -735,21 +765,26 @@ const TablePurchaseList = ({ listData }) => {
                 </TableCell>
                 <TableCell component="th" scope="row" align="center">
                   {row.img_name ? (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
                       className="download-attch"
-                      href={`${prEndPoint[0].url}${
-                        prEndPoint[0].port !== ""
-                          ? ":" + prEndPoint[0].port
-                          : ""
-                      }/public/image/purchase/${row.img_name
-                        .split(".")
-                        .slice(0, -1)
-                        .join(".")}${".jpeg"}`}
-                      download>
+                      onClick={() =>
+                        forceDownload(
+                          `${prEndPoint[0].url}${
+                            prEndPoint[0].port !== ""
+                              ? ":" + prEndPoint[0].port
+                              : ""
+                          }/public/image/purchase/${row.img_name
+                            .split(".")
+                            .slice(0, -1)
+                            .join(".")}${".jpeg"}`,
+                          `${row.img_name
+                            .split(".")
+                            .slice(0, -1)
+                            .join(".")}${".jpeg"}`
+                        )
+                      }>
                       download
-                    </a>
+                    </button>
                   ) : null}
                 </TableCell>
               </TableRow>

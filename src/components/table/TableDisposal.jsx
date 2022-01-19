@@ -228,6 +228,14 @@ const TableDisposal = () => {
             disposal.status_id = statusmap[disposal.status_approval];
           });
 
+          arr_status.forEach(function (status_condition) {
+            statusmap[status_condition.id] = status_condition;
+          });
+
+          arr_disposal.forEach(function (disposal) {
+            disposal.status_condition = statusmap[disposal.status_disposal];
+          });
+
           let JoinRole = arr_disposal;
 
           setDataDisposal(JoinRole);

@@ -291,8 +291,11 @@ const InputDisposal = ({ dataDisposal }) => {
       return;
     }
 
-    selectDisposal.forEach((el) => {
-      axios.post(
+    // console.log(selectDisposal);
+    const jsonString = JSON.stringify(selectDisposal);
+
+    await axios
+      .post(
         `${pathEndPoint[0].url}${
           pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
         }/api/v1/disposal/`,
@@ -300,24 +303,35 @@ const InputDisposal = ({ dataDisposal }) => {
           disposal_code: codeDis,
           disposal_name: nameDisposal,
           disposal_desc: descriptionDisposal,
-          item_no: el.asset_number,
-          item_name: el.asset_name,
-          type_asset: el.type_asset,
-          area_asset: el.area_name + "-" + el.alias_name,
+          item_list: jsonString,
           status_disposal: statusdis.value,
           status_approval: status_aprove,
         }
-      );
+      )
+      .then((response) => {
+        console.log("success");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
+    selectDisposal.forEach((el) => {
       // Updated Status
-      axios.patch(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/inventory/updated-status/${el.id}/disposal/`,
-        {
-          disposal: true,
-        }
-      );
+      axios
+        .patch(
+          `${pathEndPoint[0].url}${
+            pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+          }/api/v1/inventory/updated-status/${el.id}/disposal/`,
+          {
+            disposal: true,
+          }
+        )
+        .then((response) => {
+          console.log("success");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     });
 
     setToast(true);
