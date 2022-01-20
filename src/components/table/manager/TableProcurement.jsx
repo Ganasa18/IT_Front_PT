@@ -227,7 +227,7 @@ const TableProcurement = () => {
             request_id.status_id = statusmap[request_id.status_id];
           });
 
-          console.log(newDataRequest);
+          // console.log(newDataRequest);
           setDataPR(newDataRequest);
           setIsLoading(false);
         })
