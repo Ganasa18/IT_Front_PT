@@ -27,6 +27,8 @@ import RequestDetail from "../pages/manager/RequestDetail";
 import RequestApprove from "../pages/manager/RequestApprove";
 import IncomingPR from "../pages/purchase/IncomingPR";
 import IncomingPRDetail from "../pages/purchase/IncomingPRDetail";
+import DisposalApprove from "../pages/manager/DisposalApprove";
+import DisposalApproveDetail from "../pages/manager/DisposalApproveDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -231,6 +233,30 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 4 ? (
             <RequestApprove {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/disposal-asset-approval/"
+        component={(props) =>
+          parseInt(roleUser) === 4 ? (
+            <DisposalApprove {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/disposal-asset-approval/request/approve"
+        component={(props) =>
+          parseInt(roleUser) === 4 ? (
+            <DisposalApproveDetail {...props} />
           ) : (
             <Redirect to="/" />
           )

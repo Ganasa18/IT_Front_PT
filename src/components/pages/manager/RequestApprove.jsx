@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { invEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
-import { Redirect } from "react-router-dom";
+
 import {
   makeStyles,
   Grid,
@@ -713,7 +713,7 @@ const TablePurchaseList = ({ listData }) => {
   return (
     <TableContainer className={classes.tableWidth}>
       <Paper>
-        <Toolbar>
+        {/* <Toolbar>
           <div className="col-10">
             <Typography
               variant="h6"
@@ -722,7 +722,7 @@ const TablePurchaseList = ({ listData }) => {
               Purchase Request
             </Typography>
           </div>
-        </Toolbar>
+        </Toolbar> */}
         <Table className={classes.table} aria-label="custom pagination table">
           <TableHead classes={{ root: classes.thead }}>
             <TableRow>

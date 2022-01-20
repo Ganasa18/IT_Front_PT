@@ -310,6 +310,11 @@ a {
   font-size: 13px;
 }
 
+.form-input[readonly] {
+  background-color: #b2b2b26e;
+  color: #000;
+}
+
 .form-input:focus {
   outline: none;
 }
@@ -388,6 +393,15 @@ a {
 .margin-top {
   margin-top: 20px;
 }
+
+.margin-top-0 {
+  margin-top: 5px;
+}
+
+.margin-top-1 {
+  margin-top: 10px;
+}
+
 .margin-top-2 {
   margin-top: 40px;
 }

@@ -79,6 +79,9 @@
   list-style: none;
   margin: 0;
   padding-inline-start: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 250px;
 }
 
 /**

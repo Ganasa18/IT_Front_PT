@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../assets/select-search.css";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { pathEndPoint } from "../../assets/menu";
@@ -26,6 +27,7 @@ import {
   Fade,
   Modal,
   Backdrop,
+  Divider,
 } from "@material-ui/core";
 import "../../assets/master.css";
 import IconButton from "@material-ui/core/IconButton";
@@ -164,11 +166,11 @@ const useStyles2 = makeStyles((theme) => ({
     transform: "translate(-50%,-50%)",
     top: "30%",
     left: "50%",
-    width: 550,
+    width: 850,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(2, 8, 3),
   },
   paperTble: {
     height: "480px",
@@ -203,12 +205,19 @@ const TableAssetUser = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(3);
   //   const [dataArea, setDataArea] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingAsset, setIsLoadingAsset] = useState(true);
   const [allSelected, setAllSelected] = useState(false);
   const [selected, setSelected] = useState({});
   const [dataAsset, setDataAsset] = useState([]);
+  const [dataAssetInv, setDataAssetInv] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [assetNumber, setAssetNumber] = useState("");
+  const [assetName, setAssetName] = useState("");
+  const [assetCategory, setAssetCategory] = useState("");
 
   useEffect(() => {
     getAssetUser();
+    // getAsset();
   }, []);
 
   // const dataArea = [
@@ -334,6 +343,120 @@ const TableAssetUser = (props) => {
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, dataAsset.length - page * rowsPerPage);
 
+  const modalPop = async () => {
+    setModalOpen((prevModal) => !prevModal);
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    await axios
+      .get(inventory)
+      .then((response) => {
+        let dataAsset = response.data.data.inventorys;
+        dataAsset = dataAsset.filter(
+          (item) => item.status_asset === false && item.disposal === false
+        );
+        dataAsset = dataAsset.map((row) => ({
+          name: row.asset_name,
+          value: row.id,
+          code: row.asset_number,
+          category: row.category_name,
+        }));
+
+        setDataAssetInv(dataAsset);
+        setIsLoadingAsset(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleAsset = async (...e) => {
+    setAssetNumber(e[1].code);
+    setAssetName(e[1].name);
+    setAssetCategory(e[1].category);
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <form>
+            <div className="row">
+              <div className="col-12">
+                <h3>Add Asset</h3>
+              </div>
+            </div>
+            <Divider />
+            <br />
+            {isLoadingAsset ? (
+              <isLoadingAsset />
+            ) : (
+              <>
+                <div className="row">
+                  <div className="col-6">
+                    <label htmlFor="roleName">Asset Inventory</label>
+                    <SelectSearch
+                      options={dataAssetInv}
+                      value={dataAssetInv}
+                      onChange={handleAsset}
+                      filterOptions={fuzzySearch}
+                      search
+                      placeholder="Search Assets"
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label htmlFor="roleName">Asset Number</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={assetNumber}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="row margin-top-1">
+                  <div className="col-6"></div>
+                  <div className="col-6">
+                    <label htmlFor="roleName">Name Asset</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={assetName}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="row margin-top-1">
+                  <div className="col-6"></div>
+                  <div className="col-6">
+                    <label htmlFor="roleName">Category</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={assetCategory}
+                      readOnly
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            <br />
+            <br />
+            <div className="footer-modal">
+              <button className={"btn-cancel"} onClick={modalPop}>
+                Cancel
+              </button>
+              <button className={"btn-submit"}>Submit</button>
+            </div>
+          </form>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -349,6 +472,7 @@ const TableAssetUser = (props) => {
             </div>
             <div className="col-2">
               <Button
+                onClick={modalPop}
                 className={classes.buttonAdd}
                 variant="contained"
                 color="primary"
@@ -463,6 +587,15 @@ const TableAssetUser = (props) => {
           </Table>
         </Paper>
       </TableContainer>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };
