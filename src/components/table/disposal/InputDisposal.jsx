@@ -19,14 +19,17 @@ import {
   Typography,
 } from "@material-ui/core";
 import "../../../assets/master.css";
+import "../../../assets/multi_upload.css";
 import { pathEndPoint } from "../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import CancelIcon from "@material-ui/icons/Cancel";
 import axios from "axios";
 import MuiAlert from "@material-ui/lab/Alert";
+import useUploadImg from "../../../assets/useUploadImg";
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -183,6 +186,8 @@ const InputDisposal = ({ dataDisposal }) => {
   const [toast, setToast] = useState(false);
   const [lastNumber, setLastNumber] = useState("");
 
+  const [dataImg, onChange, onDone, onRemoveOne] = useUploadImg();
+
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -294,6 +299,58 @@ const InputDisposal = ({ dataDisposal }) => {
     // console.log(selectDisposal);
     const jsonString = JSON.stringify(selectDisposal);
 
+    // console.log(dataImg.files);
+
+    // console.log(imgArr);
+    // console.log(imageFormData);
+
+    // const imageFormData = new FormData();
+    // imageFormData.append("imageDisposal", dataImg.files);
+    let imgStringJson = null;
+
+    if (dataImg.files.length > 0) {
+      const imgString = dataImg.files;
+      // console.log(imgString);
+
+      var imgArr = [];
+      const imageFormData = new FormData();
+
+      imgString.forEach((item) => {
+        imgArr.push(
+          `${codeDis}-${item.name.split(".").slice(0, -1).join(".")}`
+        );
+      });
+
+      imgStringJson = JSON.stringify(imgArr);
+
+      Array.from(dataImg.files).forEach((f) => {
+        imageFormData.append("images", f);
+      });
+
+      imageFormData.append("no_dis", codeDis);
+
+      await axios
+        .post(
+          `${pathEndPoint[0].url}${
+            pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+          }/api/v1/disposal/images`,
+          imageFormData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        .then((response) => {
+          console.log("success");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
+    console.log(imgStringJson);
+
     await axios
       .post(
         `${pathEndPoint[0].url}${
@@ -306,6 +363,7 @@ const InputDisposal = ({ dataDisposal }) => {
           item_list: jsonString,
           status_disposal: statusdis.value,
           status_approval: status_aprove,
+          img_list: imgStringJson === null ? null : imgStringJson,
         }
       )
       .then((response) => {
@@ -339,6 +397,17 @@ const InputDisposal = ({ dataDisposal }) => {
       window.location.reload();
     }, 3000);
   };
+
+  const PreviewImg = ({ className, src, remove }) => (
+    <div className="relative p-2">
+      <span
+        className="absolute top-0 right-0 rounded-full bg-red-500 text-gray-800"
+        onClick={remove}>
+        <CancelIcon />
+      </span>
+      <img src={src} alt={"img"} className="h-12 w-auto rounded-md" />
+    </div>
+  );
 
   return (
     <>
@@ -386,6 +455,31 @@ const InputDisposal = ({ dataDisposal }) => {
                 </>
               ))}
             </Grid>
+          </div>
+        </Grid>
+        <Grid item xs={5}>
+          <label htmlFor="upload">
+            <span className="rounded-btn">
+              <input
+                type="file"
+                accept="image/jpg,image/png,image/jpeg"
+                id="uploadDisposal"
+                className="form-input"
+                multiple={true}
+                onChange={onChange}
+              />
+            </span>
+          </label>
+        </Grid>
+        <Grid item xs={7}>
+          <div className="flex flex-row flex-wrap justify-center items-center ">
+            {dataImg.previews.map((url, index) => (
+              <PreviewImg
+                key={index}
+                src={url}
+                remove={() => onRemoveOne(index)}
+              />
+            ))}
           </div>
         </Grid>
       </Grid>
