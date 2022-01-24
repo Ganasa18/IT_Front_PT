@@ -8,7 +8,6 @@ import {
   Document,
   StyleSheet,
   PDFDownloadLink,
-  PDFViewer,
 } from "@react-pdf/renderer";
 import ReactPDF from "@react-pdf/renderer";
 
@@ -25,6 +24,7 @@ import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
 import TableDisposal from "./TableDisposal";
+import ModalGalery from "../../asset/ModalGalery";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -76,6 +76,7 @@ const DisposalDetail = () => {
   const dataStorage = localStorage.getItem("disposalData");
   const parseObject = JSON.parse(dataStorage);
   const [dataDisposal] = useState(parseObject);
+  const [modalGaleryOpen, setModalGaleryOpen] = useState(false);
 
   // Create styles
   Font.register({
@@ -248,10 +249,6 @@ const DisposalDetail = () => {
     },
   });
 
-  console.log(dataDisposal);
-
-  console.log(JSON.parse(dataDisposal.item_list));
-
   // Create Document Component
   const MyDocument = ({ dataDs, listDispos }) => (
     <Document>
@@ -333,6 +330,10 @@ const DisposalDetail = () => {
       <div className={classes.toolbar} />
       <br />
       <Breadcrumbs
+        onClick={function () {
+          const origin = window.location.origin;
+          window.location.href = `${origin}/disposal-assets`;
+        }}
         separator={<NavigateNextIcon fontSize="small" />}
         aria-label="breadcrumb">
         <span className={"span_crumb"}>Disposal Asset</span>
@@ -387,6 +388,7 @@ const DisposalDetail = () => {
                 </PDFDownloadLink>
               </div>
             </div>
+
             <br />
             <div className="row">
               <div className="col-2">
@@ -401,6 +403,23 @@ const DisposalDetail = () => {
                 <p className="label-asset">PIC</p>
                 <p>{dataDisposal.user_name}</p>
               </div>
+              {dataDisposal.img_list !== null ? (
+                <div className="col-2">
+                  <p className="label-asset">Image</p>
+                  <p>
+                    <button
+                      className="attachment-view"
+                      onClick={() => setModalGaleryOpen(true)}>
+                      view
+                    </button>
+                    <ModalGalery
+                      imgList={dataDisposal.img_list}
+                      onClose={() => setModalGaleryOpen(false)}
+                      show={modalGaleryOpen}
+                    />
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </Grid>
