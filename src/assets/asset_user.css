@@ -260,7 +260,7 @@
   background-color: #2f81ed3f;
   color: #000;
   left: 50%;
-  transform: translate(40%, 0%);
+  transform: translate(25%, 0%);
 }
 
 /* talk bubble contents */
@@ -372,6 +372,7 @@
   }
 
   .talk-bubble-right {
+    margin: 40px;
     width: 200px;
     left: 45%;
     transform: translate(40%, 0%);

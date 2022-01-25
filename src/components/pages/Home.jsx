@@ -32,7 +32,7 @@ const Home = () => {
         </Grid>
         <Grid container spacing={3}>
           <Grid item xs={6}>
-            <div className="card">
+            <div className="card-dashboard">
               <div className="container-head">
                 <p className="title-card">Action Request Approval</p>
                 <div className="grow"></div>
@@ -49,7 +49,7 @@ const Home = () => {
             </div>
           </Grid>
           <Grid item xs={6}>
-            <div className="card">
+            <div className="card-dashboard">
               <div className="container-head">
                 <p className="title-card">Facility & Access Approval</p>
                 <div className="grow"></div>
@@ -64,24 +64,6 @@ const Home = () => {
                 <p className="total-title">Request need to approve</p>
               </div>
             </div>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Paper className={classes.paper}>xs=12 sm=6</Paper>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Paper className={classes.paper}>xs=12 sm=6</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>xs=6 sm=3</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>xs=6 sm=3</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>xs=6 sm=3</Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className={classes.paper}>xs=6 sm=3</Paper>
           </Grid>
         </Grid>
       </Grid>

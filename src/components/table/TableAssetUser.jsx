@@ -3,11 +3,12 @@ import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../assets/select-search.css";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
+import { pathEndPoint, authEndPoint } from "../../assets/menu";
 import AddIcon from "@material-ui/icons/Add";
 
 import Loading from "../asset/Loading";
 import {
+  Grid,
   Toolbar,
   Checkbox,
   useTheme,
@@ -35,6 +36,10 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import Cookies from "universal-cookie";
+import InputDisposal from "./disposal/InputDisposal";
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -175,6 +180,22 @@ const useStyles2 = makeStyles((theme) => ({
   paperTble: {
     height: "480px",
   },
+
+  paperDisposal: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "45%",
+    left: "50%",
+    width: 1200,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+      width: 1000,
+    },
+  },
   buttonAdd: {
     [theme.breakpoints.up("xl")]: {
       width: "150px",
@@ -211,91 +232,83 @@ const TableAssetUser = (props) => {
   const [dataAsset, setDataAsset] = useState([]);
   const [dataAssetInv, setDataAssetInv] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [assetSelected, setAssetSelected] = useState([]);
   const [assetNumber, setAssetNumber] = useState("");
   const [assetName, setAssetName] = useState("");
   const [assetCategory, setAssetCategory] = useState("");
+  const [selectedDisposal, setSelectedDisposal] = useState([]);
+  const [modalDisposal, setModalDisposal] = useState(false);
 
   useEffect(() => {
-    getAssetUser();
+    setTimeout(() => {
+      getAssetUser();
+    }, 2000);
     // getAsset();
-  }, []);
-
-  // const dataArea = [
-  //   {
-  //     id: "1",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  //   {
-  //     id: "2",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  //   {
-  //     id: "3",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  //   {
-  //     id: "4",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  //   {
-  //     id: "5",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  //   {
-  //     id: "6",
-  //     asset_no: "123444",
-  //     asset_name: "Macbook",
-  //     unit_part: "part",
-  //     category: "Hardware",
-  //     sub_category: "Laptop",
-  //   },
-  // ];
+  }, [dataAsset]);
 
   const getAssetUser = async () => {
+    localStorage.setItem("userData", JSON.stringify(dataUser));
+    const dataNow = localStorage.getItem("userData");
+    const userNow = JSON.parse(dataNow);
+
     let inventory = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory`;
-    await axios
-      .get(inventory)
-      .then((response) => {
-        let filterAsset = response.data.data.inventorys;
 
-        if (dataUser.user_id !== undefined) {
-          filterAsset = filterAsset.filter(
-            (item) => item.used_by === dataUser.user_id
-          );
-        } else {
-          filterAsset = filterAsset.filter(
-            (item) => item.used_by === dataUser.id
-          );
-        }
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
 
-        setDataAsset(filterAsset);
-        setIsLoading(false);
-      })
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestTwo = await axios.get(inventory);
+
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+
+          let newDataUser = responseOne.data.data.users;
+          let filterAsset = responseTwo.data.data.inventorys;
+
+          if (userNow.user_id !== undefined) {
+            filterAsset = filterAsset.filter(
+              (item) => item.used_by === userNow.user_id
+            );
+          } else {
+            filterAsset = filterAsset.filter(
+              (item) => item.used_by === userNow.id
+            );
+          }
+
+          const arr_user = [...newDataUser];
+          const arr_invent = [...filterAsset];
+
+          var usermap = {};
+
+          arr_user.forEach(function (user_id) {
+            usermap[user_id.id] = user_id;
+          });
+
+          arr_invent.forEach(function (invent) {
+            invent.user_id = usermap[invent.used_by];
+          });
+          // console.log(arr_invent);
+          setDataAsset(arr_invent);
+          setIsLoading(false);
+        })
+      )
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const modalHandleDisposal = () => {
+    setModalDisposal((prevSelected) => !prevSelected);
   };
 
   const toggleAllSelected = (e) => {
@@ -353,18 +366,25 @@ const TableAssetUser = (props) => {
     await axios
       .get(inventory)
       .then((response) => {
-        let dataAsset = response.data.data.inventorys;
-        dataAsset = dataAsset.filter(
-          (item) => item.status_asset === false && item.disposal === false
+        let dataAssetSelect = response.data.data.inventorys;
+
+        dataAssetSelect = dataAssetSelect.filter(
+          (item) =>
+            item.type_asset !== "departement" &&
+            item.used_by === null &&
+            item.status_asset === false &&
+            item.disposal === false &&
+            item.area === dataAsset[0]?.area
         );
-        dataAsset = dataAsset.map((row) => ({
+
+        dataAssetSelect = dataAssetSelect.map((row) => ({
           name: row.asset_name,
           value: row.id,
           code: row.asset_number,
           category: row.category_name,
         }));
 
-        setDataAssetInv(dataAsset);
+        setDataAssetInv(dataAssetSelect);
         setIsLoadingAsset(false);
       })
       .catch((error) => {
@@ -373,9 +393,83 @@ const TableAssetUser = (props) => {
   };
 
   const handleAsset = async (...e) => {
+    setAssetSelected(e);
     setAssetNumber(e[1].code);
     setAssetName(e[1].name);
     setAssetCategory(e[1].category);
+  };
+
+  const handleSubmit = async () => {
+    const data = {
+      id: assetSelected[0],
+      used_by: dataAsset[0].user_id.id,
+      departement: dataAsset[0].user_id.departement,
+      subdepartement: dataAsset[0].user_id.subdepartement,
+      type_asset: "user",
+      status_asset: true,
+    };
+    // console.log(dataAsset[0].user_id.id);
+    // console.log(dataAsset[0].user_id.departement);
+    // console.log(dataAsset[0].user_id.subdepartement);
+    // console.log(assetSelected[0]);
+    // console.log(data);
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/updatedInvent`;
+
+    await axios
+      .patch(inventory, data)
+      .then((response) => {
+        alert(response.data.status);
+        setTimeout(() => {
+          setAssetNumber("");
+          setAssetName("");
+          setAssetCategory("");
+          setModalOpen((prevModal) => !prevModal);
+        }, 1500);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleDelete = async (row) => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/updatedInvent`;
+
+    await axios
+      .patch(inventory, {
+        id: row.id,
+        type_asset: row.type_asset,
+        status_asset: false,
+      })
+      .then((response) => {
+        setTimeout(() => {
+          alert("success");
+        }, 1500);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const checkValue = () => {
+    setModalDisposal((prevSelected) => !prevSelected);
+    var result = Object.keys(selected).map((key) => [
+      Number(key),
+      selected[key],
+    ]);
+
+    result = result.filter((key) => key[1] !== false);
+    result = result.map((key) => ({
+      id: key[0],
+    }));
+    const newArrDisposal = Object.values(result).map((key) => key.id);
+    var newInvent = dataAsset;
+    newInvent = newInvent.filter((row) => newArrDisposal.includes(row.id));
+    setSelectedDisposal(newInvent);
   };
 
   const bodyModal = (
@@ -449,9 +543,39 @@ const TableAssetUser = (props) => {
               <button className={"btn-cancel"} onClick={modalPop}>
                 Cancel
               </button>
-              <button className={"btn-submit"}>Submit</button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className={"btn-submit"}>
+                Submit
+              </button>
             </div>
           </form>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyDisposal = (
+    <>
+      <Fade in={modalDisposal}>
+        <div className={classes.paperDisposal}>
+          <div className="row">
+            <div className="col-12">
+              <h3>Disposal Asset</h3>
+            </div>
+          </div>
+          <Divider />
+          <br />
+          <Grid container spacing={3}>
+            <InputDisposal dataDisposal={selectedDisposal} />
+          </Grid>
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalHandleDisposal}
+            variant="outlined">
+            Cancel
+          </Button>
         </div>
       </Fade>
     </>
@@ -490,7 +614,18 @@ const TableAssetUser = (props) => {
               </>
             ) : null}
 
-            <button className="btn-disposal">Disposal</button>
+            {selectedCount > 0 ? (
+              <button className="btn-disposal-inv" onClick={checkValue}>
+                Disposal
+              </button>
+            ) : (
+              <button
+                className="btn-disposal-inv-disabled"
+                disabled="disabled"
+                onClick={""}>
+                Disposal
+              </button>
+            )}
           </div>
 
           <Table
@@ -549,7 +684,9 @@ const TableAssetUser = (props) => {
                       {row.subcategory_name}
                     </TableCell>
                     <TableCell align="center">
-                      <button className="btn-delete" onClick={(e) => {}}>
+                      <button
+                        className="btn-delete"
+                        onClick={(e) => handleDelete(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-fill"></span>
@@ -595,6 +732,15 @@ const TableAssetUser = (props) => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalDisposal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyDisposal}
       </Modal>
     </>
   );
