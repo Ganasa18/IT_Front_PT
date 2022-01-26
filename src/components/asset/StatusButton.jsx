@@ -278,10 +278,10 @@ const StatusButton = (styleProps) => {
     // console.log(idRequest);
   };
 
-  const submitTrouble = async () => {
-    console.log(troubleTitle);
-    console.log(remark);
-  };
+  // const submitTrouble = async () => {
+  //   console.log(troubleTitle);
+  //   console.log(remark);
+  // };
 
   const bodyModalDefault = (
     <>

@@ -124,7 +124,7 @@ const RequestDetail = () => {
             request_id.invent_id = inventmap[request_id.asset_id];
           });
 
-          console.log(arr_request);
+          // console.log(arr_request);
           localStorage.setItem("userId", arr_request[0].user_id);
           setInfoRequest(arr_request);
           setIsLoading(false);
