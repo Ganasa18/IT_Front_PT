@@ -239,6 +239,8 @@ const TableUserDepartementAsset = (props) => {
   const [assetCategory, setAssetCategory] = useState("");
   const [selectedDisposal, setSelectedDisposal] = useState([]);
   const [modalDisposal, setModalDisposal] = useState(false);
+  const [modalRemove, setModalRemove] = useState(false);
+  const [removeItem, setRemoveItem] = useState([]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -301,7 +303,7 @@ const TableUserDepartementAsset = (props) => {
           arr_invent.forEach(function (invent) {
             invent.user_id = usermap[invent.used_by];
           });
-          console.log(arr_invent);
+          // console.log(arr_invent);
           setDataAsset(arr_invent);
           setIsLoading(false);
         })
@@ -435,12 +437,13 @@ const TableUserDepartementAsset = (props) => {
 
     await axios
       .patch(inventory, {
-        id: row.id,
-        type_asset: row.type_asset,
+        id: removeItem.id,
+        type_asset: removeItem.type_asset,
         status_asset: false,
       })
       .then((response) => {
         setTimeout(() => {
+          setModalRemove(false);
           alert("success");
         }, 1500);
       })
@@ -468,6 +471,15 @@ const TableUserDepartementAsset = (props) => {
 
   const modalHandleDisposal = () => {
     setModalDisposal((prevSelected) => !prevSelected);
+  };
+
+  const handleModalRemove = (row) => {
+    setModalRemove(true);
+    setRemoveItem(row);
+  };
+
+  const modalClose = () => {
+    setModalRemove(false);
   };
 
   const bodyModal = (
@@ -566,7 +578,10 @@ const TableUserDepartementAsset = (props) => {
           <Divider />
           <br />
           <Grid container spacing={3}>
-            <InputDisposal dataDisposal={selectedDisposal} />
+            <InputDisposal
+              dataDisposal={selectedDisposal}
+              userProp={!dataUser ? null : dataUser.user_id}
+            />
           </Grid>
           <Button
             className={classes.cancelBtn}
@@ -574,6 +589,26 @@ const TableUserDepartementAsset = (props) => {
             variant="outlined">
             Cancel
           </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyModalRemove = (
+    <>
+      <Fade in={modalRemove}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to remove</h3>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalClose}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleDelete}>
+              Submit
+            </button>
+          </div>
         </div>
       </Fade>
     </>
@@ -684,7 +719,7 @@ const TableUserDepartementAsset = (props) => {
                     <TableCell align="center">
                       <button
                         className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
+                        onClick={(e) => handleModalRemove(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-fill"></span>
@@ -739,6 +774,15 @@ const TableUserDepartementAsset = (props) => {
           timeout: 500,
         }}>
         {bodyDisposal}
+      </Modal>
+      <Modal
+        open={modalRemove}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalRemove}
       </Modal>
     </>
   );

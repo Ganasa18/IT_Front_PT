@@ -238,6 +238,8 @@ const TableAssetUser = (props) => {
   const [assetCategory, setAssetCategory] = useState("");
   const [selectedDisposal, setSelectedDisposal] = useState([]);
   const [modalDisposal, setModalDisposal] = useState(false);
+  const [modalRemove, setModalRemove] = useState(false);
+  const [removeItem, setRemoveItem] = useState([]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -434,19 +436,25 @@ const TableAssetUser = (props) => {
       });
   };
 
-  const handleDelete = async (row) => {
+  const handleModalRemove = (row) => {
+    setModalRemove(true);
+    setRemoveItem(row);
+  };
+
+  const handleDelete = async () => {
     let inventory = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory/updatedInvent`;
 
     await axios
       .patch(inventory, {
-        id: row.id,
-        type_asset: row.type_asset,
+        id: removeItem.id,
+        type_asset: removeItem.type_asset,
         status_asset: false,
       })
       .then((response) => {
         setTimeout(() => {
+          setModalRemove(false);
           alert("success");
         }, 1500);
       })
@@ -470,6 +478,10 @@ const TableAssetUser = (props) => {
     var newInvent = dataAsset;
     newInvent = newInvent.filter((row) => newArrDisposal.includes(row.id));
     setSelectedDisposal(newInvent);
+  };
+
+  const modalClose = () => {
+    setModalRemove(false);
   };
 
   const bodyModal = (
@@ -568,7 +580,10 @@ const TableAssetUser = (props) => {
           <Divider />
           <br />
           <Grid container spacing={3}>
-            <InputDisposal dataDisposal={selectedDisposal} />
+            <InputDisposal
+              dataDisposal={selectedDisposal}
+              userProp={!dataUser ? null : dataUser.user_id}
+            />
           </Grid>
           <Button
             className={classes.cancelBtn}
@@ -576,6 +591,26 @@ const TableAssetUser = (props) => {
             variant="outlined">
             Cancel
           </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyModalRemove = (
+    <>
+      <Fade in={modalRemove}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to remove</h3>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalClose}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleDelete}>
+              Submit
+            </button>
+          </div>
         </div>
       </Fade>
     </>
@@ -686,7 +721,7 @@ const TableAssetUser = (props) => {
                     <TableCell align="center">
                       <button
                         className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
+                        onClick={(e) => handleModalRemove(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-fill"></span>
@@ -741,6 +776,15 @@ const TableAssetUser = (props) => {
           timeout: 500,
         }}>
         {bodyDisposal}
+      </Modal>
+      <Modal
+        open={modalRemove}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalRemove}
       </Modal>
     </>
   );

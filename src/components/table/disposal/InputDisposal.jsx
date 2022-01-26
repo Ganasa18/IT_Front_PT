@@ -175,7 +175,7 @@ const useStyles2 = makeStyles((theme) => ({
 //   return "DSP" + year + month + day;
 // }
 
-const InputDisposal = ({ dataDisposal }) => {
+const InputDisposal = ({ dataDisposal, userProp }) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -185,6 +185,9 @@ const InputDisposal = ({ dataDisposal }) => {
   const [statusDisposal, setStatusDisposal] = useState([]);
   const [toast, setToast] = useState(false);
   const [lastNumber, setLastNumber] = useState("");
+  const [userProfile] = useState(userProp);
+
+  console.log(userProfile);
 
   const [dataImg, onChange, onDone, onRemoveOne] = useUploadImg();
 
@@ -349,7 +352,7 @@ const InputDisposal = ({ dataDisposal }) => {
         });
     }
 
-    console.log(imgStringJson);
+    // console.log(imgStringJson);
 
     await axios
       .post(
@@ -364,6 +367,7 @@ const InputDisposal = ({ dataDisposal }) => {
           status_disposal: statusdis.value,
           status_approval: status_aprove,
           img_list: imgStringJson === null ? null : imgStringJson,
+          user_prop: userProfile === undefined ? null : parseInt(userProfile),
         }
       )
       .then((response) => {

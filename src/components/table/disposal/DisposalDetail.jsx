@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Page,
   Text,
@@ -9,7 +9,7 @@ import {
   StyleSheet,
   PDFDownloadLink,
 } from "@react-pdf/renderer";
-import ReactPDF from "@react-pdf/renderer";
+// import ReactPDF from "@react-pdf/renderer";
 
 import {
   makeStyles,
@@ -19,12 +19,19 @@ import {
   Divider,
 } from "@material-ui/core";
 
+import { authEndPoint, pathEndPoint } from "../../../assets/menu";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
 import TableDisposal from "./TableDisposal";
 import ModalGalery from "../../asset/ModalGalery";
+import Loading from "../../asset/Loading";
+import axios from "axios";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -77,6 +84,130 @@ const DisposalDetail = () => {
   const parseObject = JSON.parse(dataStorage);
   const [dataDisposal] = useState(parseObject);
   const [modalGaleryOpen, setModalGaleryOpen] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [userInfo, setUserInfo] = useState([]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (dataDisposal.user_prop !== null) {
+        getInfoUser();
+      }
+    }, 1000);
+  }, []);
+
+  const getInfoUser = async () => {
+    const userId = dataDisposal.user_prop;
+
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let role = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/role`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
+
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const requestTwo = await axios.get(area);
+    const requestThree = await axios.get(role, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
+
+    axios
+      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+          const responseFive = responses[4];
+          let newDataUser = responseOne.data.data.users;
+          let newDataArea = responseTwo.data.data.areas;
+          let newDataRole = responseThree.data.data.roles;
+          let newDataDepartement = responseFour.data.data.departements;
+          let newDataSubDepartement = responseFive.data.data.subdepartements;
+
+          newDataUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          newDataUser = newDataUser.filter(
+            (item) => item.id === parseInt(userId)
+          );
+
+          let arr_user = [...newDataUser];
+          let arr_area = [...newDataArea];
+          let arr_role = [...newDataRole];
+          let arr_departement = [...newDataDepartement];
+          let arr_subdepartement = [...newDataSubDepartement];
+
+          var usermap = {};
+
+          arr_area.forEach(function (id_area_user) {
+            usermap[id_area_user.id] = id_area_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_area_user = usermap[request_id.area];
+          });
+
+          arr_role.forEach(function (id_role_user) {
+            usermap[id_role_user.id] = id_role_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_role_user = usermap[request_id.role];
+          });
+
+          arr_departement.forEach(function (id_departement_user) {
+            usermap[id_departement_user.id] = id_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_departement_user = usermap[request_id.departement];
+          });
+
+          arr_subdepartement.forEach(function (id_sub_departement_user) {
+            usermap[id_sub_departement_user.id] = id_sub_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_sub_departement_user =
+              usermap[request_id.subdepartement];
+          });
+          console.log(arr_user);
+          setUserInfo(arr_user);
+          setIsLoadingUser(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
 
   // Create styles
   Font.register({
@@ -424,6 +555,67 @@ const DisposalDetail = () => {
           </div>
         </Grid>
       </Grid>
+      {dataDisposal.user_prop !== null ? (
+        isLoadingUser ? (
+          <Loading />
+        ) : (
+          <Grid container spacing={3}>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <div className="card-asset-action">
+                <div className="flex-card">
+                  <h3>Profile</h3>
+                </div>
+                <div className="row">
+                  <div className="col-3">
+                    <p className="label-asset">Request By</p>
+                    <p>{capitalizeFirstLetter(userInfo[0].name)}</p>
+                  </div>
+                  <div className="col-3">
+                    <p className="label-asset">Departement</p>
+                    <p>
+                      {capitalizeFirstLetter(
+                        userInfo[0].id_departement_user.departement_name
+                      )}
+                    </p>
+                  </div>
+                  <div className="col-3">
+                    <p className="label-asset">Role</p>
+                    <p>
+                      {capitalizeFirstLetter(
+                        userInfo[0].id_role_user.role_name
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <br />
+                <div className="row">
+                  <div className="col-3">
+                    <p className="label-asset">Area</p>
+                    <p>
+                      {`${capitalizeFirstLetter(
+                        userInfo[0].id_area_user.area_name
+                      )}-${userInfo[0].id_area_user.alias_name}`}
+                    </p>
+                  </div>
+                  <div className="col-3">
+                    <p className="label-asset">Sub Department </p>
+                    <p>
+                      {capitalizeFirstLetter(
+                        userInfo[0].id_sub_departement_user.subdepartement_name
+                      )}
+                    </p>
+                  </div>
+                  <div className="col-3">
+                    <p className="label-asset">Status Employee </p>
+                    <p>{capitalizeFirstLetter(userInfo[0].employe)}</p>
+                  </div>
+                </div>
+              </div>
+            </Grid>
+          </Grid>
+        )
+      ) : null}
+
       <Grid container spacing={3}>
         <Grid item xs={12} className={classes.cardPadding}>
           <TableDisposal listData={JSON.parse(dataDisposal.item_list)} />
