@@ -233,8 +233,8 @@ const StatusButton = (styleProps) => {
 
     if (
       data.status_id.id === 8 ||
-      data.status_id.id === 19 ||
-      data.status_id.id === 11
+      data.status_id.id === 11 ||
+      data.status_id.id === 19
     ) {
       button.setAttribute("disabled", true);
       button.style.cursor = "not-allowed";

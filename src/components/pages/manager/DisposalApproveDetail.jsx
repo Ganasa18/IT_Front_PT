@@ -260,8 +260,77 @@ const DisposalApproveDetail = () => {
   const classes = useStyles();
   const dataStorage = localStorage.getItem("ticketData");
   const parseObject = JSON.parse(dataStorage);
+  const [modalOpen, setModalOpen] = useState(false);
   console.log(parseObject);
-  console.log(JSON.parse(parseObject.item_list));
+  // console.log(JSON.parse(parseObject.item_list));
+
+  const handleModal = async () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <div className="row">
+            <div className="col-12">
+              <h3>Approve Disposal</h3>
+            </div>
+          </div>
+          <Divider />
+          <br />
+          <form>
+            <div className="row">
+              <div className="col-5">
+                <p style={{ fontWeight: "bold" }}>Submit OTP</p>
+                <p style={{ fontWeight: "300" }}>
+                  Check your mail to know the OTP
+                </p>
+                <input
+                  type="text"
+                  id="OtpNumber"
+                  className="form-input-otp"
+                  placeholder="OTP..."
+                  maxLength="6"
+                  autoComplete="off"
+                />
+                <small>
+                  Not send yet ?<span className="resend"> Resend</span>
+                </small>
+              </div>
+              <div className="col-1"></div>
+              <div className="col-6">
+                <label style={{ fontWeight: "bold" }}>Leave Comment</label>
+                <textarea
+                  className="form-input-area"
+                  placeholder="Comment here... "
+                  cols="30"
+                  rows="10"></textarea>
+              </div>
+            </div>
+            <br />
+            <div className="footer-modal">
+              <button className="btn-cancel" onClick={handleModalClose}>
+                Cancel
+              </button>
+              <button
+                className={`btn-submit`}
+                disabled={`disabled`}
+                type="submit">
+                Approve
+              </button>
+            </div>
+          </form>
+          <br />
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -283,7 +352,10 @@ const DisposalApproveDetail = () => {
               <h3>Information</h3>
 
               <div className="button-approve">
-                <button type="button" className="approve-btn">
+                <button
+                  type="button"
+                  onClick={handleModal}
+                  className="approve-btn">
                   Approve
                 </button>
                 <button type="button" className="deny-btn">
@@ -335,6 +407,15 @@ const DisposalApproveDetail = () => {
           <TableDisposalList listData={JSON.parse(parseObject.item_list)} />
         </Grid>
       </Grid>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };

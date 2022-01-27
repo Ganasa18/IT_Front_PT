@@ -269,6 +269,7 @@ const RequestApprove = () => {
   const [dataRequest, setDataRequest] = useState([]);
   const [purchaseList, setPurchaseList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpenDeny, setModalOpenDeny] = useState(false);
   const [dataUser, setDataUser] = useState([]);
   const [inputOTP, setInputOTP] = useState("");
   const [timer, setTimer] = useState(null);
@@ -355,6 +356,53 @@ const RequestApprove = () => {
       });
   };
 
+  const handleDeny = async () => {
+    const dataUpdated = {
+      id: parseObject.id,
+      director_name: dataUser[0].username,
+      status_id: 20,
+    };
+
+    const ticketUpdated = {
+      ticket_code: parseObject.action_req_code,
+      status_id: 8,
+    };
+
+    let deny_pr = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/deny-purchase`;
+
+    let ticket = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/updated-ticket-status/${parseObject.action_req_code}`;
+
+    const origin = window.location.origin;
+
+    await axios
+      .patch(deny_pr, dataUpdated)
+      .then((response) => {
+        setToast(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    await axios
+      .patch(ticket, {
+        status_id: 8,
+      })
+      .then((response) => {
+        console.log(response.data.status);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    setTimeout(() => {
+      window.location.href = `${origin}/procurement-approval`;
+    }, 2000);
+  };
+
   const handleModal = async () => {
     const otpNum = generateOTP();
 
@@ -425,6 +473,10 @@ const RequestApprove = () => {
 
   const handleModalClose = () => {
     setModalOpen(false);
+  };
+
+  const handleModalDeny = () => {
+    setModalOpenDeny((prevModal) => !prevModal);
   };
 
   const getInfoPR = async () => {
@@ -560,6 +612,26 @@ const RequestApprove = () => {
     </>
   );
 
+  const bodyDeny = (
+    <>
+      <Fade in={modalOpenDeny}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to deny {parseObject.purchase_req_code}</h3>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={handleModalDeny}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleDeny}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   if (isLoading) {
     return <Loading />;
   }
@@ -594,7 +666,10 @@ const RequestApprove = () => {
                       className="approve-btn">
                       Approve
                     </button>
-                    <button type="button" className="deny-btn">
+                    <button
+                      type="button"
+                      onClick={handleModalDeny}
+                      className="deny-btn">
                       Deny
                     </button>
                   </div>
@@ -659,6 +734,15 @@ const RequestApprove = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenDeny}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyDeny}
       </Modal>
       <Snackbar
         autoHideDuration={5000}
