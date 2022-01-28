@@ -363,10 +363,10 @@ const RequestApprove = () => {
       status_id: 20,
     };
 
-    const ticketUpdated = {
-      ticket_code: parseObject.action_req_code,
-      status_id: 8,
-    };
+    // const ticketUpdated = {
+    //   ticket_code: parseObject.action_req_code,
+    //   status_id: 8,
+    // };
 
     let deny_pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
