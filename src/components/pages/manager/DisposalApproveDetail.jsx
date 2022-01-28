@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { invEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
+import { pathEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import {
   makeStyles,
@@ -37,6 +37,10 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
 import MuiAlert from "@material-ui/lab/Alert";
+import ModalGalery from "../../asset/ModalGalery";
+const cookies = new Cookies();
+const token = cookies.get("token");
+const userID = cookies.get("id");
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -258,14 +262,145 @@ function calbill(date) {
 
 const DisposalApproveDetail = () => {
   const classes = useStyles();
-  const dataStorage = localStorage.getItem("ticketData");
+  const dataStorage = localStorage.getItem("ticketDispos");
   const parseObject = JSON.parse(dataStorage);
   const [modalOpen, setModalOpen] = useState(false);
-  console.log(parseObject);
+  const [modalOpenDeny, setModalOpenDeny] = useState(false);
+  const [dataUser, setDataUser] = useState([]);
+  const [toast, setToast] = useState(false);
+  const [isLoadingOTP, setIsLoadingOTP] = useState(true);
+  const [inputOTP, setInputOTP] = useState("");
+  const [buttonAllow, setButtonAllow] = useState(false);
+  const [timer, setTimer] = useState(null);
+  const [modalGaleryOpen, setModalGaleryOpen] = useState(false);
+
   // console.log(JSON.parse(parseObject.item_list));
 
+  useEffect(() => {
+    getInfoUser();
+  }, []);
+
+  const handleOtp = (e) => {
+    const Otp = document.querySelector("#OtpNumber");
+    const otpNow = localStorage.getItem("otp");
+
+    setButtonAllow(false);
+    if (timer) {
+      clearTimeout(timer);
+      setTimer(null);
+    }
+    setTimer(
+      setTimeout(() => {
+        setInputOTP(e);
+        // console.log(Otp.classList);
+        if (e !== otpNow) {
+          if (Otp.classList[1] !== undefined) {
+            Otp.classList.remove("success");
+          }
+          Otp.classList.add("fail");
+          return;
+        }
+        if (Otp.classList[1] !== undefined) {
+          Otp.classList.remove("fail");
+        }
+
+        setButtonAllow(true);
+        Otp.classList.add("success");
+        console.log(e);
+      }, 3000)
+    );
+  };
+
+  const resendOTP = async () => {
+    const otpNum = generateOTP();
+    localStorage.setItem("otp", otpNum);
+    let numberOTP = localStorage.getItem("otp");
+    const urlHost = window.location.origin;
+    const email = dataUser[0].email;
+    const username = dataUser[0].username;
+    const request = parseObject.disposal_code;
+
+    let otp = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/disposal/disposal-otp`;
+
+    await axios
+      .post(otp, {
+        number: numberOTP,
+        url: urlHost,
+        email: email,
+        username: username,
+        request: request,
+      })
+      .then((response) => {
+        console.log(response);
+        alert("success resend");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const getInfoUser = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        let newDataUser = response.data.data.users;
+        newDataUser = newDataUser.map((row) => ({
+          id: row.id,
+          username: row.username,
+          email: row.email,
+        }));
+
+        newDataUser = newDataUser.filter(
+          (item) => item.id === parseInt(userID)
+        );
+
+        setDataUser(newDataUser);
+        setIsLoadingOTP(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const handleModal = async () => {
+    const otpNum = generateOTP();
+
+    localStorage.setItem("otp", otpNum);
+    let numberOTP = localStorage.getItem("otp");
+    console.log(numberOTP);
+
+    const urlHost = window.location.origin;
+    const email = dataUser[0].email;
+    const username = dataUser[0].username;
+    const request = parseObject.disposal_code;
     setModalOpen(true);
+
+    let otp = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/disposal/disposal-otp`;
+
+    await axios
+      .post(otp, {
+        number: numberOTP,
+        url: urlHost,
+        email: email,
+        username: username,
+        request: request,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleModalClose = () => {
@@ -290,6 +425,9 @@ const DisposalApproveDetail = () => {
                 <p style={{ fontWeight: "300" }}>
                   Check your mail to know the OTP
                 </p>
+                {isLoadingOTP ? null : (
+                  <p style={{ fontWeight: "300" }}>{dataUser[0].email}</p>
+                )}
                 <input
                   type="text"
                   id="OtpNumber"
@@ -297,9 +435,14 @@ const DisposalApproveDetail = () => {
                   placeholder="OTP..."
                   maxLength="6"
                   autoComplete="off"
+                  onChange={(e) => handleOtp(e.target.value)}
                 />
                 <small>
-                  Not send yet ?<span className="resend"> Resend</span>
+                  Not send yet ?
+                  <span className="resend" onClick={resendOTP}>
+                    {" "}
+                    Resend
+                  </span>
                 </small>
               </div>
               <div className="col-1"></div>
@@ -318,8 +461,8 @@ const DisposalApproveDetail = () => {
                 Cancel
               </button>
               <button
-                className={`btn-submit`}
-                disabled={`disabled`}
+                className={`btn-submit ${buttonAllow ? "" : "disabled"}`}
+                disabled={`${buttonAllow ? "" : "disabled"}`}
                 type="submit">
                 Approve
               </button>
@@ -396,10 +539,30 @@ const DisposalApproveDetail = () => {
                 <p className="label-asset">Reason</p>
                 <p className="wrap-paraf">{parseObject.disposal_desc}</p>
               </div>
-              <div className="col-3">
-                <p className="label-asset">Approval</p>
-                <p>manager name</p>
-              </div>
+              {parseObject.pic_name !== null ? (
+                <div className="col-3">
+                  <p className="label-asset">Approval</p>
+                  <p>{parseObject.pic_name}</p>
+                </div>
+              ) : null}
+
+              {parseObject.img_list !== null ? (
+                <div className="col-3">
+                  <p className="label-asset">Image</p>
+                  <p>
+                    <button
+                      className="attachment-view"
+                      onClick={() => setModalGaleryOpen(true)}>
+                      view
+                    </button>
+                    <ModalGalery
+                      imgList={parseObject.img_list}
+                      onClose={() => setModalGaleryOpen(false)}
+                      show={modalGaleryOpen}
+                    />
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
         </Grid>

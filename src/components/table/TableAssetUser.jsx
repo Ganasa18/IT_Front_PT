@@ -370,6 +370,8 @@ const TableAssetUser = (props) => {
       .then((response) => {
         let dataAssetSelect = response.data.data.inventorys;
 
+        console.log(dataAssetSelect);
+
         dataAssetSelect = dataAssetSelect.filter(
           (item) =>
             item.type_asset !== "departement" &&

@@ -353,7 +353,8 @@ const ChatComponent = () => {
             )}
           </div>
         </div>
-        {isLoadingInput ? null : checkStatusData[0].status_id !== 11 ? (
+        {isLoadingInput ? null : checkStatusData[0].status_id === 11 ||
+          checkStatusData[0].status_id === 20 ? null : (
           <div className="card-footer">
             <form onSubmit={handleSubmit}>
               <div className="row">
@@ -403,7 +404,7 @@ const ChatComponent = () => {
               </div>
             </form>
           </div>
-        ) : null}
+        )}
       </div>
       <div className="popimg"></div>
       <div class="pop_upcontent">

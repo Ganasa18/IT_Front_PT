@@ -461,9 +461,14 @@ const InformationTicket = () => {
             <div className="col-3">
               <p className="label-asset">Sub Departement</p>
               <p>
-                {capitalizeFirstLetter(
-                  ticketData[0].id_sub_departement_user.subdepartement_name
-                )}
+                {`${
+                  ticketData[0].id_sub_departement_user
+                    ? capitalizeFirstLetter(
+                        ticketData[0].id_sub_departement_user
+                          .subdepartement_name
+                      )
+                    : null
+                }`}
               </p>
             </div>
             <div className="col-3">

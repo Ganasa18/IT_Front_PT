@@ -84,6 +84,10 @@
   max-height: 250px;
 }
 
+.select-search__options::-webkit-scrollbar {
+  display: none;
+}
+
 /**
   * Option row
   */

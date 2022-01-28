@@ -247,8 +247,9 @@ const TableDisposal = () => {
     setPage(0);
   };
 
-  const storePurchase = (row) => {
-    localStorage.setItem("ticketData", JSON.stringify(row));
+  const storeData = (row) => {
+    localStorage.setItem("ticketDispos", JSON.stringify(row));
+    console.log(row);
   };
 
   return (
@@ -278,8 +279,13 @@ const TableDisposal = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link
+                      {/* <Link
                         onClick={storePurchase(row)}
+                        to="/disposal-asset-approval/request/approve">
+                        {row.disposal_code}
+                      </Link> */}
+                      <Link
+                        onClick={() => storeData(row)}
                         to="/disposal-asset-approval/request/approve">
                         {row.disposal_code}
                       </Link>

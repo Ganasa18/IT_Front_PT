@@ -131,6 +131,22 @@ const StatusButton = (styleProps) => {
         button.setAttribute("disabled", true);
         button.style.cursor = "not-allowed";
       }
+
+      if (button.innerHTML === "troubleshoot") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "damaged") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
+      if (button.innerHTML === "closed") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+
       return;
     }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Loader from "react-loader-spinner";
 import { invEndPoint, authEndPoint } from "../../../assets/menu";
 
 import {
@@ -143,13 +143,15 @@ const ActionApproveDetail = () => {
         (item) => item.id === parseInt(userID)
       );
 
+      document.getElementById("overlay").style.display = "block";
+
       await axios
         .patch(
           `${invEndPoint[0].url}${
             invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
           }/api/v1/action-req/updated-ticket/${dataRequest.id}`,
           {
-            status_id: 7,
+            status_id: 20,
             leader_id: parseInt(userID),
             lead: leadEmail,
             username: getLead[0].name,
@@ -181,6 +183,8 @@ const ActionApproveDetail = () => {
       alert("comment must have min 10 character");
       return;
     }
+
+    document.getElementById("overlay").style.display = "block";
 
     await axios
       .patch(
@@ -255,6 +259,15 @@ const ActionApproveDetail = () => {
           </form>
         </div>
       </Fade>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 

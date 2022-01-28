@@ -107,7 +107,9 @@ const ActionReqDetail = () => {
             <div className="row">
               <div className="col-3">
                 <p className="label-asset">Description Of Problem</p>
-                <p>{dataRequest.action_req_description}</p>
+                <p className="wrap-paraf">
+                  {dataRequest.action_req_description}
+                </p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Date</p>

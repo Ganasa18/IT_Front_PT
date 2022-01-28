@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-
+import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Grid,
@@ -194,9 +194,13 @@ const ActionReq = () => {
       .get(asset)
       .then((response) => {
         const Asset = response.data.data.inventory;
-        var filterUser = Asset.filter((item) => item.type_asset === "user");
+        var filterUser = Asset.filter(
+          (item) => item.type_asset === "user" && item.disposal === false
+        );
+
+        console.log(filterUser);
         var filterDepartement = Asset.filter(
-          (item) => item.type_asset === "departement"
+          (item) => item.type_asset === "departement" && item.disposal === false
         );
 
         filterUser = filterUser.map((item) => ({
@@ -298,6 +302,7 @@ const ActionReq = () => {
       alert("Please Fill Description Min 10 Character");
       return;
     }
+    document.getElementById("overlay").style.display = "block";
 
     let act_req = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
@@ -409,6 +414,15 @@ const ActionReq = () => {
           </form>
         </div>
       </Fade>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 
