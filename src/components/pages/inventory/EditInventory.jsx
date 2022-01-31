@@ -30,6 +30,11 @@ const useStyles = makeStyles((theme) => ({
       height: "40px",
       transform: "translate(270%, 140%)",
     },
+    [theme.breakpoints.between("xlm", "xl")]: {
+      width: "130px",
+      height: "35px",
+      transform: "translate(200%, 80%)",
+    },
   },
 }));
 

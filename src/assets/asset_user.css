@@ -404,6 +404,13 @@
   }
 }
 
+@media only screen and (min-width: 1440px) and (max-width: 1500px) {
+  .card-asset {
+    height: 38vh;
+    padding: 5px 35px;
+  }
+}
+
 /* IMG Slide */
 
 .img-message {

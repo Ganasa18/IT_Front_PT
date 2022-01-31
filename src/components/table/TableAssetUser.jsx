@@ -214,6 +214,11 @@ const useStyles2 = makeStyles((theme) => ({
       bottom: "20px",
       width: "120px",
     },
+    [theme.breakpoints.between("xlm", "xl")]: {
+      width: "150px",
+      left: "10%",
+      top: "8px",
+    },
     fontSize: 12,
     height: "50px",
   },

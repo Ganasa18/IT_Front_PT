@@ -236,3 +236,11 @@ export const prEndPoint = [
     port: "2888",
   },
 ];
+
+export const logsEndPoint = [
+  {
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
+    port: "7800",
+  },
+];
