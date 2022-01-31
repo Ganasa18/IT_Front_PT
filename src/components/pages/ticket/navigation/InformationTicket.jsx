@@ -250,14 +250,20 @@ const InformationTicket = () => {
               usermap[request_id.id_user.departement];
           });
 
+          var subdepartement = {};
+
           arr_subdepartement.forEach(function (id_sub_departement_user) {
-            usermap[id_sub_departement_user.id] = id_sub_departement_user;
+            subdepartement[id_sub_departement_user.id] =
+              id_sub_departement_user;
           });
 
           JoinInvent.forEach(function (request_id) {
             request_id.id_sub_departement_user =
-              usermap[request_id.id_user.subdepartement];
+              subdepartement[request_id.id_user.subdepartement];
           });
+
+          // console.log(arr_subdepartement);
+          // console.log(JoinInvent);
 
           // Get Lead
 
@@ -462,12 +468,12 @@ const InformationTicket = () => {
               <p className="label-asset">Sub Departement</p>
               <p>
                 {`${
-                  ticketData[0].id_sub_departement_user
+                  ticketData[0].id_sub_departement_user !== undefined
                     ? capitalizeFirstLetter(
                         ticketData[0].id_sub_departement_user
                           .subdepartement_name
                       )
-                    : null
+                    : "none"
                 }`}
               </p>
             </div>

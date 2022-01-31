@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
 
   paper: {
     position: "fixed",
-    transform: "translate(-50%,-60%)",
+    transform: "translate(-50%,-40%)",
     top: "54%",
     left: "50%",
     width: 1200,
@@ -84,8 +84,14 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(4, 10, 4),
     [theme.breakpoints.down("lg")]: {
-      transform: "translate(-50%,-45%)",
+      transform: "translate(-50%,-50%)",
       width: 1000,
+    },
+
+    [theme.breakpoints.between("xlm", "xl")]: {
+      top: "-2%",
+      left: "20%",
+      transform: "scale(0.9)",
     },
   },
 }));

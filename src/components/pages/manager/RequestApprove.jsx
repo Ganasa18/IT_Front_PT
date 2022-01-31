@@ -38,6 +38,7 @@ import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
 import MuiAlert from "@material-ui/lab/Alert";
+import ModalGaleryPurchase from "../../asset/ModalGaleryPurchase";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -276,6 +277,7 @@ const RequestApprove = () => {
   const [buttonAllow, setButtonAllow] = useState(false);
   const [comment, setComment] = useState("");
   const [toast, setToast] = useState(false);
+  const [modalGaleryOpen, setModalGaleryOpen] = useState(false);
 
   useEffect(() => {
     getInfoPR();
@@ -717,6 +719,21 @@ const RequestApprove = () => {
                 <p className="label-asset">Request Date</p>
                 <p className="wrap-paraf">
                   {calbill(dataRequest[0].req_created)}
+                </p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Image</p>
+                <p>
+                  <button
+                    className="attachment-view"
+                    onClick={() => setModalGaleryOpen(true)}>
+                    view
+                  </button>
+                  <ModalGaleryPurchase
+                    onClose={() => setModalGaleryOpen(false)}
+                    imgList={purchaseList}
+                    show={modalGaleryOpen}
+                  />
                 </p>
               </div>
             </div>

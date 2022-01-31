@@ -196,6 +196,13 @@ export const menuDataUser4 = [
     exact: true,
     to: `/purchase-done`,
   },
+  {
+    id: 4,
+    name: "Action Request",
+    icon: "carbon:inventory-management",
+    exact: true,
+    to: `/action-request`,
+  },
 ];
 
 export const pathEndPoint = [

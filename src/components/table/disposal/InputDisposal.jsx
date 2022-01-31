@@ -178,7 +178,7 @@ const useStyles2 = makeStyles((theme) => ({
 const InputDisposal = ({ dataDisposal, userProp }) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(2);
   const [selectDisposal, setSelectDisposal] = useState(dataDisposal);
   const [nameDisposal, setNameDisposal] = useState("");
   const [descriptionDisposal, setDescriptionDisposal] = useState("");
@@ -551,7 +551,7 @@ const InputDisposal = ({ dataDisposal, userProp }) => {
             <TableFooter className={classes.posPagination}>
               <TableRow>
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                  rowsPerPageOptions={[2]}
                   colSpan={3}
                   count={selectDisposal.length}
                   rowsPerPage={rowsPerPage}

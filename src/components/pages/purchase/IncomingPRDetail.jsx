@@ -359,13 +359,16 @@ const IncomingPRDetail = () => {
             request_id.id_departement_user = usermap[request_id.departement];
           });
 
+          var subdepartement = {};
+
           arr_subdepartement.forEach(function (id_sub_departement_user) {
-            usermap[id_sub_departement_user.id] = id_sub_departement_user;
+            subdepartement[id_sub_departement_user.id] =
+              id_sub_departement_user;
           });
 
           arr_user.forEach(function (request_id) {
             request_id.id_sub_departement_user =
-              usermap[request_id.subdepartement];
+              subdepartement[request_id.subdepartement];
           });
           let jsonList = JSON.parse(purchaseData.request_list);
 
@@ -439,7 +442,16 @@ const IncomingPRDetail = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Sub Department</p>
-                <p>{userInfo[0].id_sub_departement_user.subdepartement_name}</p>
+                <p>
+                  {`${
+                    userInfo[0].id_sub_departement_user !== undefined
+                      ? capitalizeFirstLetter(
+                          userInfo[0].id_sub_departement_user
+                            .subdepartement_name
+                        )
+                      : "none"
+                  }`}
+                </p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Comment</p>

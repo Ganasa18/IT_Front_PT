@@ -354,6 +354,7 @@ const ChatComponent = () => {
           </div>
         </div>
         {isLoadingInput ? null : checkStatusData[0].status_id === 11 ||
+          checkStatusData[0].status_id === 10 ||
           checkStatusData[0].status_id === 20 ? null : (
           <div className="card-footer">
             <form onSubmit={handleSubmit}>

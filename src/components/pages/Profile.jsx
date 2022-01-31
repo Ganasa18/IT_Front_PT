@@ -138,7 +138,10 @@ const Profile = () => {
               area: userArea.area_name,
               role: userRole.role_name,
               departement: userDepartement.departement_name,
-              subdepartement: userSubDepartement.subdepartement_name,
+              subdepartement:
+                userSubDepartement !== undefined
+                  ? userSubDepartement.subdepartement_name
+                  : null,
             },
           ];
 
@@ -223,7 +226,9 @@ const Profile = () => {
                         </div>
                         <div className="col-3">
                           <p className="label-asset">Sub Departement</p>
-                          <p>{item.subdepartement}</p>
+                          <p>{`${
+                            item.subdepartement ? item.subdepartement : null
+                          } `}</p>
                         </div>
                       </>
                     ))}
