@@ -1,24 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import axios from "axios";
 import "../../assets/auth.css";
 import logoIT from "../../assets/Logo_IT.svg";
-import { authEndPoint } from "../../assets/menu";
+import { authEndPoint, logsEndPoint } from "../../assets/menu";
 
 const cookies = new Cookies();
+
+// IP User
 
 const Auth = () => {
   const [emailUser, setEmailUser] = useState("");
   const [passwordUser, setPasswordUser] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [ip, setIP] = useState(null);
+
+  useEffect(() => {
+    getIPLogs();
+  }, []);
+
+  const getIPLogs = async () => {
+    const res = await axios.get("https://geolocation-db.com/json/");
+    setIP(res.data);
+    console.log(res.data);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(ip);
     const URL = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
     }/api/v1/auth/login`;
+
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/`;
 
     (async () => {
       let apiRes = null;
@@ -38,6 +55,13 @@ const Auth = () => {
               cookies.set("uuid", response.data.data.user.uuid);
               cookies.set("role", response.data.data.user.role);
               cookies.set("departement", response.data.data.user.departement);
+
+              axios.post(Logs, {
+                user_log: emailUser,
+                log_description: "login",
+                log_ip: ip.IPv4,
+                log_country: ip.country_name,
+              });
             }
             setIsLoading(true);
             setTimeout(() => {
@@ -45,8 +69,15 @@ const Auth = () => {
             }, 2000);
           })
           .catch((error) => {
-            console.log(error);
-            console.log(error.response.status);
+            axios.post(Logs, {
+              user_log: !emailUser ? "anonymous" : emailUser,
+              log_description: "login fail",
+              log_ip: ip.IPv4,
+              log_country: ip.country_name,
+            });
+
+            // console.log(error);
+            // console.log(error.response.status);
             if (error.response.status === 429) {
               return setError(error.response.data);
             }
