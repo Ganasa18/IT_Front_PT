@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { makeStyles, Grid, Avatar } from "@material-ui/core";
+import Loader from "react-loader-spinner";
+import {
+  makeStyles,
+  Grid,
+  Avatar,
+  Button,
+  Backdrop,
+  Fade,
+  Modal,
+} from "@material-ui/core";
+import SettingsIcon from "@material-ui/icons/Settings";
 import { authEndPoint, pathEndPoint } from "../../assets/menu";
 import axios from "axios";
 import Cookies from "universal-cookie";
@@ -20,6 +30,26 @@ const useStyles = makeStyles((theme) => ({
   cardPadding: {
     marginTop: theme.spacing(5),
   },
+  buttonChangedPassword: {
+    [theme.breakpoints.up("xl")]: {
+      width: "180px",
+      left: "60%",
+      top: "60px",
+      transform: "translate(180%, -0%)",
+    },
+
+    [theme.breakpoints.down("lg")]: {
+      width: "180px",
+      left: "50%",
+      top: "60px",
+      transform: "translate(180%, -0%)",
+    },
+    [theme.breakpoints.down("sm")]: {
+      bottom: "20px",
+      width: "120px",
+    },
+    fontSize: 10,
+  },
 
   large: {
     fontSize: "50px",
@@ -33,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
       width: theme.spacing(35),
       height: theme.spacing(35),
       bottom: "50%",
-      transform: "translate(80%, -100%);",
+      transform: "translate(80%, -50%);",
     },
 
     [theme.breakpoints.down("lg")]: {
@@ -41,6 +71,17 @@ const useStyles = makeStyles((theme) => ({
       height: theme.spacing(27),
       transform: "translate(25%, 10%);",
     },
+  },
+  paper: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "30%",
+    left: "50%",
+    width: 650,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 4, 3),
   },
 }));
 
@@ -58,6 +99,20 @@ function titleCase(str) {
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [error, setError] = useState("");
+  const classes = useStyles();
+
+  const modalPop = () => {
+    setModalOpen(true);
+  };
+
+  const modalClose = () => {
+    setModalOpen(false);
+  };
 
   useEffect(() => {
     getDataUser();
@@ -154,13 +209,146 @@ const Profile = () => {
       });
   };
 
-  const classes = useStyles();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(oldPassword);
+    console.log(userId);
+
+    if (newPassword.length < 4) {
+      alert("Please Fill Password Min 4 Character");
+      return;
+    }
+
+    if (newPassword !== newPasswordConfirm) {
+      alert("Password Confirm not match");
+      return;
+    }
+    document.getElementById("overlay").style.display = "block";
+
+    let changePass = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/change-password`;
+
+    await axios
+      .patch(
+        changePass,
+        {
+          id: userId,
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        document.getElementById("overlay").style.display = "none";
+        setModalOpen(false);
+        setOldPassword("");
+        setNewPassword("");
+        setNewPasswordConfirm("");
+        setError("");
+        alert(response.data.status);
+      })
+      .catch((error) => {
+        if (error.response.status === 429) {
+          return setError(error.response.data);
+        }
+        setError(
+          error.response.data.message === undefined
+            ? error.response
+            : error.response.data.message
+        );
+        document.getElementById("overlay").style.display = "none";
+      });
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <form onSubmit={handleSubmit}>
+            <div className="row">
+              <div className="col-12">
+                <h3>Change Password</h3>
+              </div>
+              <div className="col-12">
+                <label htmlFor="">Old Password</label>
+                <input
+                  type="password"
+                  value={oldPassword}
+                  id="oldPassword"
+                  className="form-input"
+                  onChange={function (e) {
+                    setOldPassword(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="col-12">
+                <label htmlFor="">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  id="newPassword"
+                  className="form-input"
+                  onChange={function (e) {
+                    setNewPassword(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="col-12">
+                <label htmlFor="">Repeat Password</label>
+                <input
+                  type="password"
+                  value={newPasswordConfirm}
+                  id="newPassword2"
+                  className="form-input"
+                  onChange={function (e) {
+                    setNewPasswordConfirm(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+            {error && <div className="error-msg">{error}</div>}
+            <br />
+            <div className="footer-modal">
+              <button className={"btn-cancel"} onClick={modalClose}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </Fade>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
       <h2>My Profile</h2>
       <Grid container spacing={3}>
-        <Grid item xs={12} className={classes.cardPadding}></Grid>
+        <Grid item xs={12} className={classes.cardPadding}>
+          <Button
+            onClick={modalPop}
+            variant="contained"
+            color="primary"
+            className={classes.buttonChangedPassword}
+            startIcon={<SettingsIcon />}>
+            Change Password
+          </Button>
+        </Grid>
         <div className="card-profile">
           <div className="row">
             <div className="col-3">
@@ -285,6 +473,15 @@ const Profile = () => {
           </div>
         </div>
       </Grid>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
     </>
   );
 };

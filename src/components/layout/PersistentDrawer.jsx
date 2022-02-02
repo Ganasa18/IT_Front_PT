@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MenuItem from "./MenuItem";
-import { authEndPoint } from "../../assets/menu";
+import { authEndPoint, logsEndPoint } from "../../assets/menu";
 import Routes from "../routes/Routes";
 import clsx from "clsx";
 import axios from "axios";
@@ -215,12 +215,14 @@ const PersistentDrawer = (props) => {
   const [inactive, setInactive] = useState(false);
   const [menuDatas, setMenuDatas] = useState([]);
   const [userLogin, setUserLogin] = useState([]);
+  const [ip, setIP] = useState(null);
 
   const roleUser = userRole;
   const userId = userID;
   const token = tokenUser;
 
   useEffect(() => {
+    getIPLogs();
     if (token) {
       getDataUser();
     }
@@ -272,6 +274,12 @@ const PersistentDrawer = (props) => {
   //   }
   // };
 
+  const getIPLogs = async () => {
+    const res = await axios.get("https://geolocation-db.com/json/");
+    setIP(res.data);
+    console.log(res.data);
+  };
+
   const getDataUser = async () => {
     const URL = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
@@ -313,6 +321,10 @@ const PersistentDrawer = (props) => {
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
     }/api/v1/auth/logout`;
 
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/`;
+
     await axios
       .get(URL, {
         headers: { Authorization: `Bearer ${token}` },
@@ -324,6 +336,12 @@ const PersistentDrawer = (props) => {
         cookies.remove("id", { path: "/" });
         cookies.remove("departement", { path: "/" });
         setUserLogin([]);
+        axios.post(Logs, {
+          user_log: userLogin.email,
+          log_description: "logout",
+          log_ip: ip.IPv4,
+          log_country: ip.country_name,
+        });
         setTimeout(() => {
           window.location.assign("/");
         }, 1500);

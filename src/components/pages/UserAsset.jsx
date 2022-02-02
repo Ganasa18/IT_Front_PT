@@ -109,7 +109,7 @@ const UserAsset = (props) => {
               <div className="col-3">
                 <p className="label-asset">Sub Departement</p>
                 <p>
-                  {!userData.subdepart_id ? "null" : userData.subdepart_id.name}
+                  {!userData.subdepart_id ? "none" : userData.subdepart_id.name}
                 </p>
               </div>
             </div>

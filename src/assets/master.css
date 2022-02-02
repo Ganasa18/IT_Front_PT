@@ -181,6 +181,12 @@ a {
   padding: 5px 35px;
 }
 
+@media only screen and (min-width: 1400px) and (max-width: 1500px) {
+  .card-profile {
+    height: 42vh;
+  }
+}
+
 @media only screen and (min-width: 1280px) and (max-width: 1368px) {
   .vertical-line {
     border-left: 1px solid #bdbdbd;
