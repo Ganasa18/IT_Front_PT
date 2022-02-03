@@ -58,3 +58,9 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.chip-timeline {
+  padding: 6px 50px;
+  border-radius: 4px;
+  font-size: 11px;
+}

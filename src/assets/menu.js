@@ -94,6 +94,25 @@ export const menuData = [
     exact: true,
     to: `/disposal-assets`,
   },
+  {
+    id: 7,
+    name: "History",
+    icon: "ant-design:history-outlined",
+    exact: true,
+    // to: `/master`,
+    subMenus: [
+      {
+        name: "Ticket Management",
+        to: "/history/ticket",
+        icon: "fluent:ticket-diagonal-16-filled",
+      },
+      {
+        name: "Inventory",
+        to: "/history/inventory",
+        icon: "fluent:clipboard-bullet-list-rtl-20-filled",
+      },
+    ],
+  },
 ];
 
 export const menuDataUser = [

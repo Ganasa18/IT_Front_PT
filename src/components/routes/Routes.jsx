@@ -29,6 +29,9 @@ import IncomingPR from "../pages/purchase/IncomingPR";
 import IncomingPRDetail from "../pages/purchase/IncomingPRDetail";
 import DisposalApprove from "../pages/manager/DisposalApprove";
 import DisposalApproveDetail from "../pages/manager/DisposalApproveDetail";
+import HistoryTicket from "../pages/history/ticket/HistoryTicket";
+import HistoryFaciltyAccess from "../pages/history/ticket/HistoryFaciltyAccess";
+import HistoryActionReq from "../pages/history/ticket/detail/HistoryActionReq";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -200,6 +203,40 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <ActionReqTicketDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/history/ticket"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <HistoryTicket {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        path="/history/ticket/action-req/detail/"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <HistoryActionReq {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/history/facility-access"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <HistoryFaciltyAccess {...props} />
           ) : (
             <Redirect to="/" />
           )
