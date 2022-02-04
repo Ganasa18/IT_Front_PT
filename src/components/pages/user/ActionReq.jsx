@@ -165,10 +165,14 @@ const ActionReq = () => {
   const modalPop = async () => {
     setModalOpen(true);
 
-    // Get Lead User
+    // Get Lead Usera
     const getData = allDataUser.filter(
-      (item) => item.departement === userData[0].departement && item.role === 3
+      (item) =>
+        (item.departement === userData[0].departement && item.role === 3) ||
+        (item.departement === userData[0].departement && item.role === 6)
     );
+
+    console.log(getData);
 
     const getDataAdmin = allDataUser.filter((item) => item.role === 1);
 
