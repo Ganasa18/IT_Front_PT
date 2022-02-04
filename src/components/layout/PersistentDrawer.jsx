@@ -37,6 +37,7 @@ import {
   menuDataUser2,
   menuDataUser3,
   menuDataUser4,
+  menuDataUser5,
 } from "../../assets/menu.js";
 import { BrowserRouter } from "react-router-dom";
 import Cookies from "universal-cookie";
@@ -234,6 +235,8 @@ const PersistentDrawer = (props) => {
       setMenuDatas(menuDataUser3);
     } else if (roleUser === "5") {
       setMenuDatas(menuDataUser4);
+    } else if (roleUser === "6") {
+      setMenuDatas(menuDataUser5);
     } else {
       setMenuDatas(menuDataUser);
     }

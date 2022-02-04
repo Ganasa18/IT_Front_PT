@@ -22,6 +22,8 @@ import HistoryInformation from "./navigation/HistoryInformation";
 import ChatComponent from "../../../../asset/ChatComponent";
 import ChatHistory from "../../../../asset/ChatHistory";
 import HistoryInventory from "./navigation/HistoryInventory";
+import HistoryPurchase from "./navigation/HistoryPurchase";
+import HistoryGoodReceived from "./navigation/HistoryGoodReceived";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -99,6 +101,10 @@ const HistoryActionReq = () => {
           <div className={classes.toolbar} />
           <br />
           <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/history/ticket`;
+            }}
             textSpan={"Action Request"}
             typographyText={req_no}
           />
@@ -174,6 +180,10 @@ const HistoryActionReq = () => {
           <br />
 
           <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/history/ticket`;
+            }}
             textSpan={"Action Request"}
             typographyText={req_no}
           />
@@ -235,6 +245,10 @@ const HistoryActionReq = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <HistoryInventory />
             </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <ChatHistory />
+            </Grid>
           </Grid>
         </>
       );
@@ -245,6 +259,10 @@ const HistoryActionReq = () => {
           <div className={classes.toolbar} />
           <br />
           <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/history/ticket`;
+            }}
             textSpan={"Action Request"}
             typographyText={req_no}
           />
@@ -303,6 +321,13 @@ const HistoryActionReq = () => {
                   {text}
                 </NavLink>
               ))}
+            </Grid>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <HistoryPurchase />
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <ChatHistory />
             </Grid>
           </Grid>
         </>
@@ -314,6 +339,10 @@ const HistoryActionReq = () => {
           <div className={classes.toolbar} />
           <br />
           <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/history/ticket`;
+            }}
             textSpan={"Action Request"}
             typographyText={req_no}
           />
@@ -372,6 +401,13 @@ const HistoryActionReq = () => {
                   {text}
                 </NavLink>
               ))}
+            </Grid>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <HistoryGoodReceived />
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <ChatHistory />
             </Grid>
           </Grid>
         </>

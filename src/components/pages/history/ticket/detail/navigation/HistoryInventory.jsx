@@ -13,6 +13,7 @@ import {
 } from "../../../../../../assets/menu";
 import Cookies from "universal-cookie";
 import HistoryAssetUserTable from "../../table/HistoryAssetUserTable";
+import HistoryAssetDepartementTable from "../../table/HistoryAssetDepartementTable";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -35,6 +36,9 @@ const HistoryInventory = () => {
     <>
       <Grid item xs={12} className={classes.cardPadding}>
         <HistoryAssetUserTable />
+      </Grid>
+      <Grid item xs={12} className={classes.cardPadding}>
+        <HistoryAssetDepartementTable />
       </Grid>
     </>
   );

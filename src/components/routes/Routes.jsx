@@ -168,7 +168,7 @@ const Routes = () => {
         exact
         path="/approval/action-request"
         component={(props) =>
-          parseInt(roleUser) === 3 ? (
+          parseInt(roleUser) === 3 || parseInt(roleUser) === 6 ? (
             <ActionApproved {...props} />
           ) : (
             <Redirect to="/" />
@@ -178,7 +178,7 @@ const Routes = () => {
       <Route
         path="/approval/action-request/detail"
         component={(props) =>
-          parseInt(roleUser) === 3 ? (
+          parseInt(roleUser) === 3 || parseInt(roleUser) === 6 ? (
             <ActionApproveDetail {...props} />
           ) : (
             <Redirect to="/" />

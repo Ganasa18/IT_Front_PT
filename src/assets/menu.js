@@ -73,11 +73,11 @@ export const menuData = [
         to: "/gr/asset",
         icon: "dashicons:category",
       },
-      {
-        name: "GR History",
-        to: "/gr/history",
-        icon: "carbon:status-acknowledge",
-      },
+      // {
+      //   name: "GR History",
+      //   to: "/gr/history",
+      //   icon: "carbon:status-acknowledge",
+      // },
     ],
   },
   {
@@ -221,6 +221,56 @@ export const menuDataUser4 = [
     icon: "carbon:inventory-management",
     exact: true,
     to: `/action-request`,
+  },
+];
+
+export const menuDataUser5 = [
+  {
+    id: 1,
+    name: "Dashboard",
+    icon: "mdi:desktop-mac-dashboard",
+    exact: true,
+    to: `/`,
+  },
+  {
+    id: 2,
+    name: "Incoming PR",
+    icon: "bi:cart-fill",
+    exact: true,
+    to: `/in-coming-pr`,
+  },
+
+  {
+    id: 3,
+    name: "Purchase Done",
+    icon: "bi:cart-fill",
+    exact: true,
+    to: `/purchase-done`,
+  },
+  {
+    id: 4,
+    name: "Action Request",
+    icon: "carbon:inventory-management",
+    exact: true,
+    to: `/action-request`,
+  },
+  {
+    id: 5,
+    name: "Ticket Approval",
+    icon: "bi:ticket-detailed",
+    exact: true,
+    subMenus: [
+      {
+        name: "Action Req Approval",
+        to: "/approval/action-request",
+        icon: "fluent:ticket-diagonal-16-filled",
+      },
+      {
+        name: "Facility & Access Approval",
+        to: "/approval/facility-request",
+        icon: "fluent:ticket-diagonal-16-filled",
+      },
+    ],
   },
 ];
 

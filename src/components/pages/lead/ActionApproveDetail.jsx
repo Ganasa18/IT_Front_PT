@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Loader from "react-loader-spinner";
-import { invEndPoint, authEndPoint } from "../../../assets/menu";
+import { invEndPoint, authEndPoint, logsEndPoint } from "../../../assets/menu";
 
 import {
   makeStyles,
@@ -184,6 +184,33 @@ const ActionApproveDetail = () => {
       return;
     }
 
+    console.log("approve");
+
+    const log_data = {
+      request_number: dataRequest.action_req_code,
+      asset_number: dataRequest.invent_id.asset_number,
+      asset_name: dataRequest.invent_id.asset_name,
+      status_ar: 12,
+      request_by: dataRequest.id_user.name,
+      status_user: dataRequest.id_user.employe,
+      departement_user: dataRequest.id_departement_user.departement_name,
+      subdepartement_user:
+        dataRequest.id_sub_departement_user !== undefined
+          ? dataRequest.id_sub_departement_user.subdepartement_name
+          : "none",
+      role_user: dataRequest.id_role_user.role_name,
+      area_user:
+        dataRequest.id_area_user.area_name +
+        "-" +
+        dataRequest.id_area_user.alias_name,
+    };
+    console.log(log_data);
+
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+    // console.log(dataRequest);
+
     document.getElementById("overlay").style.display = "block";
 
     await axios
@@ -204,8 +231,8 @@ const ActionApproveDetail = () => {
         }
       )
       .then((response) => {
+        axios.post(Logs, log_data);
         alert(response.data.status);
-
         setTimeout(() => {
           window.location = `${host}/approval/action-request/`;
         }, 1500);

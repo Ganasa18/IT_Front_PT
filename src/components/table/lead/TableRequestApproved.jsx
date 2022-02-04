@@ -226,26 +226,65 @@ const TableRequestApproved = () => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory`;
 
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let role = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/role`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
+
     const requestOne = await axios.get(user, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const requestTwo = await axios.get(act_req);
     const requestThree = await axios.get(status);
     const requestFour = await axios.get(inventory);
+    const requestFive = await axios.get(area);
+    const requestSix = await axios.get(role, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const requestSevent = await axios.get(departement);
+    const requestEight = await axios.get(subdepartement);
 
     axios
-      .all([requestOne, requestTwo, requestThree, requestFour])
+      .all([
+        requestOne,
+        requestTwo,
+        requestThree,
+        requestFour,
+        requestFive,
+        requestSix,
+        requestSevent,
+        requestEight,
+      ])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
           const responseThree = responses[2];
           const responseFour = responses[3];
+          const requestFive = responses[4];
+          const requestSix = responses[5];
+          const requestSevent = responses[6];
+          const requestEight = responses[7];
 
           let newDataUser = responseOne.data.data.users;
           let newDataRequest = responseTwo.data.data.request_tiket;
           let newStatus = responseThree.data.data.statuss;
           let newInvent = responseFour.data.data.inventorys;
+          let newDataArea = requestFive.data.data.areas;
+          let newDataRole = requestSix.data.data.roles;
+          let newDataDepartement = requestSevent.data.data.departements;
+          let newDataSubDepartement = requestEight.data.data.subdepartements;
 
           var getID = newDataUser.filter(
             (item) => item.id === parseInt(userID)
@@ -258,6 +297,7 @@ const TableRequestApproved = () => {
             subdepartement: item.subdepartement,
             area: item.area,
             email: item.email,
+            employe: item.employe_status,
           }));
           setUserData(getID);
 
@@ -269,11 +309,16 @@ const TableRequestApproved = () => {
             subdepartement: item.subdepartement,
             area: item.area,
             email: item.email,
+            employe: item.employe_status,
           }));
 
           var arr_request = [...newDataRequest];
           const arr_status = [...newStatus];
           const arr_inventory = [...newInvent];
+          const arr_area = [...newDataArea];
+          const arr_role = [...newDataRole];
+          const arr_departement = [...newDataDepartement];
+          const arr_subdepartement = [...newDataSubDepartement];
 
           arr_request = arr_request.filter(
             (item) =>
@@ -314,6 +359,43 @@ const TableRequestApproved = () => {
 
           JoinInvent.forEach(function (request_id) {
             request_id.id_user = usermap[request_id.user_id];
+          });
+
+          arr_area.forEach(function (id_area_user) {
+            usermap[id_area_user.id] = id_area_user;
+          });
+
+          JoinInvent.forEach(function (request_id) {
+            request_id.id_area_user = usermap[request_id.id_user.area];
+          });
+
+          arr_role.forEach(function (id_role_user) {
+            usermap[id_role_user.id] = id_role_user;
+          });
+
+          JoinInvent.forEach(function (request_id) {
+            request_id.id_role_user = usermap[request_id.id_user.role];
+          });
+
+          arr_departement.forEach(function (id_departement_user) {
+            usermap[id_departement_user.id] = id_departement_user;
+          });
+
+          JoinInvent.forEach(function (request_id) {
+            request_id.id_departement_user =
+              usermap[request_id.id_user.departement];
+          });
+
+          var subdepartement = {};
+
+          arr_subdepartement.forEach(function (id_sub_departement_user) {
+            subdepartement[id_sub_departement_user.id] =
+              id_sub_departement_user;
+          });
+
+          JoinInvent.forEach(function (request_id) {
+            request_id.id_sub_departement_user =
+              subdepartement[request_id.id_user.subdepartement];
           });
 
           setDataRequest(JoinInvent);
