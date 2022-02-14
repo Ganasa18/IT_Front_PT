@@ -293,8 +293,8 @@ const TableIncomingPR = () => {
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.purchase_prder_code
-                        ? row.purchase_prder_code
+                      {row.purchase_order_code
+                        ? row.purchase_order_code
                         : " - "}
                     </TableCell>
                     <TableCell component="th" scope="row">

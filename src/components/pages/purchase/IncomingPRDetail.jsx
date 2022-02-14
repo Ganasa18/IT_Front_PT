@@ -387,12 +387,50 @@ const IncomingPRDetail = () => {
       });
   };
 
-  // const handlePO = (e) => {
-  //   let value = e.target.value;
-  //   value = value.toUpperCase();
-  //   setInputPoNumber(value);
-  //   console.log(value);
-  // };
+  const handlePO = async () => {
+    const PoNumber1 = inputPoNumber1;
+    const PoNumber2 = inputPoNumber2;
+    const PoNumber3 = inputPoNumber3;
+    const PoNumber4 = inputPoNumber4;
+
+    let updated_po = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/updated-po`;
+
+    if (PoNumber1.length < 1) {
+      alert("must fill input po");
+      return;
+    }
+    if (PoNumber2.length < 1) {
+      alert("must fill input po");
+      return;
+    }
+    if (PoNumber3.length < 1) {
+      alert("must fill input po");
+      return;
+    }
+    if (PoNumber4.length < 1) {
+      alert("must fill input po");
+      return;
+    }
+
+    const PO_Number = `${PoNumber1}/${PoNumber2}/${PoNumber3}/${PoNumber4}`;
+
+    await axios
+      .patch(updated_po, {
+        purchase_order_code: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      })
+      .then((res) => {
+        document.getElementById("sucess-po").style.display = "block";
+        setTimeout(() => {
+          document.getElementById("sucess-po").style.display = "none";
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -569,14 +607,16 @@ const IncomingPRDetail = () => {
             <br />
             <div className="row">
               <div className="col-4">
-                <button className="btn-submit">Submit</button>
+                <button className="btn-submit" onClick={handlePO}>
+                  Submit
+                </button>
               </div>
               <div className="col-1"></div>
-              <div className="col-7">
-                {/* <span
+              <div className="col-7" id="sucess-po">
+                <span
                   className="iconify iconSuccess"
                   data-icon="clarity:success-standard-solid"></span>
-                <span className="text-po-submit">PO No success to submit</span> */}
+                <span className="text-po-submit">PO No success to submit</span>
               </div>
             </div>
           </div>

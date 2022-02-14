@@ -1881,3 +1881,7 @@ input[type="radio"] {
 .form-input-po:focus {
   outline: none;
 }
+
+#sucess-po {
+  display: none;
+}

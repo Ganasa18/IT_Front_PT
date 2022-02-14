@@ -341,7 +341,11 @@ const PurchaseTicket = () => {
             </div>
             <div className="col-3">
               <p className="label-asset">PO Date</p>
-              <p> - </p>
+              <p>
+                {!dataPR[0].purchase_order_date
+                  ? "-"
+                  : calbill(dataPR[0].purchase_order_date)}
+              </p>
             </div>
             <div className="col-3">
               <p className="label-asset">Request No</p>
