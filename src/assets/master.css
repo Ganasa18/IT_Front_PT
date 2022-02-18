@@ -1885,3 +1885,98 @@ input[type="radio"] {
 #sucess-po {
   display: none;
 }
+
+/* PO CREATE */
+
+.btn-create-po {
+  margin: 0 5px 0 5px;
+  color: #1653a6;
+  width: 96px;
+  height: 30px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: transparent;
+  color: #fff;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-create-po.disabled {
+  cursor: not-allowed;
+}
+
+.btn-create-po:hover {
+  background-color: #1652a649;
+}
+
+.btn-create-po .icon-btn {
+  color: #1653a6;
+  left: 5px;
+  bottom: 8px;
+  position: absolute;
+  font-size: 14px;
+}
+
+.btn-create-po .name-btn {
+  color: #1653a6;
+  right: 10px;
+  bottom: 4px;
+  position: absolute;
+}
+
+.btn-image-po {
+  outline: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #1652a6;
+}
+
+.btn-image-po:hover {
+  color: #1652a652;
+}
+
+.wrapper-po {
+  position: relative;
+  height: 400px;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.wrapper-po::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.wrapper-po::-webkit-scrollbar-track {
+  box-shadow: inset rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.wrapper-po::-webkit-scrollbar-thumb {
+  background-color: rgb(134, 130, 130);
+  outline: none;
+}
+
+.position-total-po {
+  position: relative;
+  top: 80px;
+  left: 75%;
+}
+
+.position-total-po p {
+  font-size: 18px;
+}
+
+.position-total-po span {
+  font-size: 19px;
+  color: #1652a6;
+  margin-left: 40px;
+}

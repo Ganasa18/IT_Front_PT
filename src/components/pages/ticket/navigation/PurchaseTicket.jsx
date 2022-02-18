@@ -16,6 +16,10 @@ import {
   useTheme,
   Toolbar,
   Typography,
+  Backdrop,
+  Fade,
+  Modal,
+  Button,
 } from "@material-ui/core";
 import axios from "axios";
 import "../../../../assets/master.css";
@@ -23,12 +27,23 @@ import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
 
 import Loading from "../../../asset/Loading";
-import { pathEndPoint, prEndPoint } from "../../../../assets/menu";
+import {
+  pathEndPoint,
+  prEndPoint,
+  invEndPoint,
+  authEndPoint,
+} from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import CreatePurchaseOrder from "./CreatePurchaseOrder";
+
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -151,14 +166,34 @@ const useStyles2 = makeStyles((theme) => ({
   },
   paper: {
     position: "fixed",
-    transform: "translate(-50%,-50%)",
-    top: "30%",
+    transform: "translate(-50%,-40%)",
+    top: "54%",
     left: "50%",
-    width: 550,
+    width: 1400,
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(4, 12, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-50%)",
+      width: 1000,
+    },
+
+    [theme.breakpoints.between("xlm", "xl")]: {
+      top: "1%",
+      left: "10%",
+      transform: "scale(0.9)",
+    },
+  },
+  cancelBtn: {
+    color: "#EB5757",
+    border: "1px solid #EB5757",
+    width: "130px",
+    height: "40px",
+    fontSize: "13px",
+    position: "relative",
+    left: "0",
+    transform: "translate(35%, -40%)",
   },
   paperTble: {
     height: "580px",
@@ -211,9 +246,11 @@ const PurchaseTicket = () => {
   const [dataPR, setDataPR] = useState([]);
   const req_no = localStorage.getItem("req_no");
   const [listReq, setListReq] = useState([]);
+  const [ticketData, setTicketData] = useState([]);
 
   useEffect(() => {
     getDataPR();
+    getRequest();
   }, []);
 
   const getDataPR = async () => {
@@ -263,9 +300,103 @@ const PurchaseTicket = () => {
           setDataPR(arr_request);
           setListReq(jsonList);
 
-          console.log(arr_request);
+          // console.log(arr_request);
 
           setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
+
+  const getRequest = async () => {
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    const requestOne = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestTwo = await axios.get(act_req);
+
+    const requestThree = await axios.get(area);
+    const requestFour = await axios.get(departement);
+
+    axios
+      .all([requestOne, requestTwo, requestThree, requestFour])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+
+          let newDataUser = responseOne.data.data.users;
+          let newDataRequest = responseTwo.data.data.request_tiket;
+          let newDataArea = responseThree.data.data.areas;
+          let newDataDepartement = responseFour.data.data.departements;
+
+          const getUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          var arr_request = [...newDataRequest];
+          const arr_area = [...newDataArea];
+          const arr_departement = [...newDataDepartement];
+
+          arr_request = arr_request.filter(
+            (item) => item.action_req_code === req_no
+          );
+
+          var usermap = {};
+          getUser.forEach(function (id_user) {
+            usermap[id_user.id] = id_user;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.id_user = usermap[request_id.user_id];
+          });
+
+          arr_area.forEach(function (id_area_user) {
+            usermap[id_area_user.id] = id_area_user;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.id_area_user = usermap[request_id.id_user.area];
+          });
+
+          arr_departement.forEach(function (id_departement_user) {
+            usermap[id_departement_user.id] = id_departement_user;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.id_departement_user =
+              usermap[request_id.id_user.departement];
+          });
+
+          setTicketData(arr_request);
         })
       )
       .catch((errors) => {
@@ -358,6 +489,14 @@ const PurchaseTicket = () => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
+
+      {dataPR[0].img_po !== null ? (
+        <>
+          <Grid item xs={12} className={classes.cardPadding}>
+            <TableScreenPO listData={dataPR} ticketUser={ticketData} />
+          </Grid>
+        </>
+      ) : null}
     </>
   );
 };
@@ -485,6 +624,125 @@ const TablePurchaseList = ({ listData }) => {
         </Table>
       </Paper>
     </TableContainer>
+  );
+};
+
+const TableScreenPO = ({ listData, ticketUser }) => {
+  const classes = useStyles2();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [listScreenshot] = useState(listData);
+  const [userTicket] = useState(ticketUser);
+
+  const modalPop = () => {
+    setModalOpen((prevModal) => !prevModal);
+  };
+
+  const bodyModal = (
+    <>
+      {console.log(userTicket)}
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <CreatePurchaseOrder />
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalPop}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  function forceDownload(url, fileName) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function () {
+      var urlCreator = window.URL || window.webkitURL;
+      var imageUrl = urlCreator.createObjectURL(this.response);
+      var tag = document.createElement("a");
+      tag.href = imageUrl;
+      tag.download = fileName;
+      document.body.appendChild(tag);
+      tag.click();
+      document.body.removeChild(tag);
+    };
+    xhr.send();
+  }
+
+  // const [listImage] = useState(listData);
+  return (
+    <>
+      <TableContainer className={classes.tableWidth}>
+        <Paper>
+          <Toolbar>
+            <div className="col-10">
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ marginTop: "15px" }}>
+                Purchase Order
+              </Typography>
+            </div>
+          </Toolbar>
+          <Table className={classes.table} aria-label="custom pagination table">
+            <TableHead classes={{ root: classes.thead }}>
+              <TableRow>
+                <StyledTableCell>Image</StyledTableCell>
+                <StyledTableCell>Date</StyledTableCell>
+                <StyledTableCell align="center">Action</StyledTableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {listScreenshot.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell style={{ width: 450 }} component="th" scope="row">
+                    <button
+                      className="btn-image-po"
+                      onClick={() =>
+                        forceDownload(
+                          `${prEndPoint[0].url}${
+                            prEndPoint[0].port !== ""
+                              ? ":" + prEndPoint[0].port
+                              : ""
+                          }/public/image/po/${row.img_po}`,
+                          `${row.img_po}`
+                        )
+                      }>
+                      image.jpg
+                    </button>
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {!row.purchase_order_date
+                      ? "-"
+                      : calbill(row.purchase_order_date)}
+                  </TableCell>
+                  <TableCell component="th" scope="row" align="center">
+                    <button className="btn-create-po" onClick={modalPop}>
+                      <span
+                        class="iconify icon-btn"
+                        data-icon="ant-design:plus-outlined"></span>
+                      <span className="name-btn">Create PO</span>
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </TableContainer>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
+    </>
   );
 };
 

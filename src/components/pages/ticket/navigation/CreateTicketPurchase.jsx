@@ -467,16 +467,6 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     }
     const jsonString = JSON.stringify(todos);
 
-    // console.log("MKDPR" + lastNumber);
-    // console.log(dataReq[0].action_req_code);
-    // console.log(dataReq[0].user_id);
-    // console.log(dataReq[0].status_id);
-    // console.log(createdBy);
-    // console.log(requestBy);
-    // console.log(jsonString);
-    // console.log(JSON.parse(jsonString));
-    // console.log(todos);
-
     todos.forEach(function (item) {
       const imageFormData = new FormData();
       imageFormData.append("attachment", item.attachment);

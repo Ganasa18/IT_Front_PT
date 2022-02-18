@@ -430,6 +430,24 @@ const IncomingPRDetail = () => {
       .catch((error) => {
         console.error(error);
       });
+
+    let ticket = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+
+    await axios
+      .patch(ticket, {
+        status_id: 13,
+        trouble_title: null,
+        trouble_detail: null,
+        close_remark: null,
+      })
+      .then((response) => {
+        console.log(response.data.status);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   if (isLoading) {
