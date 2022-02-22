@@ -215,20 +215,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CreatePurchaseOrder = () => {
+function generateId() {
+  return Date.now();
+}
+
+const CreatePurchaseOrder = (props) => {
   const classes = useStyles();
   const [quantity, setQuantity] = useState(0);
   const [dataCategory, setDataCategory] = useState([]);
-  const [category, setCategory] = useState("");
-  const [subCategory, setSubCategory] = useState("");
+  const [category, setCategory] = useState([]);
+  const [subCategory, setSubCategory] = useState([]);
   const [dataSubCategory, setDataSubCategory] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(2);
   const [todos, setTodos] = useState([]);
+  const initialRef = React.useRef(null);
+  const getInitialRef = React.useRef(null);
+  const priceRef = React.useRef(null);
+  const [subTotal, setSubTotal] = useState(0);
+
+  const { ticketUser, lastNum, listData } = props;
+
+  console.log(listData);
+
+  localStorage.setItem("last_number", lastNum);
 
   useEffect(() => {
     getCategoryList();
-  }, []);
+    setTimeout(() => {
+      checkTodos();
+    }, 800);
+  }, [todos]);
+
+  const checkTodos = () => {
+    var finalArray = todos.map(function (obj) {
+      return obj.total_price_int;
+    });
+    const total_price_data = finalArray.reduce(function (total, current) {
+      return total + current;
+    }, 0);
+
+    setSubTotal(total_price_data);
+  };
 
   const getCategoryList = async () => {
     await axios
@@ -252,7 +280,7 @@ const CreatePurchaseOrder = () => {
   };
 
   const handleCategory = async (...args) => {
-    setCategory(args[1].name);
+    setCategory(args[1]);
     await axios
       .get(
         `${pathEndPoint[0].url}${
@@ -278,6 +306,228 @@ const CreatePurchaseOrder = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const handleSubCategory = async (...args) => {
+    setSubCategory(args[1]);
+  };
+
+  const totalformatRupiah = (money) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(money);
+  };
+
+  // const getTotalAmount = () => {
+  //   var sub_total = 0;
+  //   for (var i = 0; i < todos.length; i++) {
+  //     var total = todos[i].total_price_unit;
+  //     var format_data = total.match(/\d/g);
+  //     format_data = format_data.join("");
+  //     sub_total = sub_total + format_data;
+  //     setSubTotal(format_data);
+  //     console.log(subTotal);
+  //   }
+  // };
+
+  const handleTodo = () => {
+    const typeasset = document.querySelector('input[name="userdpt"]:checked');
+    const fisiktype = document.querySelector('input[name="fisiknon"]:checked');
+    const parttype = document.querySelector('input[name="unit_parts"]:checked');
+    const ponumber = document.getElementById("ponumber").value;
+    const phone_number = document.getElementById("phone_number").value;
+    const vendor_name = document.getElementById("vendor_name").value;
+    const address_vendor = document.getElementById("address_vendor").value;
+    const desc_po = document.getElementById("desc_po").value;
+    var nowNumber = localStorage.getItem("last_number");
+    let checkfisik = fisiktype.value === "fisik" ? "0" : "1";
+
+    const code =
+      "MKD" +
+      getInitialRef.current.value +
+      ticketUser[0].id_area_user.alias_name +
+      checkfisik +
+      "-" +
+      nowNumber;
+
+    if (fisiktype === null) {
+      alert("must select 1");
+      return;
+    }
+    if (parttype === null) {
+      alert("must select 1");
+      return;
+    }
+
+    if (typeasset === null) {
+      alert("must select 1");
+      return;
+    }
+
+    if (category.length === 0) {
+      alert("category must select 1");
+      return;
+    }
+
+    if (quantity === 0) {
+      alert("quantity must greater than 0");
+      return;
+    }
+
+    if (priceRef.current.value === "") {
+      alert("must fill price unit");
+      return;
+    }
+
+    var format_price = priceRef.current.value.match(/\d/g);
+    format_price = format_price.join("");
+    let total_price = quantity * format_price;
+    let int_total = total_price;
+    total_price = totalformatRupiah(total_price);
+
+    if (vendor_name === "") {
+      alert("must fill asset name");
+      return;
+    }
+
+    if (initialRef.current.value === "") {
+      alert("must fill asset name");
+      return;
+    }
+
+    if (ponumber === "") {
+      alert("must fill po number");
+      return;
+    }
+
+    const data = {
+      id: generateId(),
+      asset_number: code,
+      asset_name: initialRef.current.value,
+      initial_asset_name: getInitialRef.current.value,
+      qty: quantity,
+      price_unit: priceRef.current.value,
+      total_price_unit: total_price,
+      total_price_int: int_total,
+      asset_part_or_unit: parttype.value,
+      asset_fisik_or_none: fisiktype.value,
+      type_asset: typeasset.value,
+      area: ticketUser[0].id_area_user.id,
+      departement: ticketUser[0].id_departement_user.id,
+      id_category: category.value,
+      category: category.name,
+      id_subcategory: subCategory.length === 0 ? null : subCategory.value,
+      subcategory: subCategory.name,
+      asset_po_number: "MKDPO-" + ponumber,
+      vendor_phone: phone_number,
+      vendor_name: vendor_name,
+      address_vendor: address_vendor,
+      desc_po: desc_po,
+    };
+
+    // console.log(data);
+    setTodos([...todos, data]);
+
+    setTimeout(() => {
+      var numb = nowNumber;
+      numb = parseInt(numb) + 1;
+      var str = "" + numb;
+      var pad = "000";
+      var ans = pad.substring(0, pad.length - str.length) + str;
+      localStorage.setItem("last_number", ans);
+      priceRef.current.value = "";
+      document.getElementById("vendor_name").value = "";
+      initialRef.current.value = "";
+      getInitialRef.current.value = "";
+      document.getElementById("phone_number").value = "";
+      document.getElementById("address_vendor").value = "";
+      document.getElementById("desc_po").value = "";
+      setQuantity(0);
+    }, 1500);
+  };
+
+  const handleSubmit = async () => {
+    const data = {
+      ticket_number: listData[0].action_req_code,
+      pr_number: listData[0].purchase_req_code,
+      po_list: JSON.stringify(todos),
+      subtotal_price: parseInt(subTotal),
+    };
+
+    let po = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-order/`;
+
+    await axios
+      .post(po, data)
+      .then((response) => {
+        console.log(response);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    console.log(data);
+  };
+
+  function removeHandler(todoId) {
+    const filteredDisposal = todos.filter(function (todo) {
+      return todo.id !== todoId;
+    });
+    setTodos(filteredDisposal);
+  }
+
+  const handleInitial = () => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 8000;
+    clearTimeout(typingTimer);
+    var value = initialRef.current.value;
+
+    var variable1 = value.substring(0, 1);
+    var variable2 = variable1.toUpperCase();
+    var variable3 = value.substring(2);
+    var variable4 = [...variable3];
+
+    if (value) {
+      typingTimer = setTimeout(
+        doneTyping(variable2, variable4),
+        doneTypingInterval
+      );
+    }
+  };
+
+  function doneTyping(variable2, variable4) {
+    var ran = variable4[Math.floor(Math.random() * variable4.length)];
+    var randVal = variable2 + ran;
+    getInitialRef.current.value = randVal.toUpperCase();
+  }
+
+  /* Fungsi formatRupiah */
+  function formatRupiah(angka, prefix) {
+    var number_string = angka.replace(/[^,\d]/g, "").toString(),
+      split = number_string.split(","),
+      sisa = split[0].length % 3,
+      rupiah = split[0].substr(0, sisa),
+      ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+    // tambahkan titik jika yang di input sudah menjadi angka ribuan
+    if (ribuan) {
+      var separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+    }
+
+    rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+    return prefix === undefined ? rupiah : rupiah ? "Rp." + rupiah : "";
+  }
+
+  const handlePrice = () => {
+    var angka = formatRupiah(priceRef.current.value, "Rp.");
+    priceRef.current.value = angka;
   };
 
   const handleChangePage = (event, newPage) => {
@@ -306,23 +556,27 @@ const CreatePurchaseOrder = () => {
         <div className="row">
           <div className="col-5">
             <label htmlFor="">PO No</label>
-            <input type="text" className="form-input" />
+            <input type="text" id="ponumber" className="form-input" />
           </div>
           <div className="col-1"></div>
           <div className="col-5">
             <label htmlFor="">Phone</label>
-            <input type="text" className="form-input" />
+            <input type="text" id="phone_number" className="form-input" />
           </div>
         </div>
         <div className="row margin-top-0">
           <div className="col-5">
             <label htmlFor="">Vendor Name</label>
-            <input type="text" className="form-input" />
+            <input type="text" id="vendor_name" className="form-input" />
           </div>
           <div className="col-1"></div>
           <div className="col-5">
             <label htmlFor="">Address</label>
-            <textarea className="form-input-area" cols="30" rows="8"></textarea>
+            <textarea
+              id="address_vendor"
+              className="form-input-area"
+              cols="30"
+              rows="8"></textarea>
           </div>
         </div>
         <div className="row margin-top-0">
@@ -360,8 +614,19 @@ const CreatePurchaseOrder = () => {
           </div>
           <div className="col-1"></div>
           <div className="col-5">
-            <label htmlFor="">Code Item</label>
-            <input type="text" className="form-input" />
+            <label htmlFor="">
+              {" "}
+              Item Initials
+              <span style={{ color: "#ec9108" }}> ( initial can be edit )</span>
+            </label>
+            <input
+              type="text"
+              onInput={function (e) {
+                getInitialRef.current.value = e.target.value.toUpperCase();
+              }}
+              ref={getInitialRef}
+              className="form-input"
+            />
           </div>
         </div>
         <div className="row margin-top-0">
@@ -400,7 +665,12 @@ const CreatePurchaseOrder = () => {
           <div className="col-1"></div>
           <div className="col-5">
             <label htmlFor="">Unit Price</label>
-            <input type="text" className="form-input" />
+            <input
+              type="text"
+              ref={priceRef}
+              onKeyUp={handlePrice}
+              className="form-input"
+            />
           </div>
         </div>
         <div className="row margin-top-0">
@@ -464,12 +734,18 @@ const CreatePurchaseOrder = () => {
         <div className="row margin-top-1">
           <div className="col-5">
             <label htmlFor="">Asset Name</label>
-            <input type="text" className="form-input" />
+            <input
+              type="text"
+              ref={initialRef}
+              onKeyUp={handleInitial}
+              className="form-input"
+            />
           </div>
           <div className="col-1"></div>
           <div className="col-5">
             <label htmlFor="">Description</label>
             <textarea
+              id="desc_po"
               className="form-input-area"
               cols="30"
               rows="10"></textarea>
@@ -501,6 +777,7 @@ const CreatePurchaseOrder = () => {
               <SelectSearch
                 options={dataSubCategory}
                 value={dataSubCategory}
+                onChange={handleSubCategory}
                 filterOptions={fuzzySearch}
                 search
                 placeholder="Search Sub Category"
@@ -512,6 +789,7 @@ const CreatePurchaseOrder = () => {
         </div>
         <div className="row">
           <Button
+            onClick={handleTodo}
             className={classes.addBtn}
             variant="outlined"
             startIcon={<AddIcon />}>
@@ -559,29 +837,50 @@ const CreatePurchaseOrder = () => {
                     ).map((row) => (
                       <TableRow key={row.id}>
                         <TableCell component="th" scope="row">
-                          {row.asset_name}
+                          <div className="text-hide"> {row.asset_number} </div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <div className="text-hide"> {row.asset_name}</div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <div className="text-hide"> {row.vendor_name}</div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <div className="text-hide"> {row.vendor_phone} </div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <div className="text-hide">{row.address_vendor} </div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          {row.asset_fisik_or_none}
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          {row.asset_part_or_unit}
                         </TableCell>
                         <TableCell component="th" scope="row">
                           {row.type_asset}
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {row.category}
+                          <div className="text-hide"> {row.category} </div>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {row.subcategory}
+                          <div className="text-hide">{row.subcategory} </div>
                         </TableCell>
                         <TableCell component="th" scope="row">
-                          {row.description}
+                          <div className="text-hide">{row.desc_po}</div>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          {row.price_unit}
                         </TableCell>
                         <TableCell component="th" scope="row">
                           {row.qty}
                         </TableCell>
-                        <TableCell
-                          component="th"
-                          scope="row"
-                          align="center"></TableCell>
+
                         <TableCell style={{ width: 100 }} align="center">
-                          <button className="btn-delete">
+                          {row.total_price_unit}
+                          <button
+                            className="btn-delete"
+                            onClick={removeHandler.bind(this, row.id)}>
                             <span
                               class="iconify icon-btn"
                               data-icon="ant-design:delete-filled"></span>
@@ -624,12 +923,19 @@ const CreatePurchaseOrder = () => {
         <div className="row">
           <div className="col-12 position-total-po">
             <p>
-              Total All <span>Rp 0</span>
+              Total All
+              <span>
+                {subTotal === 0 ? "Rp. 0" : totalformatRupiah(subTotal)}
+              </span>
             </p>
           </div>
         </div>
       </div>
-      <Button variant="contained" color="primary" className={classes.btnSubmit}>
+      <Button
+        onClick={handleSubmit}
+        variant="contained"
+        color="primary"
+        className={classes.btnSubmit}>
         Submit
       </Button>
       <br />

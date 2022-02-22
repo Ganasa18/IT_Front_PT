@@ -41,6 +41,7 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import CreatePurchaseOrder from "./CreatePurchaseOrder";
 
 import Cookies from "universal-cookie";
+import TablePurchaseOrder from "../../../table/purchase/TablePurchaseOrder";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -247,10 +248,13 @@ const PurchaseTicket = () => {
   const req_no = localStorage.getItem("req_no");
   const [listReq, setListReq] = useState([]);
   const [ticketData, setTicketData] = useState([]);
+  const [lastNumber, setLastNumber] = useState("");
+  const [isLoadingTicket, setIsLoadingTicket] = useState(true);
 
   useEffect(() => {
     getDataPR();
     getRequest();
+    getInvLatestId();
   }, []);
 
   const getDataPR = async () => {
@@ -308,6 +312,38 @@ const PurchaseTicket = () => {
       .catch((errors) => {
         // react on errors.
         console.error(errors);
+      });
+  };
+
+  const getInvLatestId = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/latestId`;
+
+    await axios
+      .get(inventory)
+      .then((response) => {
+        var text = response.data.data?.inventory[0]?.asset_number;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        text = text.split("-")[1].trim();
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -396,7 +432,10 @@ const PurchaseTicket = () => {
               usermap[request_id.id_user.departement];
           });
 
+          console.log(arr_request);
+
           setTicketData(arr_request);
+          setIsLoadingTicket(false);
         })
       )
       .catch((errors) => {
@@ -493,7 +532,20 @@ const PurchaseTicket = () => {
       {dataPR[0].img_po !== null ? (
         <>
           <Grid item xs={12} className={classes.cardPadding}>
-            <TableScreenPO listData={dataPR} ticketUser={ticketData} />
+            {isLoadingTicket ? (
+              <>
+                <Loading />
+              </>
+            ) : (
+              <TableScreenPO
+                getLastNumber={lastNumber}
+                listData={dataPR}
+                ticketUser={ticketData}
+              />
+            )}
+          </Grid>
+          <Grid item xs={12} className={classes.cardPadding}>
+            <TablePurchaseOrder listData={dataPR} />
           </Grid>
         </>
       ) : null}
@@ -627,7 +679,7 @@ const TablePurchaseList = ({ listData }) => {
   );
 };
 
-const TableScreenPO = ({ listData, ticketUser }) => {
+const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
   const classes = useStyles2();
   const [modalOpen, setModalOpen] = useState(false);
   const [listScreenshot] = useState(listData);
@@ -639,10 +691,13 @@ const TableScreenPO = ({ listData, ticketUser }) => {
 
   const bodyModal = (
     <>
-      {console.log(userTicket)}
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <CreatePurchaseOrder />
+          <CreatePurchaseOrder
+            listData={listData}
+            lastNum={getLastNumber}
+            ticketUser={userTicket}
+          />
           <Button
             className={classes.cancelBtn}
             onClick={modalPop}
