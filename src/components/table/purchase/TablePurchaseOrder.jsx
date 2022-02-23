@@ -199,11 +199,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function calbill(date) {
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  var myDate = new Date(date);
+  var d = myDate.getDate();
+  var m = myDate.getMonth();
+  m += 1;
+  var y = myDate.getFullYear();
+
+  var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+  return newdate;
+}
+
 const TablePurchaseOrder = (props) => {
   const classes = useStyles();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [orderData, setOrderData] = useState([]);
+  // const [page, setPage] = useState(0);
+  // const [rowsPerPage, setRowsPerPage] = useState(5);
+  // const [orderData, setOrderData] = useState([]);
   const [dataPO, setDataPO] = useState([]);
   const [isLoading, setIsloading] = useState(true);
   const { listData } = props;
@@ -228,7 +254,7 @@ const TablePurchaseOrder = (props) => {
           (row) => row.pr_number === listData[0].purchase_req_code
         );
         setDataPO(PoData);
-        setOrderData(JSON.parse(PoData[0].po_list));
+        // setOrderData(JSON.parse(PoData[0].po_list));
         setIsloading(false);
       })
       .catch((error) => {
@@ -244,23 +270,119 @@ const TablePurchaseOrder = (props) => {
     }).format(money);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, orderData.length - page * rowsPerPage);
+  // const emptyRows =
+  //   rowsPerPage - Math.min(rowsPerPage, orderData.length - page * rowsPerPage);
 
   if (isLoading) return <Loading />;
 
   return (
     <>
-      <TableContainer className={classes.tableWidth}>
+      {dataPO.map((row, index) => (
+        <>
+          <TableContainer className={classes.tableWidth}>
+            <Paper className={classes.paperTable}>
+              <Toolbar>
+                <div className="col-10">
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    style={{ marginTop: "15px" }}>
+                    Purchase Order {index + 1}
+                  </Typography>
+                </div>
+                <div className="col-2">
+                  <p>PO : Date {calbill(row.createdAt)}</p>
+                </div>
+              </Toolbar>
+
+              <Table
+                className={classes.table}
+                aria-label="custom pagination table">
+                <TableHead classes={{ root: classes.thead }}>
+                  <TableRow>
+                    <StyledTableCell>Asset No</StyledTableCell>
+                    <StyledTableCell>Item Name</StyledTableCell>
+                    <StyledTableCell>User/Dept</StyledTableCell>
+                    <StyledTableCell>Ctg</StyledTableCell>
+                    <StyledTableCell>Sub Cat.</StyledTableCell>
+                    <StyledTableCell>Desc</StyledTableCell>
+                    <StyledTableCell>Unit Price</StyledTableCell>
+                    <StyledTableCell>QTY</StyledTableCell>
+                    <StyledTableCell align="center">Total</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {JSON.parse(row.po_list).map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row">
+                        {row.asset_number}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.asset_name}
+                      </TableCell>
+
+                      <TableCell component="th" scope="row">
+                        {row.type_asset}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.category}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.subcategory}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <div className="text-hide"> {row.desc_po} </div>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.price_unit}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.qty}
+                      </TableCell>
+                      <TableCell style={{ width: 100 }} align="center">
+                        {row.total_price_unit}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <br />
+                <TableRow>
+                  <TableCell rowSpan={3} />
+                  <TableCell colSpan={6} align="right">
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      style={{ fontSize: 13 }}>
+                      Total All
+                    </Typography>
+                  </TableCell>
+                  <TableCell colSpan={2} align="right">
+                    <Typography
+                      variant="h6"
+                      component="div"
+                      style={{ color: "#1653A6", fontWeight: "bold" }}>
+                      {totalformatRupiah(row.subtotal_price)}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </Table>
+            </Paper>
+          </TableContainer>
+          <br />
+        </>
+      ))}
+
+      {/* <TableContainer className={classes.tableWidth}>
         <Paper className={classes.paperTable}>
           <Toolbar>
             <div className="col-10">
@@ -327,11 +449,6 @@ const TablePurchaseOrder = (props) => {
                   </TableCell>
                 </TableRow>
               ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 20 * emptyRows }}>
-                  <TableCell colSpan={9} />
-                </TableRow>
-              )}
             </TableBody>
 
             <TableRow>
@@ -353,30 +470,9 @@ const TablePurchaseOrder = (props) => {
                 </Typography>
               </TableCell>
             </TableRow>
-
-            <TableFooter className={classes.posPagination}>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5]}
-                  colSpan={3}
-                  count={orderData.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  SelectProps={{
-                    inputProps: { "aria-label": "rows per page" },
-                    native: true,
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
-                />
-              </TableRow>
-            </TableFooter>
           </Table>
         </Paper>
-      </TableContainer>
-      <br />
-      <br />
+      </TableContainer> */}
     </>
   );
 };

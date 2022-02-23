@@ -32,6 +32,7 @@ import DisposalApproveDetail from "../pages/manager/DisposalApproveDetail";
 import HistoryTicket from "../pages/history/ticket/HistoryTicket";
 import HistoryFaciltyAccess from "../pages/history/ticket/HistoryFaciltyAccess";
 import HistoryActionReq from "../pages/history/ticket/detail/HistoryActionReq";
+import PurchaseDone from "../pages/purchase/PurchaseDone";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -297,6 +298,14 @@ const Routes = () => {
           ) : (
             <Redirect to="/" />
           )
+        }
+      />
+
+      <Route
+        exact
+        path="/purchase-done"
+        component={(props) =>
+          parseInt(roleUser) === 5 ? <PurchaseDone /> : <Redirect to="/" />
         }
       />
 

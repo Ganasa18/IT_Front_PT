@@ -476,20 +476,12 @@ const PurchaseTicket = () => {
         <div className="card-asset-action">
           <h3>Purchase Information</h3>
           <div className="row">
-            <div className="col-3">
+            <div className="col-4">
               <p className="label-asset">PR No</p>
               <p>{dataPR[0].purchase_req_code}</p>
             </div>
-            <div className="col-3">
-              <p className="label-asset">Po No</p>
-              <p>
-                {!dataPR[0].purchase_order_code
-                  ? "-"
-                  : dataPR[0].purchase_order_code}
-              </p>
-            </div>
 
-            <div className="col-3">
+            <div className="col-4">
               <p className="label-asset">Status</p>
               <p className="">
                 <span
@@ -505,23 +497,16 @@ const PurchaseTicket = () => {
           </div>
           <br />
           <div className="row">
-            <div className="col-3">
+            <div className="col-4">
               <p className="label-asset">PR Date</p>
               <p>{calbill(dataPR[0].createdAt)}</p>
             </div>
-            <div className="col-3">
-              <p className="label-asset">PO Date</p>
-              <p>
-                {!dataPR[0].purchase_order_date
-                  ? "-"
-                  : calbill(dataPR[0].purchase_order_date)}
-              </p>
-            </div>
-            <div className="col-3">
+
+            <div className="col-4">
               <p className="label-asset">Request No</p>
               <p>{dataPR[0].action_req_code}</p>
             </div>
-            <div className="col-3"></div>
+            <div className="col-4"></div>
           </div>
         </div>
       </Grid>
@@ -529,7 +514,7 @@ const PurchaseTicket = () => {
         <TablePurchaseList listData={listReq} />
       </Grid>
 
-      {dataPR[0].img_po !== null ? (
+      {dataPR[0].img_po_1 !== null ? (
         <>
           <Grid item xs={12} className={classes.cardPadding}>
             {isLoadingTicket ? (
@@ -749,7 +734,6 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
-
             <TableBody>
               {listScreenshot.map((row) => (
                 <TableRow key={row.id}>

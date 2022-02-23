@@ -262,6 +262,7 @@ const IncomingPRDetail = () => {
   const [inputPoNumber2, setInputPoNumber2] = useState("");
   const [inputPoNumber3, setInputPoNumber3] = useState("");
   const [inputPoNumber4, setInputPoNumber4] = useState("");
+  const [selectedButton, setSelectedButton] = useState("PO 1");
 
   useEffect(() => {
     getDataInfo();
@@ -414,40 +415,57 @@ const IncomingPRDetail = () => {
       return;
     }
 
-    const PO_Number = `${PoNumber1}/${PoNumber2}/${PoNumber3}/${PoNumber4}`;
+    var str = selectedButton.split(" ").pop();
+    console.log(str);
 
-    await axios
-      .patch(updated_po, {
-        purchase_order_code: PO_Number,
-        purchase_req_code: purchaseData.purchase_req_code,
-      })
-      .then((res) => {
-        document.getElementById("sucess-po").style.display = "block";
-        setTimeout(() => {
-          document.getElementById("sucess-po").style.display = "none";
-        }, 1500);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // const PO_Number = `${PoNumber1}/${PoNumber2}/${PoNumber3}/${PoNumber4}`;
 
-    let ticket = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+    // await axios
+    //   .patch(updated_po, {
+    //     purchase_order_code: PO_Number,
+    //     purchase_req_code: purchaseData.purchase_req_code,
+    //   })
+    //   .then((res) => {
+    //     document.getElementById("sucess-po").style.display = "block";
+    //     setTimeout(() => {
+    //       document.getElementById("sucess-po").style.display = "none";
+    //     }, 1500);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
 
-    await axios
-      .patch(ticket, {
-        status_id: 13,
-        trouble_title: null,
-        trouble_detail: null,
-        close_remark: null,
-      })
-      .then((response) => {
-        console.log(response.data.status);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // let ticket = `${invEndPoint[0].url}${
+    //   invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    // }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+
+    // await axios
+    //   .patch(ticket, {
+    //     status_id: 13,
+    //     trouble_title: null,
+    //     trouble_detail: null,
+    //     close_remark: null,
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data.status);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
+  };
+
+  const handleSelectButton = (e) => {
+    if (
+      document.querySelector(".po-select-flex .po-button-select.selected") !==
+      null
+    ) {
+      document
+        .querySelector(".po-select-flex .po-button-select.selected")
+        .classList.remove("selected");
+    }
+    e.target.className = "po-button-select selected";
+
+    setSelectedButton(e.target.innerHTML);
   };
 
   if (isLoading) {
@@ -569,6 +587,38 @@ const IncomingPRDetail = () => {
             <div className="flex-card">
               <h3>Input Po No</h3>
             </div>
+            <div className="row">
+              <div className="col-8">
+                <div className="po-select-flex">
+                  <button
+                    onClick={handleSelectButton}
+                    className="po-button-select selected">
+                    PO 1
+                  </button>
+                  <button
+                    onClick={handleSelectButton}
+                    className="po-button-select">
+                    PO 2
+                  </button>
+                  <button
+                    onClick={handleSelectButton}
+                    className="po-button-select">
+                    PO 3
+                  </button>
+                  <button
+                    onClick={handleSelectButton}
+                    className="po-button-select">
+                    PO 4
+                  </button>
+                  <button
+                    onClick={handleSelectButton}
+                    className="po-button-select">
+                    PO 5
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="row">
               <div className="col-12">
                 <div className="row">

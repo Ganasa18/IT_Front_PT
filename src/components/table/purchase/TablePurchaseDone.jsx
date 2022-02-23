@@ -176,7 +176,7 @@ function calbill(date) {
   return newdate;
 }
 
-const TableIncomingPR = () => {
+const TablePurchaseDone = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -191,16 +191,16 @@ const TableIncomingPR = () => {
   }, []);
 
   const getPRList = async () => {
+    let po = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-order`;
+
     let pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req`;
 
-    let status = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/status`;
-
-    const requestOne = await axios.get(pr);
-    const requestTwo = await axios.get(status);
+    const requestOne = await axios.get(po);
+    const requestTwo = await axios.get(pr);
 
     axios
       .all([requestOne, requestTwo])
@@ -208,26 +208,22 @@ const TableIncomingPR = () => {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          let newDataRequest = responseOne.data.data.request_purchase;
+          let newDataOrder = responseOne.data.data.purchase_order;
+          let newDataRequest = responseTwo.data.data.request_purchase;
 
-          newDataRequest = newDataRequest.filter(
-            (item) => item.status_id === 7
-          );
-
-          let newStatus = responseTwo.data.data.statuss;
-          const arr_status = [...newStatus];
+          const arr_order = [...newDataOrder];
           const arr_request = [...newDataRequest];
+          var requestmap = {};
 
-          var statusmap = {};
-
-          arr_status.forEach(function (status_id) {
-            statusmap[status_id.id] = status_id;
-          });
           arr_request.forEach(function (request_id) {
-            request_id.status_id = statusmap[request_id.status_id];
+            requestmap[request_id.action_req_code] = request_id;
           });
 
-          setDataPR(newDataRequest);
+          arr_order.forEach(function (request_id) {
+            request_id.request_id = requestmap[request_id.ticket_number];
+          });
+
+          setDataPR(arr_order);
           setIsLoading(false);
         })
       )
@@ -235,10 +231,6 @@ const TableIncomingPR = () => {
         // react on errors.
         console.error(errors);
       });
-  };
-
-  const storePurchase = (row) => {
-    localStorage.setItem("ticketData", JSON.stringify(row));
   };
 
   const emptyRows =
@@ -260,11 +252,11 @@ const TableIncomingPR = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>PR No</StyledTableCell>
-                <StyledTableCell>PO No</StyledTableCell>
-                <StyledTableCell>Create by</StyledTableCell>
-                <StyledTableCell>Request For</StyledTableCell>
-                <StyledTableCell>PR Date</StyledTableCell>
+                <StyledTableCell align="center">PR No</StyledTableCell>
+                <StyledTableCell align="center">PO No</StyledTableCell>
+                <StyledTableCell align="center">Create by</StyledTableCell>
+                <StyledTableCell align="center">PR Date</StyledTableCell>
+                <StyledTableCell align="center">PO Date</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -280,25 +272,19 @@ const TableIncomingPR = () => {
                   : dataPR
                 ).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      <Link
-                        to="/in-coming-pr/detail"
-                        onClick={() => storePurchase(row)}>
-                        {row.purchase_req_code}
-                      </Link>
+                    <TableCell component="th" scope="row" align="center">
+                      {row.pr_number}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.purchase_order_code
-                        ? row.purchase_order_code
-                        : " - "}
+                    <TableCell component="th" scope="row" align="center">
+                      {row.request_id.purchase_order_code}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.created_by}
+                    <TableCell component="th" scope="row" align="center">
+                      {row.request_id.request_by}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.request_by}
+                    <TableCell component="th" scope="row" align="center">
+                      {calbill(row.request_id.createdAt)}
                     </TableCell>
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" align="center">
                       {calbill(row.createdAt)}
                     </TableCell>
                   </TableRow>
@@ -336,4 +322,4 @@ const TableIncomingPR = () => {
   );
 };
 
-export default TableIncomingPR;
+export default TablePurchaseDone;
