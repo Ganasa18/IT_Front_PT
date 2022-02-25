@@ -24,13 +24,14 @@ import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
 import _ from "lodash";
 import Loading from "../../../asset/Loading";
-
+import { prEndPoint } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import AddIcon from "@material-ui/icons/Add";
+import axios from "axios";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -75,15 +76,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -93,8 +92,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -104,8 +102,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -173,61 +170,43 @@ const useStyles2 = makeStyles((theme) => ({
 }));
 
 const GoodReceiveTicket = () => {
-  const DataDummy = [
-    {
-      id: "1",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 1,
-    },
-    {
-      id: "2",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 3,
-    },
-    {
-      id: "3",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 5,
-    },
-    {
-      id: "4",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 2,
-    },
-    {
-      id: "5",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 3,
-    },
-    {
-      id: "6",
-      po_number: "123444",
-      asset_name: "Macbook",
-      description: "part",
-      qty: 3,
-    },
-  ];
-
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [editModal, setEditModal] = useState(false);
+  // const [editModal, setEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [allSelected, setAllSelected] = useState(false);
   const [selected, setSelected] = useState({});
-  const [dataGR, setDataGR] = useState(DataDummy);
+  const [dataGR, setDataGR] = useState([]);
+  const req_no = localStorage.getItem("req_no");
   const [selectGR, setSelectGR] = useState([]);
-  const [itemCount, setItemCount] = useState(0);
+  // const [itemCount, setItemCount] = useState(0);
+
+  useEffect(() => {
+    getDataPO();
+  }, []);
+
+  const getDataPO = async () => {
+    let poData = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-order/`;
+
+    await axios
+      .get(poData)
+      .then((response) => {
+        let PoData = response.data.data.purchase_order;
+
+        PoData = PoData.filter(
+          (row) => row.ticket_number === req_no && row.gr_status === true
+        );
+
+        setDataGR(JSON.parse(PoData[0].po_list));
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -238,9 +217,9 @@ const GoodReceiveTicket = () => {
     setPage(0);
   };
 
-  const modalClose = () => {
-    setEditModal(false);
-  };
+  // const modalClose = () => {
+  //   setEditModal(false);
+  // };
 
   const toggleAllSelected = (e) => {
     const { checked } = e.target;
@@ -327,10 +306,11 @@ const GoodReceiveTicket = () => {
       const valueId = parseInt(element.children[0].children[0].value);
       const tableValue = document.getElementsByClassName(`rowId-${valueId}`);
       const arr2 = [...tableValue];
-      console.log(arr2[0].childNodes[5].childNodes[1].innerHTML);
-      console.log(arr2[0].childNodes[1].innerHTML);
+      // console.log(arr2[0].childNodes[5].childNodes[1].innerHTML);
+      // console.log(arr2[0].childNodes[1].innerHTML);
+      // console.log(arr2[0].childNodes[2].innerHTML);
+      // console.log(arr2[0].childNodes[3].innerHTML);
       console.log(arr2[0].childNodes[2].innerHTML);
-      console.log(arr2[0].childNodes[3].innerHTML);
       console.log(valueId);
     });
 
@@ -349,6 +329,8 @@ const GoodReceiveTicket = () => {
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, dataGR.length - page * rowsPerPage);
 
+  if (isLoading) return <Loading />;
+
   return (
     <>
       <Grid item xs={12} className={classes.cardPadding}>
@@ -359,8 +341,7 @@ const GoodReceiveTicket = () => {
                 <Typography
                   variant="h5"
                   component="div"
-                  style={{ marginTop: "5px" }}
-                >
+                  style={{ marginTop: "5px" }}>
                   Good Received
                 </Typography>
               </div>
@@ -382,15 +363,14 @@ const GoodReceiveTicket = () => {
             <Table
               className={classes.table}
               size="medium"
-              aria-label="custom pagination table"
-            >
+              aria-label="custom pagination table">
               <TableHead classes={{ root: classes.thead }}>
                 <TableRow>
                   <StyledTableCell
                     padding="checkbox"
-                    style={{ width: 50 }}
-                  ></StyledTableCell>
+                    style={{ width: 50 }}></StyledTableCell>
                   <StyledTableCell>PO Number</StyledTableCell>
+                  <StyledTableCell>Item Number</StyledTableCell>
                   <StyledTableCell>Name Item</StyledTableCell>
                   <StyledTableCell>Description</StyledTableCell>
                   <StyledTableCell>QTY</StyledTableCell>
@@ -412,8 +392,7 @@ const GoodReceiveTicket = () => {
                     <TableRow
                       key={row.id}
                       id="check-value"
-                      className={`rowId-${row.id}`}
-                    >
+                      className={`rowId-${row.id}`}>
                       <TableCell padding="checkbox" style={{ width: 50 }}>
                         <Checkbox
                           value={row.id}
@@ -422,13 +401,16 @@ const GoodReceiveTicket = () => {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.po_number}
+                        {row.asset_po_number}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.asset_number}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {row.asset_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.description}
+                        {row.desc_po}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {row.qty}
@@ -437,8 +419,7 @@ const GoodReceiveTicket = () => {
                         <button
                           type="button"
                           className="btn-plus"
-                          onClick={() => handleIncrement(row.id, row.qty)}
-                        >
+                          onClick={() => handleIncrement(row.id, row.qty)}>
                           +
                         </button>
                         <span className="item-count" id={`count-${row.id}`}>
@@ -447,8 +428,7 @@ const GoodReceiveTicket = () => {
                         <button
                           type="button"
                           className="btn-min"
-                          onClick={() => handleDecrement(row.id)}
-                        >
+                          onClick={() => handleDecrement(row.id)}>
                           -
                         </button>
                       </TableCell>

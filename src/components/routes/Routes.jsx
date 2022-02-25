@@ -33,6 +33,7 @@ import HistoryTicket from "../pages/history/ticket/HistoryTicket";
 import HistoryFaciltyAccess from "../pages/history/ticket/HistoryFaciltyAccess";
 import HistoryActionReq from "../pages/history/ticket/detail/HistoryActionReq";
 import PurchaseDone from "../pages/purchase/PurchaseDone";
+import PurchaseDoneDetail from "../pages/purchase/PurchaseDoneDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -306,6 +307,18 @@ const Routes = () => {
         path="/purchase-done"
         component={(props) =>
           parseInt(roleUser) === 5 ? <PurchaseDone /> : <Redirect to="/" />
+        }
+      />
+
+      <Route
+        exact
+        path="/purchase-done/detail"
+        component={(props) =>
+          parseInt(roleUser) === 5 ? (
+            <PurchaseDoneDetail />
+          ) : (
+            <Redirect to="/" />
+          )
         }
       />
 

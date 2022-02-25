@@ -234,7 +234,7 @@ const TablePurchaseOrder = (props) => {
   const [isLoading, setIsloading] = useState(true);
   const { listData } = props;
 
-  console.log(listData);
+  // console.log(listData);
 
   useEffect(() => {
     getDataPO();

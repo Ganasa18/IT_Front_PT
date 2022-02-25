@@ -1889,16 +1889,15 @@ input[type="radio"] {
 /* PO CREATE */
 
 .btn-create-po {
-  margin: 0 5px 0 5px;
-  color: #1653a6;
-  width: 96px;
-  height: 30px;
+  margin: 10px 5px 0 15px;
+  width: 80%;
+  height: 40px;
   font-size: 0.7rem;
   min-width: 64px;
   outline: none;
-  border: transparent;
+  border: none;
   color: #fff;
-  background-color: transparent;
+  background-color: #1653a6;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   font-weight: 500;
   line-height: 1.75;
@@ -1918,18 +1917,19 @@ input[type="radio"] {
 }
 
 .btn-create-po .icon-btn {
-  color: #1653a6;
-  left: 5px;
-  bottom: 8px;
+  color: #fcfcfc;
+  left: 15px;
+  bottom: 10px;
   position: absolute;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .btn-create-po .name-btn {
-  color: #1653a6;
-  right: 10px;
-  bottom: 4px;
+  color: #ffffff;
+  left: 60px;
+  bottom: 8px;
   position: absolute;
+  font-size: 14px;
 }
 
 .btn-image-po {

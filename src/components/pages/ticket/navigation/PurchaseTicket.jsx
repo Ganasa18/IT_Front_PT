@@ -432,7 +432,7 @@ const PurchaseTicket = () => {
               usermap[request_id.id_user.departement];
           });
 
-          console.log(arr_request);
+          // console.log(arr_request);
 
           setTicketData(arr_request);
           setIsLoadingTicket(false);
@@ -514,7 +514,7 @@ const PurchaseTicket = () => {
         <TablePurchaseList listData={listReq} />
       </Grid>
 
-      {dataPR[0].img_po_1 !== null ? (
+      {dataPR[0].img_po !== null ? (
         <>
           <Grid item xs={12} className={classes.cardPadding}>
             {isLoadingTicket ? (
@@ -530,6 +530,7 @@ const PurchaseTicket = () => {
             )}
           </Grid>
           <Grid item xs={12} className={classes.cardPadding}>
+            {console.log(dataPR)}
             <TablePurchaseOrder listData={dataPR} />
           </Grid>
         </>
@@ -670,6 +671,23 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
   const [listScreenshot] = useState(listData);
   const [userTicket] = useState(ticketUser);
 
+  function countTotalPo(listScreenshot) {
+    var data = listScreenshot.map((item) => ({
+      value: [
+        item.purchase_order_code_1,
+        item.purchase_order_code_2,
+        item.purchase_order_code_3,
+        item.purchase_order_code_4,
+        item.purchase_order_code_5,
+      ],
+    }));
+
+    var len = data[0].value.filter(function (x) {
+      return x !== null;
+    }).length;
+    return len;
+  }
+
   const modalPop = () => {
     setModalOpen((prevModal) => !prevModal);
   };
@@ -722,8 +740,16 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
                 variant="h6"
                 component="div"
                 style={{ marginTop: "15px" }}>
-                Purchase Order
+                Purchase Order {`${countTotalPo(listScreenshot)} / 5`}
               </Typography>
+            </div>
+            <div className="col-2">
+              <button className="btn-create-po" onClick={modalPop}>
+                <span
+                  class="iconify icon-btn"
+                  data-icon="ant-design:plus-outlined"></span>
+                <span className="name-btn">Create PO</span>
+              </button>
             </div>
           </Toolbar>
           <Table className={classes.table} aria-label="custom pagination table">
@@ -731,13 +757,13 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
               <TableRow>
                 <StyledTableCell>Image</StyledTableCell>
                 <StyledTableCell>Date</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
-              {listScreenshot.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell style={{ width: 450 }} component="th" scope="row">
+              {JSON.parse(listScreenshot[0].img_po).map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
                     <button
                       className="btn-image-po"
                       onClick={() =>
@@ -750,22 +776,15 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
                           `${row.img_po}`
                         )
                       }>
-                      image.jpg
+                      {row.img_po}
                     </button>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {!row.purchase_order_date
-                      ? "-"
-                      : calbill(row.purchase_order_date)}
+                    {!row.date_img ? "-" : calbill(row.date_img)}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="center">
-                    <button className="btn-create-po" onClick={modalPop}>
-                      <span
-                        class="iconify icon-btn"
-                        data-icon="ant-design:plus-outlined"></span>
-                      <span className="name-btn">Create PO</span>
-                    </button>
-                  </TableCell>
+                  {/* <TableCell component="th" scope="row" align="center">
+                    
+                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>

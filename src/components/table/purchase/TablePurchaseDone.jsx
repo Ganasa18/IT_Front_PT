@@ -233,6 +233,10 @@ const TablePurchaseDone = () => {
       });
   };
 
+  const storePurchase = (row) => {
+    localStorage.setItem("ticketData", JSON.stringify(row));
+  };
+
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, dataPR.length - page * rowsPerPage);
 
@@ -253,10 +257,8 @@ const TablePurchaseDone = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell align="center">PR No</StyledTableCell>
-                <StyledTableCell align="center">PO No</StyledTableCell>
                 <StyledTableCell align="center">Create by</StyledTableCell>
                 <StyledTableCell align="center">PR Date</StyledTableCell>
-                <StyledTableCell align="center">PO Date</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -273,19 +275,18 @@ const TablePurchaseDone = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row" align="center">
-                      {row.pr_number}
+                      <Link
+                        to="/purchase-done/detail"
+                        onClick={() => storePurchase(row)}>
+                        {row.pr_number}
+                      </Link>
                     </TableCell>
-                    <TableCell component="th" scope="row" align="center">
-                      {row.request_id.purchase_order_code}
-                    </TableCell>
+
                     <TableCell component="th" scope="row" align="center">
                       {row.request_id.request_by}
                     </TableCell>
                     <TableCell component="th" scope="row" align="center">
                       {calbill(row.request_id.createdAt)}
-                    </TableCell>
-                    <TableCell component="th" scope="row" align="center">
-                      {calbill(row.createdAt)}
                     </TableCell>
                   </TableRow>
                 ))}
