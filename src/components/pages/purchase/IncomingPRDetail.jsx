@@ -44,7 +44,7 @@ import "../../asset/chips.css";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
-const userID = cookies.get("id");
+// const userID = cookies.get("id");
 const token = cookies.get("token");
 
 const useStyles = makeStyles((theme) => ({
@@ -416,42 +416,93 @@ const IncomingPRDetail = () => {
     }
 
     var str = selectedButton.split(" ").pop();
-    console.log(str);
+    // console.log(str);
 
-    // const PO_Number = `${PoNumber1}/${PoNumber2}/${PoNumber3}/${PoNumber4}`;
+    const PO_Number = `${PoNumber1}/${PoNumber2}/${PoNumber3}/${PoNumber4}`;
+    var tempData = new Array();
 
-    // await axios
-    //   .patch(updated_po, {
-    //     purchase_order_code: PO_Number,
-    //     purchase_req_code: purchaseData.purchase_req_code,
-    //   })
-    //   .then((res) => {
-    //     document.getElementById("sucess-po").style.display = "block";
-    //     setTimeout(() => {
-    //       document.getElementById("sucess-po").style.display = "none";
-    //     }, 1500);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
+    if (str === "1") {
+      var input = {
+        purchase_order_code_1: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      };
 
-    // let ticket = `${invEndPoint[0].url}${
-    //   invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    // }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+      tempData.push(input);
+    }
 
-    // await axios
-    //   .patch(ticket, {
-    //     status_id: 13,
-    //     trouble_title: null,
-    //     trouble_detail: null,
-    //     close_remark: null,
-    //   })
-    //   .then((response) => {
-    //     console.log(response.data.status);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
+    if (str === "2") {
+      input = {
+        purchase_order_code_2: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      };
+
+      tempData.push(input);
+    }
+    if (str === "3") {
+      input = {
+        purchase_order_code_3: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      };
+
+      tempData.push(input);
+    }
+    if (str === "4") {
+      input = {
+        purchase_order_code_4: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      };
+
+      tempData.push(input);
+    }
+
+    if (str === "5") {
+      input = {
+        purchase_order_code_5: PO_Number,
+        purchase_req_code: purchaseData.purchase_req_code,
+      };
+
+      tempData.push(input);
+    }
+
+    await axios
+      .patch(updated_po, tempData[0])
+      .then((res) => {
+        document.getElementById("sucess-po").style.display = "block";
+        setTimeout(() => {
+          setInputPoNumber1("");
+          setInputPoNumber2("");
+          setInputPoNumber3("");
+          setInputPoNumber4("");
+          document.getElementById("sucess-po").style.display = "none";
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    // var data = {
+    //   purchase_type: PO_Number,
+
+    //   purchase_req_code: purchaseData.purchase_req_code,
+    // }
+
+    let ticket = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+
+    await axios
+      .patch(ticket, {
+        status_id: 13,
+        trouble_title: null,
+        trouble_detail: null,
+        close_remark: null,
+      })
+      .then((response) => {
+        console.log(response.data.status);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleSelectButton = (e) => {
