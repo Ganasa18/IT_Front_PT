@@ -344,6 +344,13 @@ const CreatePurchaseOrder = (props) => {
     var nowNumber = localStorage.getItem("last_number");
     let checkfisik = fisiktype.value === "fisik" ? "0" : "1";
 
+    // const code =
+    //   "MKD" +
+    //   getInitialRef.current.value +
+    //   ticketUser[0].id_area_user.alias_name +
+    //   checkfisik +
+    //   "-" +
+    //   nowNumber;
     const code =
       "MKD" +
       getInitialRef.current.value +
@@ -810,7 +817,6 @@ const CreatePurchaseOrder = (props) => {
                   aria-label="custom pagination table">
                   <TableHead classes={{ root: classes.thead }}>
                     <TableRow>
-                      <StyledTableCell>Asset No</StyledTableCell>
                       <StyledTableCell>Item Name</StyledTableCell>
                       <StyledTableCell>V.Name</StyledTableCell>
                       <StyledTableCell>No. Hp</StyledTableCell>
@@ -836,9 +842,6 @@ const CreatePurchaseOrder = (props) => {
                       : todos
                     ).map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell component="th" scope="row">
-                          <div className="text-hide"> {row.asset_number} </div>
-                        </TableCell>
                         <TableCell component="th" scope="row">
                           <div className="text-hide"> {row.asset_name}</div>
                         </TableCell>

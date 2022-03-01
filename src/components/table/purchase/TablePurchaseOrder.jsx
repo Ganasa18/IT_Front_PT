@@ -309,7 +309,6 @@ const TablePurchaseOrder = (props) => {
                 aria-label="custom pagination table">
                 <TableHead classes={{ root: classes.thead }}>
                   <TableRow>
-                    <StyledTableCell>Asset No</StyledTableCell>
                     <StyledTableCell>Item Name</StyledTableCell>
                     <StyledTableCell>User/Dept</StyledTableCell>
                     <StyledTableCell>Ctg</StyledTableCell>
@@ -324,9 +323,6 @@ const TablePurchaseOrder = (props) => {
                 <TableBody>
                   {JSON.parse(row.po_list).map((row) => (
                     <TableRow key={row.id}>
-                      <TableCell component="th" scope="row">
-                        {row.asset_number}
-                      </TableCell>
                       <TableCell component="th" scope="row">
                         {row.asset_name}
                       </TableCell>

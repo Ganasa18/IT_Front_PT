@@ -24,7 +24,7 @@ import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
 import _ from "lodash";
 import Loading from "../../../asset/Loading";
-import { prEndPoint } from "../../../../assets/menu";
+import { prEndPoint, pathEndPoint } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -180,10 +180,13 @@ const GoodReceiveTicket = () => {
   const [dataGR, setDataGR] = useState([]);
   const req_no = localStorage.getItem("req_no");
   const [selectGR, setSelectGR] = useState([]);
+  const [dataGRTemp, setDataGRTemp] = useState([]);
+  const [lastNumber, setLastNumber] = useState("");
   // const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
     getDataPO();
+    getInvLatestId();
   }, []);
 
   const getDataPO = async () => {
@@ -200,8 +203,49 @@ const GoodReceiveTicket = () => {
           (row) => row.ticket_number === req_no && row.gr_status === true
         );
 
-        setDataGR(JSON.parse(PoData[0].po_list));
-        setIsLoading(false);
+        if (PoData.length === 1) {
+          var dataSet = [];
+
+          // setDataGR(JSON.parse(PoData[0].po_list));
+
+          for (var i = 0; i < PoData.length; i++) {
+            var mapped = JSON.parse(PoData[i].po_list);
+            for (var j = 0; j < mapped.length; j++) {
+              // console.log(mapped[j]);
+
+              const updateTodo = {
+                ...mapped[j],
+                id_gr: PoData[i].id,
+              };
+              dataSet.push(updateTodo);
+            }
+          }
+          setDataGR(dataSet);
+          setIsLoading(false);
+          console.log(dataSet);
+        } else {
+          var dataGet = [];
+
+          if (PoData.length > 1) {
+            // setDataGR(JSON.parse(PoData[0].po_list));
+
+            for (var i = 0; i < PoData.length; i++) {
+              var mapped = JSON.parse(PoData[i].po_list);
+              for (var j = 0; j < mapped.length; j++) {
+                // console.log(mapped[j]);
+
+                const updateTodo = {
+                  ...mapped[j],
+                  id_gr: PoData[i].id,
+                };
+                dataGet.push(updateTodo);
+              }
+            }
+
+            setDataGR(dataGet);
+            setIsLoading(false);
+          }
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -297,10 +341,33 @@ const GoodReceiveTicket = () => {
     // );
   };
 
-  const checkValue = () => {
+  const checkValue = async () => {
+    var result = Object.keys(selected).map((key) => [
+      Number(key),
+      selected[key],
+    ]);
+
+    result = result.filter((key) => key[1] !== false);
+    result = result.map((key) => ({
+      id: key[0],
+    }));
+
+    const newArrGR = Object.values(result).map((key) => key.id);
+    // var newInvent = dataGR;
+
+    const newInvent = dataGR.filter((row) => newArrGR.includes(row.id));
+
+    setDataGRTemp(newInvent);
+
+    // console.log(newInvent);
+    // const countData = document.querySelector('.item-count')
+
     const checkbox = document.querySelectorAll("#check-value .Mui-checked");
     const table = document.querySelectorAll("tbody #check-value");
     const arr = [...checkbox];
+
+    var x = 0;
+    var dataNew = [];
 
     arr.forEach((element) => {
       const valueId = parseInt(element.children[0].children[0].value);
@@ -309,16 +376,117 @@ const GoodReceiveTicket = () => {
       // console.log(arr2[0].childNodes[5].childNodes[1].innerHTML);
       // console.log(arr2[0].childNodes[1].innerHTML);
       // console.log(arr2[0].childNodes[2].innerHTML);
-      // console.log(arr2[0].childNodes[3].innerHTML);
-      console.log(arr2[0].childNodes[2].innerHTML);
-      console.log(valueId);
+      // console.log(arr2[0].childNodes[6].childNodes[1].innerHTML);
+      // console.log(arr2[0].childNodes[2].innerHTML);
+      // console.log(valueId);
+      // console.log(newInvent[x]);
+      const newData = {
+        id: newInvent[x].id,
+        old_qty: newInvent[x].qty,
+        new_qty: arr2[0].childNodes[6].childNodes[1].innerHTML,
+      };
+      dataNew.push(newData);
+
+      x = x + 1;
     });
+    //
+    // console.log(dataNew);
+    // var el = 0;
+    dataNew.forEach((element, index) => {
+      var arrayEmpty = [...dataGR];
+
+      let objIndex = arrayEmpty.findIndex(
+        (obj) => obj.id === dataNew[index].id
+      );
+
+      arrayEmpty[objIndex].qty = parseInt(
+        dataNew[index].old_qty - dataNew[index].new_qty
+      );
+      console.log("After update: ", arrayEmpty[objIndex]);
+    });
+
+    // console.log(newInvent);
+
+    var updateTemp = newInvent.map((item) => ({
+      ticket_number: item.id_gr,
+      gr_list: dataGR,
+    }));
+
+    console.log(updateTemp);
+
+    let gr_updated = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-order/updated-gr`;
+
+    updateTemp.forEach((element, index) => {
+      const data = {
+        ticket_number: element.ticket_number,
+        gr_list: element.gr_list,
+      };
+
+      axios
+        .patch(gr_updated, data)
+        .then((resp) => {
+          console.log(resp);
+        })
+        .catch((err) => console.error(err));
+    });
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+
+    // const data = {
+    //   ticket_number: req_no,
+    //   gr_list: dataGR,
+    // };
 
     // console.log(newArray);
     // var filteredArray = selectGR.filter((i) => newArray.includes(i.id));
     // console.log(selectGR);
     // console.log(filteredArray);
   };
+
+  const getInvLatestId = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/latestId`;
+
+    await axios
+      .get(inventory)
+      .then((response) => {
+        var text = response.data.data?.inventory[0]?.asset_number;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        text = text.split("-")[1].trim();
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  function setNumber(numb, index) {
+    numb = parseInt(numb) + index;
+    var str = "" + numb;
+    var pad = "000";
+    var ans = pad.substring(0, pad.length - str.length) + str;
+
+    return ans;
+  }
 
   const selectedCount = Object.values(selected).filter(Boolean).length;
 
@@ -388,52 +556,61 @@ const GoodReceiveTicket = () => {
                         page * rowsPerPage + rowsPerPage
                       )
                     : dataGR
-                  ).map((row) => (
-                    <TableRow
-                      key={row.id}
-                      id="check-value"
-                      className={`rowId-${row.id}`}>
-                      <TableCell padding="checkbox" style={{ width: 50 }}>
-                        <Checkbox
-                          value={row.id}
-                          checked={selected[row.id] || allSelected} // <-- is selected
-                          onChange={toggleSelected(row)} // <-- toggle state
-                        />
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.asset_po_number}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.asset_number}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.asset_name}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.desc_po}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.qty}
-                      </TableCell>
-                      <TableCell align="center">
-                        <button
-                          type="button"
-                          className="btn-plus"
-                          onClick={() => handleIncrement(row.id, row.qty)}>
-                          +
-                        </button>
-                        <span className="item-count" id={`count-${row.id}`}>
-                          0
-                        </span>
-                        <button
-                          type="button"
-                          className="btn-min"
-                          onClick={() => handleDecrement(row.id)}>
-                          -
-                        </button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  ).map((row, index) =>
+                    row.qty !== 0 ? (
+                      <>
+                        <TableRow
+                          key={row.id}
+                          id="check-value"
+                          className={`rowId-${row.id}`}>
+                          <TableCell padding="checkbox" style={{ width: 50 }}>
+                            <Checkbox
+                              value={row.id}
+                              checked={selected[row.id] || allSelected} // <-- is selected
+                              onChange={toggleSelected(row)} // <-- toggle state
+                            />
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.asset_po_number}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.asset_number.substring(
+                              0,
+                              row.asset_number.indexOf("-")
+                            )}
+
+                            {`-${setNumber(lastNumber, index)}`}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.asset_name}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.desc_po}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.qty}
+                          </TableCell>
+                          <TableCell align="center">
+                            <button
+                              type="button"
+                              className="btn-plus"
+                              onClick={() => handleIncrement(row.id, row.qty)}>
+                              +
+                            </button>
+                            <span className="item-count" id={`count-${row.id}`}>
+                              0
+                            </span>
+                            <button
+                              type="button"
+                              className="btn-min"
+                              onClick={() => handleDecrement(row.id)}>
+                              -
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ) : null
+                  )}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 10 * emptyRows }}>
                       <TableCell colSpan={8} />
