@@ -343,7 +343,7 @@ const TablePurchaseOrder = (props) => {
                         {row.price_unit}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.qty}
+                        {row.real_qty}
                       </TableCell>
                       <TableCell style={{ width: 100 }} align="center">
                         {row.total_price_unit}

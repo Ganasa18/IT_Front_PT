@@ -73,11 +73,11 @@ export const menuData = [
         to: "/gr/asset",
         icon: "dashicons:category",
       },
-      // {
-      //   name: "GR History",
-      //   to: "/gr/history",
-      //   icon: "carbon:status-acknowledge",
-      // },
+      {
+        name: "GR History",
+        to: "/gr/history",
+        icon: "carbon:status-acknowledge",
+      },
     ],
   },
   {

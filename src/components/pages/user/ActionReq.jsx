@@ -202,7 +202,7 @@ const ActionReq = () => {
           (item) => item.type_asset === "user" && item.disposal === false
         );
 
-        console.log(filterUser);
+        // console.log(filterUser);
         var filterDepartement = Asset.filter(
           (item) => item.type_asset === "departement" && item.disposal === false
         );

@@ -236,7 +236,7 @@ const CreatePurchaseOrder = (props) => {
 
   const { ticketUser, lastNum, listData } = props;
 
-  console.log(listData);
+  // console.log(listData);
 
   localStorage.setItem("last_number", lastNum);
 
@@ -355,9 +355,7 @@ const CreatePurchaseOrder = (props) => {
       "MKD" +
       getInitialRef.current.value +
       ticketUser[0].id_area_user.alias_name +
-      checkfisik +
-      "-" +
-      nowNumber;
+      checkfisik;
 
     if (fisiktype === null) {
       alert("must select 1");
@@ -409,12 +407,15 @@ const CreatePurchaseOrder = (props) => {
       return;
     }
 
+    var used_user = typeasset.value === "user" ? ticketUser[0].user_id : null;
+
     const data = {
       id: generateId(),
       asset_number: code,
       asset_name: initialRef.current.value,
       initial_asset_name: getInitialRef.current.value,
       qty: quantity,
+      real_qty: quantity,
       price_unit: priceRef.current.value,
       total_price_unit: total_price,
       total_price_int: int_total,
@@ -432,6 +433,7 @@ const CreatePurchaseOrder = (props) => {
       vendor_name: vendor_name,
       address_vendor: address_vendor,
       desc_po: desc_po,
+      used_by: used_user,
     };
 
     // console.log(data);
@@ -456,6 +458,11 @@ const CreatePurchaseOrder = (props) => {
   };
 
   const handleSubmit = async () => {
+    if (todos.length === 0) {
+      alert("must insert min 1 item");
+      return;
+    }
+
     const data = {
       ticket_number: listData[0].action_req_code,
       pr_number: listData[0].purchase_req_code,

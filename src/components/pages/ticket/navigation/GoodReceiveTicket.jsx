@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Loader from "react-loader-spinner";
 import {
   useTheme,
   makeStyles,
@@ -182,11 +183,15 @@ const GoodReceiveTicket = () => {
   const [selectGR, setSelectGR] = useState([]);
   const [dataGRTemp, setDataGRTemp] = useState([]);
   const [lastNumber, setLastNumber] = useState("");
+  const [lastNumberPR, setLastNumberPR] = useState("");
   // const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
     getDataPO();
-    getInvLatestId();
+
+    setInterval(() => {
+      getInvLatestId();
+    }, 2000);
   }, []);
 
   const getDataPO = async () => {
@@ -202,6 +207,8 @@ const GoodReceiveTicket = () => {
         PoData = PoData.filter(
           (row) => row.ticket_number === req_no && row.gr_status === true
         );
+
+        setLastNumberPR(PoData[0].pr_number);
 
         if (PoData.length === 1) {
           var dataSet = [];
@@ -373,23 +380,66 @@ const GoodReceiveTicket = () => {
       const valueId = parseInt(element.children[0].children[0].value);
       const tableValue = document.getElementsByClassName(`rowId-${valueId}`);
       const arr2 = [...tableValue];
-      // console.log(arr2[0].childNodes[5].childNodes[1].innerHTML);
+
+      if (arr2[0].childNodes[7].childNodes[1].innerHTML == 0) {
+        console.log("cannot null");
+        return;
+      }
       // console.log(arr2[0].childNodes[1].innerHTML);
       // console.log(arr2[0].childNodes[2].innerHTML);
       // console.log(arr2[0].childNodes[6].childNodes[1].innerHTML);
       // console.log(arr2[0].childNodes[2].innerHTML);
-      // console.log(valueId);
-      // console.log(newInvent[x]);
+
+      console.log(newInvent[x]);
+
+      const numberItem = arr2[0].childNodes[2].innerHTML + `-${lastNumber}`;
+
+      let inventory = `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/inventory`;
+
+      setTimeout(() => {
+        var j = 0;
+        const postData = {
+          asset_name: newInvent[j].asset_name,
+          asset_number: numberItem,
+          asset_fisik_or_none: newInvent[j].asset_fisik_or_none,
+          category_asset: parseInt(newInvent[j].id_category),
+          subcategory_asset:
+            newInvent[j].id_subcategory === null
+              ? null
+              : parseInt(newInvent[j].id_subcategory),
+          initial_asset_name: newInvent[j].initial_asset_name,
+          asset_part_or_unit: newInvent[j].asset_part_or_unit,
+          area: parseInt(newInvent[j].area),
+          type_asset: newInvent[j].type_asset,
+          asset_po_number: newInvent[j].asset_po_number,
+          asset_pr_number: lastNumberPR,
+          asset_detail: newInvent[j].desc_po,
+          asset_new_or_old: "new",
+          asset_quantity: parseInt(
+            arr2[0].childNodes[7].childNodes[1].innerHTML
+          ),
+          status_asset: true,
+          departement: newInvent[j].departement,
+          used_by: !newInvent[j].used_by ? null : newInvent[j].used_by,
+        };
+
+        axios.post(inventory, postData);
+
+        j = j + 1;
+      }, 1000);
+
       const newData = {
         id: newInvent[x].id,
         old_qty: newInvent[x].qty,
-        new_qty: arr2[0].childNodes[6].childNodes[1].innerHTML,
+        new_qty: arr2[0].childNodes[7].childNodes[1].innerHTML,
       };
       dataNew.push(newData);
 
       x = x + 1;
     });
-    //
+
     // console.log(dataNew);
     // var el = 0;
     dataNew.forEach((element, index) => {
@@ -412,7 +462,7 @@ const GoodReceiveTicket = () => {
       gr_list: dataGR,
     }));
 
-    console.log(updateTemp);
+    // console.log(updateTemp);
 
     let gr_updated = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
@@ -427,14 +477,16 @@ const GoodReceiveTicket = () => {
       axios
         .patch(gr_updated, data)
         .then((resp) => {
+          document.getElementById("overlay").style.display = "block";
           console.log(resp);
         })
         .catch((err) => console.error(err));
     });
 
     setTimeout(() => {
+      document.getElementById("overlay").style.display = "none";
       window.location.reload();
-    }, 1500);
+    }, 1800);
 
     // const data = {
     //   ticket_number: req_no,
@@ -541,7 +593,8 @@ const GoodReceiveTicket = () => {
                   <StyledTableCell>Item Number</StyledTableCell>
                   <StyledTableCell>Name Item</StyledTableCell>
                   <StyledTableCell>Description</StyledTableCell>
-                  <StyledTableCell>QTY</StyledTableCell>
+                  <StyledTableCell>Left Over</StyledTableCell>
+                  <StyledTableCell>Total QTY </StyledTableCell>
                   <StyledTableCell align="center">Received</StyledTableCell>
                 </TableRow>
               </TableHead>
@@ -574,12 +627,11 @@ const GoodReceiveTicket = () => {
                             {row.asset_po_number}
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.asset_number.substring(
+                            {row.asset_number}
+                            {/* {row.asset_number.substring(
                               0,
                               row.asset_number.indexOf("-")
-                            )}
-
-                            {`-${setNumber(lastNumber, index)}`}
+                            )} */}
                           </TableCell>
                           <TableCell component="th" scope="row">
                             {row.asset_name}
@@ -589,6 +641,9 @@ const GoodReceiveTicket = () => {
                           </TableCell>
                           <TableCell component="th" scope="row">
                             {row.qty}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.real_qty}
                           </TableCell>
                           <TableCell align="center">
                             <button
@@ -646,6 +701,15 @@ const GoodReceiveTicket = () => {
           </Paper>
         </TableContainer>
       </Grid>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 };
