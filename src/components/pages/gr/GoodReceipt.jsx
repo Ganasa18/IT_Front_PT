@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { pathEndPoint } from "../../../assets/menu";
 
 import {
   makeStyles,
@@ -14,6 +13,7 @@ import {
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
+import TableGR from "./TableGR";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -66,7 +66,9 @@ const GoodReceipt = () => {
             </div>
           </div>
         </Grid>
-        <Grid item xs={12} sm={12}></Grid>
+        <Grid item xs={12} sm={12}>
+          <TableGR />
+        </Grid>
       </Grid>
     </>
   );
