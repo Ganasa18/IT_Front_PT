@@ -193,7 +193,7 @@ const TablePurchaseDone = () => {
   const getPRList = async () => {
     let po = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
-    }/api/v1/purchase-order`;
+    }/api/v1/purchase-order/get-pr`;
 
     let pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
@@ -208,7 +208,7 @@ const TablePurchaseDone = () => {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          let newDataOrder = responseOne.data.data.purchase_order;
+          let newDataOrder = responseOne.data.data.pr_data;
           let newDataRequest = responseTwo.data.data.request_purchase;
 
           const arr_order = [...newDataOrder];

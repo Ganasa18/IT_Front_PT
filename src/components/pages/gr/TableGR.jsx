@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { pathEndPoint } from "../../../assets/menu";
+import {
+  pathEndPoint,
+  prEndPoint,
+  invEndPoint,
+  authEndPoint,
+} from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import PropTypes from "prop-types";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 import {
   useTheme,
@@ -29,6 +35,11 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -188,6 +199,152 @@ const TableGR = () => {
   const [dataGR, setDataGR] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    getDataList();
+  }, []);
+
+  const getDataList = async () => {
+    let pr_req = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/`;
+
+    let act_req = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/action-req/`;
+
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let role = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/role`;
+
+    const requestOne = await axios.get(pr_req);
+    const requestTwo = await axios.get(act_req);
+    const requestThree = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
+    const requestSix = await axios.get(area);
+    const requestSeven = await axios.get(role, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    axios
+      .all([
+        requestOne,
+        requestTwo,
+        requestThree,
+        requestFour,
+        requestFive,
+        requestSix,
+        requestSeven,
+      ])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+          const responseFive = responses[4];
+          const responseSix = responses[5];
+          const responseSeven = responses[6];
+          let newDataRequest = responseOne.data.data.request_purchase;
+          let newDataTicket = responseTwo.data.data.request_tiket;
+          let newDataUser = responseThree.data.data.users;
+          let newDataDepartement = responseFour.data.data.departements;
+          let newDataSubDepartement = responseFive.data.data.subdepartements;
+          let newDataArea = responseSix.data.data.areas;
+          let newDataRole = responseSeven.data.data.roles;
+
+          const getUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          var prmap = {};
+
+          newDataTicket.forEach(function (request_id) {
+            prmap[request_id.action_req_code] = request_id;
+          });
+
+          newDataRequest.forEach(function (purchase) {
+            purchase.request_id = prmap[purchase.action_req_code];
+          });
+
+          getUser.forEach(function (id_user) {
+            prmap[id_user.id] = id_user;
+          });
+
+          newDataRequest.forEach(function (purchase) {
+            purchase.id_user = prmap[purchase.request_id.user_id];
+          });
+
+          newDataDepartement.forEach(function (id_departement_user) {
+            prmap[id_departement_user.id] = id_departement_user;
+          });
+
+          newDataRequest.forEach(function (purchase) {
+            purchase.id_departement_user = prmap[purchase.id_user.departement];
+          });
+
+          var subdepartement = {};
+
+          newDataSubDepartement.forEach(function (id_sub_departement_user) {
+            subdepartement[id_sub_departement_user.id] =
+              id_sub_departement_user;
+          });
+
+          newDataRequest.forEach(function (request_id) {
+            request_id.id_sub_departement_user =
+              subdepartement[request_id.id_user.subdepartement];
+          });
+
+          newDataArea.forEach(function (id_area_user) {
+            prmap[id_area_user.id] = id_area_user;
+          });
+
+          newDataRequest.forEach(function (request_id) {
+            request_id.id_area_user = prmap[request_id.id_user.area];
+          });
+
+          newDataRole.forEach(function (id_role_user) {
+            prmap[id_role_user.id] = id_role_user;
+          });
+          newDataRequest.forEach(function (request_id) {
+            request_id.id_role_user = prmap[request_id.id_user.role];
+          });
+          console.log(newDataRequest);
+          setDataGR(newDataRequest);
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
+
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, dataGR.length - page * rowsPerPage);
 
@@ -200,6 +357,11 @@ const TableGR = () => {
     setPage(0);
   };
 
+  const storeData = (row) => {
+    localStorage.setItem("req_no", row.action_req_code);
+    localStorage.setItem("ticketData", JSON.stringify(row));
+  };
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -207,13 +369,11 @@ const TableGR = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>PO No</StyledTableCell>
                 <StyledTableCell>PR No</StyledTableCell>
                 <StyledTableCell>Request No</StyledTableCell>
                 <StyledTableCell>Name</StyledTableCell>
                 <StyledTableCell>Department</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
-                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -229,45 +389,25 @@ const TableGR = () => {
                   : dataGR
                 ).map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.area_name}
+                    <TableCell component="th" scope="row">
+                      <Link
+                        onClick={() => storeData(row)}
+                        to="/gr/asset/detail">
+                        {row.purchase_req_code}
+                      </Link>
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {row.action_req_code}
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {row.request_by}
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {row.id_departement_user.departement_name}
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
+                    <TableCell component="th" scope="row">
+                      {calbill(row.createdAt)}
                     </TableCell>
-                    <TableCell
-                      style={{ width: 160 }}
-                      component="th"
-                      scope="row">
-                      {row.alias_name}
-                    </TableCell>
-                    <TableCell
-                      style={{ width: 100 }}
-                      align="center"></TableCell>
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (

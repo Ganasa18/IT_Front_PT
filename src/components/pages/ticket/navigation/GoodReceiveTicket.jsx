@@ -154,7 +154,7 @@ const useStyles2 = makeStyles((theme) => ({
     },
   },
   paperTable: {
-    height: "580px",
+    height: "480px",
   },
   toolbar: {
     display: "flex",
@@ -385,12 +385,6 @@ const GoodReceiveTicket = () => {
         console.log("cannot null");
         return;
       }
-      // console.log(arr2[0].childNodes[1].innerHTML);
-      // console.log(arr2[0].childNodes[2].innerHTML);
-      // console.log(arr2[0].childNodes[6].childNodes[1].innerHTML);
-      // console.log(arr2[0].childNodes[2].innerHTML);
-
-      console.log(newInvent[x]);
 
       const numberItem = arr2[0].childNodes[2].innerHTML + `-${lastNumber}`;
 
@@ -575,9 +569,18 @@ const GoodReceiveTicket = () => {
                 </>
               ) : null}
 
-              <button className="btn-disposal" onClick={checkValue}>
-                Updated Table
-              </button>
+              {selectedCount > 0 ? (
+                <button className="btn-disposal-inv" onClick={checkValue}>
+                  Updated Table
+                </button>
+              ) : (
+                <button
+                  className="btn-disposal-inv-disabled"
+                  disabled="disabled"
+                  onClick={checkValue}>
+                  Updated Table
+                </button>
+              )}
             </div>
 
             <Table

@@ -35,6 +35,7 @@ import HistoryActionReq from "../pages/history/ticket/detail/HistoryActionReq";
 import PurchaseDone from "../pages/purchase/PurchaseDone";
 import PurchaseDoneDetail from "../pages/purchase/PurchaseDoneDetail";
 import GoodReceipt from "../pages/gr/GoodReceipt";
+import GoodReceiptDetail from "../pages/gr/GoodReceiptDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -134,10 +135,22 @@ const Routes = () => {
       />
 
       <Route
+        exact
         path="/gr/asset"
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <GoodReceipt {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/gr/asset/detail"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <GoodReceiptDetail {...props} />
           ) : (
             <Redirect to="/" />
           )
