@@ -130,6 +130,13 @@ export const menuDataUser = [
     exact: true,
     to: `/action-request`,
   },
+  {
+    id: 3,
+    name: "Facility Access",
+    icon: "carbon:inventory-management",
+    exact: true,
+    to: `/facility-acc`,
+  },
 ];
 
 export const menuDataUser2 = [
@@ -149,6 +156,13 @@ export const menuDataUser2 = [
   },
   {
     id: 3,
+    name: "Facility Access",
+    icon: "carbon:inventory-management",
+    exact: true,
+    to: `/facility-acc`,
+  },
+  {
+    id: 4,
     name: "Ticket Approval",
     icon: "bi:ticket-detailed",
     exact: true,
