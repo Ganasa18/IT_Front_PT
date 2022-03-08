@@ -62,6 +62,14 @@ function getSteps() {
   return ["Personal Data", "General Request", "Aplication"];
 }
 
+const validateEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
+
 const FacilityCreate = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
@@ -196,7 +204,127 @@ const FacilityCreate = () => {
   };
 
   const handleNext = async () => {
+    if (activeStep === 0) {
+      const status = document.querySelector('input[name="employee"]:checked');
+      const name = document.getElementById("nameUser");
+      const email = document.getElementById("emailUser");
+
+      // if (name.value === "") {
+      //   alert("cannot empty name");
+      //   return;
+      // }
+
+      // if (email.value === "") {
+      //   alert("cannot empty email");
+      //   return;
+      // }
+      // const valEmail = validateEmail(email.value);
+      // if (valEmail === null) {
+      //   alert("insert valid email");
+      //   return;
+      // }
+
+      // if (valueArea === "") {
+      //   alert("area cannot empty");
+      //   return;
+      // }
+
+      // if (valueDepartement === "") {
+      //   alert("departement cannot empty");
+      //   return;
+      // }
+
+      // localStorage.setItem("emailVal", email.value);
+      // localStorage.setItem("nameVal", name.value);
+      // localStorage.setItem("statusVal", status.value);
+
+      // console.log(area.childNodes[0].lastElementChild.value);
+    }
+
+    if (activeStep === 1) {
+      const computer = document.querySelector('input[name="computer"]:checked');
+      const emailid = document.querySelector('input[name="emailid"]:checked');
+      const internetacc = document.querySelector(
+        'input[name="internetacc"]:checked'
+      );
+      const wifiaccess = document.querySelector(
+        'input[name="wifiaccess"]:checked'
+      );
+      const telephone = document.querySelector(
+        'input[name="telephone"]:checked'
+      );
+      const printeracc = document.querySelector(
+        'input[name="printeracc"]:checked'
+      );
+
+      const comp_detail = document.getElementById("computer_detail");
+      const internetacc_detail = document.getElementById("internetacc_detail");
+      const emailid_detail = document.getElementById("emailid_detail");
+      const telephone_detail = document.getElementById("telephone_detail");
+      const printeracc_detail = document.getElementById("printeracc_detail");
+      const other_desc = document.getElementById("other_desc");
+
+      if (
+        computer === null ||
+        internetacc === null ||
+        emailid === null ||
+        wifiaccess === null ||
+        telephone === null ||
+        printeracc === null
+      ) {
+        alert("must select 1");
+        return;
+      }
+
+      const dataGeneral = {
+        computer: computer.value,
+        comp_detail: comp_detail.value,
+        internetacc: internetacc.value,
+        internetacc_detail: internetacc_detail.value,
+        emailid: emailid.value,
+        emailid_detail: emailid_detail.value,
+        telephone: telephone.value,
+        telephone_detail: telephone_detail.value,
+        printeracc: printeracc.value,
+        printeracc_detail: printeracc_detail.value,
+        other: other_desc.value,
+      };
+
+      localStorage.setItem("dataGeneral", JSON.stringify(dataGeneral));
+    }
+
+    if (activeStep === 2) {
+      const checkbox1 = document.getElementById("checkbox2-example-one");
+      const checkbox2 = document.getElementById("checkbox2-example-two");
+      const checkbox3 = document.getElementById("checkbox2-example-three");
+      const checkbox4 = document.getElementById("checkbox2-example-four");
+      const checkbox5 = document.getElementById("checkbox2-example-five");
+      const checkbox6 = document.getElementById("checkbox2-example-six");
+      const checkbox7 = document.getElementById("checkbox2-example-seven");
+      const checkbox8 = document.getElementById("checkbox2-example-eight");
+      const other_app = document.getElementById("other_desc_2");
+
+      const dataApplication = {
+        openERP: checkbox1.checked,
+        eskom: checkbox2.checked,
+        accurate: checkbox3.checked,
+        tax: checkbox4.checked,
+        clickBca: checkbox5.checked,
+        randevoo: checkbox6.checked,
+        solution: checkbox7.checked,
+        odoo: checkbox8.checked,
+        other: other_app.value,
+      };
+      console.log(dataApplication);
+    }
+
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
+
+    const dataGeneral = localStorage.getItem("dataGeneral");
+    const emailVal = localStorage.getItem("emailVal");
+    const nameVal = localStorage.getItem("nameVal");
+    console.log(valueArea, valueDepartement, nameVal, emailVal);
+    console.log(JSON.parse(dataGeneral));
   };
 
   const handleBack = () => {
@@ -232,9 +360,12 @@ const FacilityCreate = () => {
                 {getStepContent(
                   activeStep,
                   dataArea,
+                  valueArea,
                   handleArea,
                   dataDepartement,
+                  valueDepartement,
                   dataSubDepartement,
+                  valueSubDepartement,
                   handleSubDepartement,
                   handleDetail1,
                   handleDetail2,
@@ -274,9 +405,12 @@ const FacilityCreate = () => {
 function getStepContent(
   stepIndex,
   dataArea,
+  valueArea,
   handleArea,
   dataDepartement,
+  valueDepartement,
   dataSubDepartement,
+  valueSubDepartement,
   handleSubDepartement,
   handleDetail,
   handleDetail2,
@@ -349,10 +483,10 @@ function getStepContent(
                 </div>
                 <div className="row margin-top-1 margin-left-0">
                   <div className="col-5">
-                    <label className="label-text" htmlFor="">
+                    <label className="label-text" htmlFor="nameUser">
                       Name
                     </label>
-                    <input type="text" className="form-input" />
+                    <input type="text" className="form-input" id="nameUser" />
                   </div>
                   <div className="col-1"></div>
                   <div className="col-5">
@@ -370,16 +504,22 @@ function getStepContent(
                 </div>
                 <div className="row margin-top-1 margin-left-0">
                   <div className="col-5">
-                    <label className="label-text" htmlFor="">
+                    <label className="label-text" htmlFor="emailUser">
                       Personal Email
                     </label>
-                    <input type="text" className="form-input" />
+                    <input
+                      type="email"
+                      className="form-input"
+                      id="emailUser"
+                      required
+                    />
                   </div>
                 </div>
                 <div className="row margin-top-1 margin-left-0">
                   <div className="col-5">
                     <label className="label-text">Area</label>
                     <SelectSearch
+                      id="areaId"
                       options={dataArea}
                       value={dataArea}
                       onChange={handleArea}
@@ -440,7 +580,11 @@ function getStepContent(
                       </div>
                     </div>
                     <div className="row margin-top-0">
-                      <input type="text" className="form-data" />
+                      <input
+                        type="text"
+                        id="computer_detail"
+                        className="form-data"
+                      />
                     </div>
                   </div>
                   <div className="col-1"></div>
@@ -639,7 +783,7 @@ function getStepContent(
                       Others
                     </label>
                     <textarea
-                      id="desc_po"
+                      id="other_desc"
                       className="form-input-area"
                       cols="30"
                       rows="5"></textarea>
@@ -799,7 +943,7 @@ function getStepContent(
                       Others
                     </label>
                     <textarea
-                      id="desc_po"
+                      id="other_desc_2"
                       className="form-input-area"
                       cols="30"
                       rows="6"></textarea>
