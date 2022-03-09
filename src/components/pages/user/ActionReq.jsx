@@ -172,7 +172,7 @@ const ActionReq = () => {
         (item.departement === userData[0].departement && item.role === 6)
     );
 
-    console.log(getData);
+    // console.log(getData);
 
     const getDataAdmin = allDataUser.filter((item) => item.role === 1);
 
