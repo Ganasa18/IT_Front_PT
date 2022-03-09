@@ -327,3 +327,11 @@ export const logsEndPoint = [
     port: "7800",
   },
 ];
+
+export const FacEndPoint = [
+  {
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
+    port: "1234",
+  },
+];

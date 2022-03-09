@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { pathEndPoint } from "../../../assets/menu";
+import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
 import "../../../assets/master.css";
 import {
   makeStyles,
@@ -70,7 +70,7 @@ const validateEmail = (email) => {
     );
 };
 
-const FacilityCreate = () => {
+const FacilityCreate = (props) => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const steps = getSteps();
@@ -80,6 +80,11 @@ const FacilityCreate = () => {
   const [dataArea, setDataArea] = useState([]);
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
+
+  const { userData, leadEmail } = props;
+
+  console.log(userData);
+  // console.log(leadEmail);
 
   useEffect(() => {
     getAreaList();
@@ -209,36 +214,34 @@ const FacilityCreate = () => {
       const name = document.getElementById("nameUser");
       const email = document.getElementById("emailUser");
 
-      // if (name.value === "") {
-      //   alert("cannot empty name");
-      //   return;
-      // }
+      if (name.value === "") {
+        alert("cannot empty name");
+        return;
+      }
 
-      // if (email.value === "") {
-      //   alert("cannot empty email");
-      //   return;
-      // }
-      // const valEmail = validateEmail(email.value);
-      // if (valEmail === null) {
-      //   alert("insert valid email");
-      //   return;
-      // }
+      if (email.value === "") {
+        alert("cannot empty email");
+        return;
+      }
+      const valEmail = validateEmail(email.value);
+      if (valEmail === null) {
+        alert("insert valid email");
+        return;
+      }
 
-      // if (valueArea === "") {
-      //   alert("area cannot empty");
-      //   return;
-      // }
+      if (valueArea === "") {
+        alert("area cannot empty");
+        return;
+      }
 
-      // if (valueDepartement === "") {
-      //   alert("departement cannot empty");
-      //   return;
-      // }
+      if (valueDepartement === "") {
+        alert("departement cannot empty");
+        return;
+      }
 
-      // localStorage.setItem("emailVal", email.value);
-      // localStorage.setItem("nameVal", name.value);
-      // localStorage.setItem("statusVal", status.value);
-
-      // console.log(area.childNodes[0].lastElementChild.value);
+      localStorage.setItem("emailVal", email.value);
+      localStorage.setItem("nameVal", name.value);
+      localStorage.setItem("statusVal", status.value);
     }
 
     if (activeStep === 1) {
@@ -315,16 +318,55 @@ const FacilityCreate = () => {
         odoo: checkbox8.checked,
         other: other_app.value,
       };
-      console.log(dataApplication);
+      // console.log(dataApplication);
+      localStorage.setItem("dataApplication", JSON.stringify(dataApplication));
+
+      const dataGeneral = localStorage.getItem("dataGeneral");
+      const subdataApplication = localStorage.getItem("dataApplication");
+      const emailVal = localStorage.getItem("emailVal");
+      const nameVal = localStorage.getItem("nameVal");
+      const statusVal = localStorage.getItem("statusVal");
+      // console.log(valueArea, valueDepartement, nameVal, emailVal, statusVal);
+      // console.log(dataGeneral);
+      // console.log(subdataApplication);
+
+      let fac_req = `${FacEndPoint[0].url}${
+        FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+      }/api/v1/facility-req`;
+      const urlHost = window.location.origin;
+
+      const data = {
+        facility_req_code: "MKDFR",
+        user_name: nameVal,
+        user_email: emailVal,
+        user_area: valueArea,
+        user_departement: valueDepartement,
+        user_subdepartement: valueSubDepartement,
+        user_status: statusVal,
+        general_request: dataGeneral,
+        aplication_req: subdataApplication,
+        status_id: userData[0].role === 3 ? 12 : 10,
+        created_by: userData[0].name,
+        url: urlHost,
+        lead: leadEmail,
+        username: userData[0].name,
+        user_id: parseInt(userData[0].id),
+      };
+
+      await axios
+        .post(fac_req, data)
+        .then((response) => {
+          alert(response.data.status);
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-
-    const dataGeneral = localStorage.getItem("dataGeneral");
-    const emailVal = localStorage.getItem("emailVal");
-    const nameVal = localStorage.getItem("nameVal");
-    console.log(valueArea, valueDepartement, nameVal, emailVal);
-    console.log(JSON.parse(dataGeneral));
   };
 
   const handleBack = () => {

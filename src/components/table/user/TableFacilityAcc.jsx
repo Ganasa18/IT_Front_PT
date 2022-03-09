@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint, invEndPoint } from "../../../assets/menu";
+import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
 import {
@@ -190,12 +190,121 @@ function calbill(date) {
   return newdate;
 }
 
+const storeData = (row) => {
+  localStorage.setItem("req_no", row.facility_req_code);
+  localStorage.setItem("ticketData", JSON.stringify(row));
+};
+
 const TableFacilityAcc = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getStatusList();
+  }, []);
+
+  const getStatusList = async () => {
+    let act_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
+
+    let status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
+
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(area);
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
+
+    axios
+      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          const responesThree = responses[2];
+          const responesFour = responses[3];
+          const responesFive = responses[4];
+
+          let newDataRequest = responseOne.data.data.request_facility;
+          let newStatus = responseTwo.data.data.statuss;
+          let newDataArea = responesThree.data.data.areas;
+          let newDataDepartement = responesFour.data.data.departements;
+          let newDataSubDepartement = responesFive.data.data.subdepartements;
+
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+          const arr_area = [...newDataArea];
+          const arr_departement = [...newDataDepartement];
+          const arr_subdepartement = [...newDataSubDepartement];
+
+          arr_request = arr_request.filter(
+            (item) => item.user_id === parseInt(userID)
+          );
+
+          var statusmap = {};
+
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          arr_area.forEach(function (area_id) {
+            statusmap[area_id.id] = area_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.area_id = statusmap[user.user_area];
+          });
+
+          arr_departement.forEach(function (depart_id) {
+            statusmap[depart_id.id] = depart_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.depart_id = statusmap[user.user_departement];
+          });
+
+          arr_subdepartement.forEach(function (subdepart_id) {
+            statusmap[subdepart_id.id] = subdepart_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.subdepart_id = statusmap[user.user_subdepartement];
+          });
+
+          setDataRequest(arr_request);
+          // console.log(arr_request);
+
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
+
   const emptyRows =
     rowsPerPage -
     Math.min(rowsPerPage, dataRequest.length - page * rowsPerPage);
@@ -236,12 +345,19 @@ const TableFacilityAcc = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link to="/action-request/detail">
-                        {row.action_req_code}
+                      <Link
+                        onClick={() => storeData(row)}
+                        to="/facility-acc/detail">
+                        {row.facility_req_code}
                       </Link>
                     </TableCell>
-                    <TableCell component="th" scope="row"></TableCell>
-                    <TableCell component="th" scope="row"></TableCell>
+                    <TableCell component="th" scope="row">
+                      {" "}
+                      {row.user_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.user_email}
+                    </TableCell>
                     <TableCell component="th" scope="row">
                       {`${calbill(row.createdAt)}`}
                     </TableCell>

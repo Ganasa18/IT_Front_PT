@@ -13,9 +13,14 @@ import {
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
-
+import { authEndPoint } from "../../../assets/menu";
 import TableFacilityAcc from "../../table/user/TableFacilityAcc";
 import FacilityCreate from "./FacilityCreate";
+import Cookies from "universal-cookie";
+import axios from "axios";
+const cookies = new Cookies();
+const token = cookies.get("token");
+const userID = cookies.get("id");
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -79,16 +84,84 @@ const useStyles = makeStyles((theme) => ({
 const FacilityAcc = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [allDataUser, setAllDataUser] = useState([]);
+  const [userData, setUserData] = useState([]);
+  const [leadEmail, setLeadEmail] = useState(null);
+
+  useEffect(() => {
+    getUserList();
+  }, []);
+
+  const getUserList = async () => {
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    await axios
+      .get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const DataUser = response.data.data.users;
+        const AllData = DataUser.map((item) => ({
+          id: item.id,
+          name: item.username,
+          role: item.role,
+          departement: item.departement,
+          subdepartement: item.subdepartement,
+          area: item.area,
+          email: item.email,
+        }));
+
+        setAllDataUser(AllData);
+
+        var getID = DataUser.filter((item) => item.id === parseInt(userID));
+        getID = getID.map((item) => ({
+          id: item.id,
+          name: item.username,
+          role: item.role,
+          departement: item.departement,
+          subdepartement: item.subdepartement,
+          area: item.area,
+          email: item.email,
+        }));
+
+        setUserData(getID);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("something wrong");
+      });
+  };
 
   const modalPop = () => {
     setModalOpen((prevSelected) => !prevSelected);
+
+    const getData = allDataUser.filter(
+      (item) =>
+        (item.departement === userData[0].departement && item.role === 3) ||
+        (item.departement === userData[0].departement && item.role === 6)
+    );
+
+    const getDataAdmin = allDataUser.filter((item) => item.role === 1);
+
+    if (getData.length > 0) {
+      setLeadEmail(getData[0].email);
+      if (userData[0].role === 3) {
+        var arr = [];
+        getDataAdmin.forEach((x) => arr.push(x.email));
+        setLeadEmail(arr);
+      }
+    } else {
+      setLeadEmail("it@markindo.co.id");
+    }
   };
 
   const bodyModal = (
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <FacilityCreate />
+          <FacilityCreate userData={userData} leadEmail={leadEmail} />
           <Button
             className={classes.cancelBtn}
             onClick={modalPop}

@@ -37,6 +37,7 @@ import PurchaseDoneDetail from "../pages/purchase/PurchaseDoneDetail";
 import GoodReceipt from "../pages/gr/GoodReceipt";
 import GoodReceiptDetail from "../pages/gr/GoodReceiptDetail";
 import FacilityAcc from "../pages/user/FacilityAcc";
+import FacilityReqDetail from "../pages/user/FacilityReqDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -196,6 +197,11 @@ const Routes = () => {
         exact
         path="/facility-acc"
         component={(props) => <FacilityAcc {...props} />}
+      />
+
+      <Route
+        path="/facility-acc/detail"
+        component={(props) => <FacilityReqDetail {...props} />}
       />
 
       <Route
