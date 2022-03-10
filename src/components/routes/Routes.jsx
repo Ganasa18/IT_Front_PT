@@ -38,6 +38,8 @@ import GoodReceipt from "../pages/gr/GoodReceipt";
 import GoodReceiptDetail from "../pages/gr/GoodReceiptDetail";
 import FacilityAcc from "../pages/user/FacilityAcc";
 import FacilityReqDetail from "../pages/user/FacilityReqDetail";
+import FacilityApproved from "../pages/lead/FacilityApproved";
+import FacilityApproveDetail from "../pages/lead/FacilityApproveDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -215,11 +217,36 @@ const Routes = () => {
           )
         }
       />
+
       <Route
         path="/approval/action-request/detail"
         component={(props) =>
           parseInt(roleUser) === 3 || parseInt(roleUser) === 6 ? (
             <ActionApproveDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/approval/facility-request"
+        component={(props) =>
+          parseInt(roleUser) === 3 || parseInt(roleUser) === 6 ? (
+            <FacilityApproved {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/approval/facility-request/detail"
+        component={(props) =>
+          parseInt(roleUser) === 3 || parseInt(roleUser) === 6 ? (
+            <FacilityApproveDetail {...props} />
           ) : (
             <Redirect to="/" />
           )

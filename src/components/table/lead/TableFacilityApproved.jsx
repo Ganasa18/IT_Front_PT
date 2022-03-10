@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint, invEndPoint, authEndPoint } from "../../../assets/menu";
+import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
 
@@ -194,14 +194,14 @@ function calbill(date) {
 }
 
 const storeData = (row) => {
+  localStorage.setItem("req_no", row.facility_req_code);
   localStorage.setItem("ticketData", JSON.stringify(row));
 };
 
-const TableRequestApproved = () => {
+const TableFacilityApproved = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -210,29 +210,17 @@ const TableRequestApproved = () => {
   }, []);
 
   const getStatusList = async () => {
-    let user = `${authEndPoint[0].url}${
-      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-    }/api/v1/auth/`;
-
-    let act_req = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/`;
+    let act_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
 
     let status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/status`;
 
-    let inventory = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/inventory`;
-
     let area = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/area`;
-
-    let role = `${authEndPoint[0].url}${
-      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-    }/api/v1/role`;
 
     let departement = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -242,72 +230,37 @@ const TableRequestApproved = () => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/subdepartement`;
 
-    const requestOne = await axios.get(user, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const requestTwo = await axios.get(act_req);
-    const requestThree = await axios.get(status);
-    const requestFour = await axios.get(inventory);
-    const requestFive = await axios.get(area);
-    const requestSix = await axios.get(role, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const requestSevent = await axios.get(departement);
-    const requestEight = await axios.get(subdepartement);
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(area);
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
 
     axios
-      .all([
-        requestOne,
-        requestTwo,
-        requestThree,
-        requestFour,
-        requestFive,
-        requestSix,
-        requestSevent,
-        requestEight,
-      ])
+      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          const responseThree = responses[2];
-          const responseFour = responses[3];
-          const requestFive = responses[4];
-          const requestSix = responses[5];
-          const requestSevent = responses[6];
-          const requestEight = responses[7];
+          const responesThree = responses[2];
+          const responesFour = responses[3];
+          const responesFive = responses[4];
 
-          let newDataUser = responseOne.data.data.users;
-          let newDataRequest = responseTwo.data.data.request_tiket;
-          let newStatus = responseThree.data.data.statuss;
-          let newInvent = responseFour.data.data.inventorys;
-          let newDataArea = requestFive.data.data.areas;
-          let newDataRole = requestSix.data.data.roles;
-          let newDataDepartement = requestSevent.data.data.departements;
-          let newDataSubDepartement = requestEight.data.data.subdepartements;
-
-          const getUser = newDataUser.map((item) => ({
-            id: item.id,
-            name: item.username,
-            role: item.role,
-            departement: item.departement,
-            subdepartement: item.subdepartement,
-            area: item.area,
-            email: item.email,
-            employe: item.employe_status,
-          }));
+          let newDataRequest = responseOne.data.data.request_facility;
+          let newStatus = responseTwo.data.data.statuss;
+          let newDataArea = responesThree.data.data.areas;
+          let newDataDepartement = responesFour.data.data.departements;
+          let newDataSubDepartement = responesFive.data.data.subdepartements;
 
           var arr_request = [...newDataRequest];
           const arr_status = [...newStatus];
-          const arr_inventory = [...newInvent];
           const arr_area = [...newDataArea];
-          const arr_role = [...newDataRole];
           const arr_departement = [...newDataDepartement];
           const arr_subdepartement = [...newDataSubDepartement];
 
           arr_request = arr_request.filter(
             (item) =>
-              parseInt(item.departement_id) === parseInt(DepartementID) &&
+              parseInt(item.user_departement) === parseInt(DepartementID) &&
               parseInt(item.user_id) !== parseInt(userID) &&
               parseInt(item.status_id) === 10
           );
@@ -322,68 +275,33 @@ const TableRequestApproved = () => {
             request_id.status_id = statusmap[request_id.status_id];
           });
 
-          let JoinStatus = arr_request;
-
-          var inventmap = {};
-
-          arr_inventory.forEach(function (invent_id) {
-            inventmap[invent_id.id] = invent_id;
+          arr_area.forEach(function (area_id) {
+            statusmap[area_id.id] = area_id;
           });
 
-          JoinStatus.forEach(function (request_id) {
-            request_id.invent_id = inventmap[request_id.asset_id];
+          arr_request.forEach(function (user) {
+            user.area_id = statusmap[user.user_area];
           });
 
-          let JoinInvent = JoinStatus;
-          // setDataRequest(JoinInvent);
-
-          var usermap = {};
-          getUser.forEach(function (id_user) {
-            usermap[id_user.id] = id_user;
+          arr_departement.forEach(function (depart_id) {
+            statusmap[depart_id.id] = depart_id;
           });
 
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_user = usermap[request_id.user_id];
+          arr_request.forEach(function (user) {
+            user.depart_id = statusmap[user.user_departement];
           });
 
-          arr_area.forEach(function (id_area_user) {
-            usermap[id_area_user.id] = id_area_user;
+          arr_subdepartement.forEach(function (subdepart_id) {
+            statusmap[subdepart_id.id] = subdepart_id;
           });
 
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_area_user = usermap[request_id.id_user.area];
+          arr_request.forEach(function (user) {
+            user.subdepart_id = statusmap[user.user_subdepartement];
           });
 
-          arr_role.forEach(function (id_role_user) {
-            usermap[id_role_user.id] = id_role_user;
-          });
+          setDataRequest(arr_request);
+          console.log(arr_request);
 
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_role_user = usermap[request_id.id_user.role];
-          });
-
-          arr_departement.forEach(function (id_departement_user) {
-            usermap[id_departement_user.id] = id_departement_user;
-          });
-
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_departement_user =
-              usermap[request_id.id_user.departement];
-          });
-
-          var subdepartement = {};
-
-          arr_subdepartement.forEach(function (id_sub_departement_user) {
-            subdepartement[id_sub_departement_user.id] =
-              id_sub_departement_user;
-          });
-
-          JoinInvent.forEach(function (request_id) {
-            request_id.id_sub_departement_user =
-              subdepartement[request_id.id_user.subdepartement];
-          });
-
-          setDataRequest(JoinInvent);
           setIsLoading(false);
         })
       )
@@ -414,8 +332,8 @@ const TableRequestApproved = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>Request No</StyledTableCell>
-                <StyledTableCell>Asset No</StyledTableCell>
-                <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>New User</StyledTableCell>
+                <StyledTableCell>Create By</StyledTableCell>
                 <StyledTableCell>Date Created</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
@@ -436,15 +354,15 @@ const TableRequestApproved = () => {
                     <TableCell component="th" scope="row">
                       <Link
                         onClick={() => storeData(row)}
-                        to="/approval/action-request/detail">
-                        {row.action_req_code}
+                        to="/approval/facility-request/detail">
+                        {row.facility_req_code}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.invent_id.asset_number}
+                      {row.user_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.invent_id.asset_name}
+                      {row.created_by}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {`${calbill(row.createdAt)}`}
@@ -495,4 +413,4 @@ const TableRequestApproved = () => {
   );
 };
 
-export default TableRequestApproved;
+export default TableFacilityApproved;

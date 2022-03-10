@@ -2134,3 +2134,11 @@ input[type="radio"] {
 .styled-input--square label:after {
   border-radius: 0;
 }
+
+.check-class {
+  position: relative;
+  top: 2px;
+  left: 10px;
+  font-size: 16px;
+  color: #219653;
+}

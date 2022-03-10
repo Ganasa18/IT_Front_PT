@@ -265,6 +265,7 @@ const FacilityCreate = (props) => {
       const emailid_detail = document.getElementById("emailid_detail");
       const telephone_detail = document.getElementById("telephone_detail");
       const printeracc_detail = document.getElementById("printeracc_detail");
+      const wifiaccess_detail = document.getElementById("wifiaccess_detail");
       const other_desc = document.getElementById("other_desc");
 
       if (
@@ -290,6 +291,8 @@ const FacilityCreate = (props) => {
         telephone_detail: telephone_detail.value,
         printeracc: printeracc.value,
         printeracc_detail: printeracc_detail.value,
+        wifiaccess: wifiaccess.value,
+        wifiaccess_detail: wifiaccess_detail.value,
         other: other_desc.value,
       };
 
