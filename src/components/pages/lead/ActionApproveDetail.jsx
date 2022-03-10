@@ -204,7 +204,7 @@ const ActionApproveDetail = () => {
         "-" +
         dataRequest.id_area_user.alias_name,
     };
-    console.log(log_data);
+    // console.log(log_data);
 
     const Logs = `${logsEndPoint[0].url}${
       logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
