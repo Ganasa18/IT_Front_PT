@@ -99,7 +99,6 @@ const useStyles = makeStyles((theme) => ({
 const ActionReqTicketDetail = () => {
   const classes = useStyles();
   const req_no = localStorage.getItem("req_no");
-
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [statusBtn, setStatusBtn] = useState([]);
@@ -188,7 +187,7 @@ const ActionReqTicketDetail = () => {
   let links = [
     {
       url: "/ticket-admin/action-request/detail/information",
-      text: " Information",
+      text: "Information",
     },
     {
       url: "/ticket-admin/action-request/detail/inventory",
@@ -273,7 +272,8 @@ const ActionReqTicketDetail = () => {
                           row.id !== 16 &&
                           row.id !== 17 &&
                           row.id !== 18 &&
-                          row.id !== 20
+                          row.id !== 20 &&
+                          row.id !== 21
                       )
                       .map((row) => (
                         <StatusButton
@@ -356,7 +356,8 @@ const ActionReqTicketDetail = () => {
                           row.id !== 16 &&
                           row.id !== 17 &&
                           row.id !== 18 &&
-                          row.id !== 20
+                          row.id !== 20 &&
+                          row.id !== 21
                       )
                       .map((row) => (
                         <StatusButton
@@ -447,7 +448,8 @@ const ActionReqTicketDetail = () => {
                           row.id !== 16 &&
                           row.id !== 17 &&
                           row.id !== 18 &&
-                          row.id !== 20
+                          row.id !== 20 &&
+                          row.id !== 21
                       )
                       .map((row) => (
                         <StatusButton

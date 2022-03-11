@@ -1,15 +1,8 @@
 import React, { useState } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
-import { pathEndPoint, prEndPoint, invEndPoint } from "../../assets/menu";
-import {
-  makeStyles,
-  Modal,
-  Backdrop,
-  Fade,
-  Button,
-  Divider,
-} from "@material-ui/core";
+import { invEndPoint } from "../../assets/menu";
+import { makeStyles, Modal, Backdrop, Fade, Divider } from "@material-ui/core";
 import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({

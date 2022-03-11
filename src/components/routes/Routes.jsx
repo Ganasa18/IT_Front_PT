@@ -40,6 +40,8 @@ import FacilityAcc from "../pages/user/FacilityAcc";
 import FacilityReqDetail from "../pages/user/FacilityReqDetail";
 import FacilityApproved from "../pages/lead/FacilityApproved";
 import FacilityApproveDetail from "../pages/lead/FacilityApproveDetail";
+import FacilityTicket from "../pages/ticket/FacilityTicket";
+import FacilityReqTicketDetail from "../pages/ticket/FacilityReqTicketDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -270,6 +272,29 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <ActionReqTicketDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        path="/ticket-admin/facility-request/detail"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <FacilityReqTicketDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/ticket-admin/facility-request"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <FacilityTicket {...props} />
           ) : (
             <Redirect to="/" />
           )
