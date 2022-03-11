@@ -91,7 +91,7 @@ const FacilityReqDetail = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">New User</p>
-                <p>{dataRequest.facility_req_code}</p>
+                <p>{dataRequest.user_name}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Email</p>
