@@ -1,0 +1,503 @@
+.card-asset {
+  height: 30vh;
+  width: 100%;
+  border-radius: 5px;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 5px 35px;
+}
+
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+
+#overlay .loading-data {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-25%, -50%);
+}
+
+.flex-card {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-approve {
+  display: flex;
+  position: relative;
+}
+
+.button-approve .approve-btn {
+  color: #219653;
+  width: 110px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #219653;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  right: 40%;
+}
+
+.button-creat-user .creat-user-btn:hover {
+  background-color: #2196534b;
+}
+
+.button-creat-user {
+  display: flex;
+  position: relative;
+}
+
+.button-creat-user .creat-user-btn {
+  color: #1653a6;
+  width: 130px;
+  height: 30px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #1653a6;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  right: 50%;
+}
+
+.button-creat-user .creat-user-btn:hover {
+  background-color: #1653a64b;
+}
+
+.button-approve .deny-btn {
+  color: #eb5757;
+  width: 110px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #eb5757;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  right: 25%;
+}
+
+.button-approve .deny-btn:hover {
+  background-color: #eb57574b;
+}
+
+.display-disposal {
+  display: flex;
+  justify-content: flex-end;
+  margin: 25px 45px 25px 0;
+  align-items: center;
+}
+
+.display-disposal .selected {
+  margin-right: 20px;
+}
+.display-disposal .count {
+  color: #ec9108;
+  margin-right: 5px;
+}
+
+/* BUTTON */
+.btn-disposal {
+  margin: 0 5px 0 5px;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 10px 25px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  color: #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  border-radius: 4px;
+  letter-spacing: 0.02957em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.btn-disposal:hover {
+  background-color: #fbae3a75;
+}
+
+.label-asset {
+  color: #9f9f9f;
+  font-size: 14px;
+}
+
+.card-asset-action {
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 25px 35px;
+}
+
+.card-comment {
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  position: relative;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin-bottom: 10px;
+  padding: 10px 17px;
+  display: inline-block;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  column-break-inside: avoid;
+  opacity: 1;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.card-comment .card-title {
+  border-bottom: 2px solid #e6e9ed;
+  padding: 1px 5px 6px;
+  margin-bottom: 10px;
+}
+.card-comment .card-body {
+  padding: 0 3px 6px;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 5px;
+}
+
+.card-footer {
+  border-top: 2px solid #e6e9ed;
+  padding: 20px 20px;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 25px;
+}
+
+.input-field-comment {
+  color: #000000;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  outline: none;
+  padding: 20px 80px 20px 20px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.button-send {
+  position: absolute;
+  width: 80px;
+  height: 48px;
+  cursor: pointer;
+  border: none;
+  top: 25px;
+  background: #ffffff;
+  box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  color: #1653a6;
+  font-size: 20px;
+}
+
+.button-send-disbled {
+  position: absolute;
+  width: 80px;
+  height: 48px;
+  cursor: not-allowed;
+  border: none;
+  top: 25px;
+  background: #ffffff;
+  box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  color: #999999;
+  font-size: 20px;
+}
+
+.text-center {
+  align-items: center;
+  text-align: center;
+}
+
+.container-chat {
+  max-height: 200px;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+/* .container-chat::-webkit-scrollbar {
+  display: none;
+} */
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.container-chat {
+  /* -ms-overflow-style: none; */
+  /* IE and Edge */
+  /* scrollbar-width: none; */
+  /* Firefox */
+}
+
+.container-chat::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.container-chat::-webkit-scrollbar-track {
+  box-shadow: inset rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.container-chat::-webkit-scrollbar-thumb {
+  background-color: rgb(134, 130, 130);
+  outline: none;
+}
+
+.body-chat {
+  position: relative;
+  height: 230px;
+}
+
+.talk-bubble {
+  margin: 40px;
+  position: relative;
+  border-radius: 5px;
+  width: 350px;
+  height: auto;
+  background-color: #2f81ed;
+  color: #f2f2f2;
+}
+
+.talk-bubble-right {
+  margin: 40px;
+  position: relative;
+  border-radius: 5px;
+  width: 350px;
+  height: auto;
+  background-color: #2f81ed3f;
+  color: #000;
+  left: 50%;
+  transform: translate(25%, 0%);
+}
+
+/* talk bubble contents */
+.talktext {
+  position: relative;
+  bottom: 10px;
+  padding: 1em;
+  text-align: left;
+  line-height: 1.5em;
+  word-wrap: break-word;
+}
+
+.talktext p {
+  /* remove webkit p margins */
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+}
+
+.talk-bubble .user-name,
+.talk-bubble-right .user-name {
+  position: relative;
+  bottom: 30px;
+  color: rgba(73, 73, 73, 0.76);
+}
+
+.talk-bubble .created,
+.talk-bubble-right .created {
+  position: absolute;
+  right: 5px;
+  font-size: 11px;
+  bottom: -30px;
+  color: rgba(0, 0, 0, 0.637);
+}
+
+.empty-chat {
+  height: 200px;
+  position: relative;
+  width: 100%;
+  display: grid;
+}
+
+.empty-chat .container {
+  margin: auto;
+}
+.empty-chat .icon-chat {
+  position: absolute;
+  font-size: 80px;
+  color: #a5a1a1;
+  left: 45%;
+  top: -50px;
+}
+
+.empty-chat p {
+  position: absolute;
+  font-size: 14px;
+  color: #a5a1a1;
+  left: 43%;
+  top: 30px;
+}
+
+.icon-attach {
+  color: #ec9108;
+  font-size: 25px;
+  position: absolute;
+  top: 50%;
+  left: 75%;
+  transform: translate(60%, -45%);
+  cursor: pointer;
+}
+
+/* Status Field */
+.card-status {
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+  width: 100%;
+  border-radius: 5px;
+  position: relative;
+  background: rgb(255 255 255);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin-bottom: 10px;
+  padding: 10px 17px;
+  display: inline-block;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  column-break-inside: avoid;
+  opacity: 1;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.card-status-item {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-column-gap: 5px;
+  grid-row-gap: 20px;
+}
+
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .card-asset {
+    height: 42vh;
+    padding: 5px 35px;
+  }
+
+  .talk-bubble {
+    width: 200px;
+  }
+
+  .talk-bubble-right {
+    margin: 40px;
+    width: 200px;
+    left: 45%;
+    transform: translate(40%, 0%);
+  }
+
+  .icon-attach {
+    left: 72%;
+  }
+}
+
+@media only screen and (min-width: 1440px) and (max-width: 1500px) {
+  .card-asset {
+    height: 38vh;
+    padding: 5px 35px;
+  }
+}
+
+/* IMG Slide */
+
+.img-message {
+  position: relative;
+  width: 250px;
+  height: 150px;
+  object-fit: cover;
+  left: 15%;
+  bottom: 5px;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.img-message:hover {
+  opacity: 0.5;
+}
+
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .img-message {
+    width: 135px;
+    height: 100px;
+    bottom: 15px;
+  }
+}
+
+/* .popimg {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background: #00000075;
+  top: 0;
+  right: 0;
+  z-index: 1260;
+  display: none;
+} */
+
+/* 
+.view-img {
+  color: #ec9108;
+  width: 85px;
+  height: 30px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+
+}
+
+.view-img:hover {
+  background-color: #ec9108;
+  color: white;
+} */
