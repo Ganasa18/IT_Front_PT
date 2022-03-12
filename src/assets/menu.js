@@ -290,48 +290,48 @@ export const menuDataUser5 = [
 
 export const pathEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "5000",
   },
 ];
 
 export const authEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "1200",
   },
 ];
 
 export const invEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "1400",
   },
 ];
 
 export const prEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "2888",
   },
 ];
 
 export const logsEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "7800",
   },
 ];
 
 export const FacEndPoint = [
   {
-    url: "http://192.168.101.48",
-    // url: "http://localhost",
+    // url: "http://192.168.101.48",
+    url: "http://localhost",
     port: "1234",
   },
 ];
