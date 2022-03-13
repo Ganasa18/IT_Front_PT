@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from "react";
-
-import { makeStyles, Grid } from "@material-ui/core";
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../../../assets/select-search.css";
+import { makeStyles, Grid, Backdrop, Fade, Modal } from "@material-ui/core";
 import axios from "axios";
 
 import "../../../../assets/master.css";
 import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
+
+import { authEndPoint } from "../../../../assets/menu";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -17,6 +24,17 @@ const useStyles = makeStyles((theme) => ({
     ...theme.mixins.toolbar,
   },
 
+  paper: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "30%",
+    left: "50%",
+    width: 950,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 8, 3),
+  },
   cardPadding: {
     marginTop: theme.spacing(5),
   },
@@ -56,9 +74,119 @@ const InformationTicketFac = (props) => {
   const classes = useStyles();
   const { ticketData } = props;
   const [dataRequest] = useState(ticketData[0]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [generalRequest] = useState(JSON.parse(dataRequest.general_request));
   const [applicationRequest] = useState(JSON.parse(dataRequest.aplication_req));
+  const [dataRole, setDataRole] = useState([]);
   console.log(dataRequest);
+
+  const modalHandle = () => {
+    setModalOpen((prevModal) => !prevModal);
+  };
+
+  useEffect(() => {
+    getRoleList();
+  }, []);
+
+  const getRoleList = async () => {
+    await axios
+      .get(
+        `${authEndPoint[0].url}${
+          authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+        }/api/v1/role`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((response) => {
+        let dataRole = response.data.data.roles;
+
+        dataRole = dataRole.map((item) => ({
+          value: item.id,
+          name: item.role_name,
+        }));
+
+        setDataRole(dataRole);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <form>
+            <div className="row">
+              <div className="col-12">
+                <h3>Create User</h3>
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Nama User</label>
+                <input
+                  type="text"
+                  value={dataRequest.user_name}
+                  className="form-input"
+                  readOnly
+                />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Role</label>
+                <SelectSearch
+                  options={dataRole}
+                  value={dataRole}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Role Search"
+                />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Departement</label>
+                <input
+                  type="text"
+                  value={dataRequest.depart_id.departement_name}
+                  className="form-input"
+                  readOnly
+                />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Email</label>
+                <input type="text" id="areaName" className="form-input" />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Sub Departement</label>
+                <input
+                  type="text"
+                  value={
+                    dataRequest.subdepart_id === undefined
+                      ? ""
+                      : dataRequest.subdepart_id.subdepartement_name
+                  }
+                  className="form-input"
+                  readOnly
+                />
+              </div>
+              <div className="col-6">
+                <label htmlFor="">Password</label>
+                <input type="text" className="form-input" />
+              </div>
+            </div>
+            <br />
+            <div className="footer-modal">
+              <button className={"btn-cancel"} onClick={modalHandle}>
+                Cancel
+              </button>
+              <button className={"btn-submit"} type="submit">
+                Submit
+              </button>
+            </div>
+          </form>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <Grid item xs={12} className={classes.cardPadding}>
@@ -67,7 +195,11 @@ const InformationTicketFac = (props) => {
             <h3>Personal Data</h3>
 
             <div className="button-creat-user">
-              <button type="button" className="creat-user-btn">
+              <button
+                onClick={modalHandle}
+                type="button"
+                className="creat-user-btn"
+              >
                 Create Account
               </button>
             </div>
@@ -94,7 +226,8 @@ const InformationTicketFac = (props) => {
                   style={{
                     background: `${dataRequest.status_id.color_status}4C`,
                     color: `${dataRequest.status_id.color_status}FF`,
-                  }}>
+                  }}
+                >
                   {dataRequest.status_id.status_name}
                 </span>
               </p>
@@ -145,7 +278,8 @@ const InformationTicketFac = (props) => {
                 Computer
                 <span
                   class="iconify check-class"
-                  data-icon="clarity:success-line"></span>
+                  data-icon="clarity:success-line"
+                ></span>
               </p>
               <p className="wrap-paraf">{generalRequest.comp_detail}</p>
             </div>
@@ -155,7 +289,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.telephone === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -170,7 +305,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.internetacc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -194,7 +330,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.emailid === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -209,7 +346,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.printeracc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -224,7 +362,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.wifiaccess === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -246,7 +385,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.openERP === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -256,7 +396,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.clickBca === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -266,7 +407,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.odoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -280,7 +422,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.eskom === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -290,7 +433,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.randevoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -310,7 +454,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.accurate === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -320,13 +465,24 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.solution === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
           </div>
         </div>
       </Grid>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        {bodyModal}
+      </Modal>
     </>
   );
 };

@@ -84,13 +84,15 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page">
+        aria-label="first page"
+      >
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page">
+        aria-label="previous page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -100,7 +102,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page">
+        aria-label="next page"
+      >
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -110,7 +113,8 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
+        aria-label="last page"
+      >
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -565,7 +569,8 @@ const TableAssetUser = (props) => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className={"btn-submit"}>
+                className={"btn-submit"}
+              >
                 Submit
               </button>
             </div>
@@ -595,7 +600,8 @@ const TableAssetUser = (props) => {
           <Button
             className={classes.cancelBtn}
             onClick={modalHandleDisposal}
-            variant="outlined">
+            variant="outlined"
+          >
             Cancel
           </Button>
         </div>
@@ -632,7 +638,8 @@ const TableAssetUser = (props) => {
               <Typography
                 variant="h5"
                 component="div"
-                style={{ marginTop: "5px" }}>
+                style={{ marginTop: "5px" }}
+              >
                 Asset User
               </Typography>
             </div>
@@ -642,7 +649,8 @@ const TableAssetUser = (props) => {
                 className={classes.buttonAdd}
                 variant="contained"
                 color="primary"
-                startIcon={<AddIcon />}>
+                startIcon={<AddIcon />}
+              >
                 Create New
               </Button>
             </div>
@@ -664,7 +672,8 @@ const TableAssetUser = (props) => {
               <button
                 className="btn-disposal-inv-disabled"
                 disabled="disabled"
-                onClick={""}>
+                onClick={""}
+              >
                 Disposal
               </button>
             )}
@@ -673,7 +682,8 @@ const TableAssetUser = (props) => {
           <Table
             className={classes.table}
             size="medium"
-            aria-label="custom pagination table">
+            aria-label="custom pagination table"
+          >
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell padding="checkbox" style={{ width: 50 }}>
@@ -728,10 +738,12 @@ const TableAssetUser = (props) => {
                     <TableCell align="center">
                       <button
                         className="btn-delete"
-                        onClick={(e) => handleModalRemove(row)}>
+                        onClick={(e) => handleModalRemove(row)}
+                      >
                         <span
                           class="iconify icon-btn"
-                          data-icon="ant-design:delete-fill"></span>
+                          data-icon="ant-design:delete-fill"
+                        ></span>
                         <span className="name-btn">Delete</span>
                       </button>
                     </TableCell>
@@ -772,7 +784,8 @@ const TableAssetUser = (props) => {
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
-        }}>
+        }}
+      >
         {bodyModal}
       </Modal>
       <Modal
@@ -781,7 +794,8 @@ const TableAssetUser = (props) => {
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
-        }}>
+        }}
+      >
         {bodyDisposal}
       </Modal>
       <Modal
@@ -790,7 +804,8 @@ const TableAssetUser = (props) => {
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
-        }}>
+        }}
+      >
         {bodyModalRemove}
       </Modal>
     </>
