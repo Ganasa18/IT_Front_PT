@@ -249,7 +249,7 @@ const User = () => {
           departement: valueDepartement,
           subdepartement: valueSubDepartement,
           employe_status: selectedValueEmply,
-          role: valueRole,
+          role: parseInt(valueRole),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -430,7 +430,9 @@ const User = () => {
                 <SelectSearch
                   options={dataRole}
                   value={dataRole}
-                  onChange={setValueRole}
+                  onChange={(e) => {
+                    setValueRole(e);
+                  }}
                   filterOptions={fuzzySearch}
                   search
                   placeholder="Search Role"

@@ -2142,3 +2142,10 @@ input[type="radio"] {
   font-size: 16px;
   color: #219653;
 }
+.iconSuccessFac {
+  color: #3ca56a;
+  font-size: 25px;
+  position: relative;
+  right: 10px;
+  top: 5px;
+}

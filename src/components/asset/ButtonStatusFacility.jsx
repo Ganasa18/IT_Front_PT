@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
-import { invEndPoint } from "../../assets/menu";
+import { FacEndPoint } from "../../assets/menu";
 import { makeStyles, Modal, Backdrop, Fade, Divider } from "@material-ui/core";
 import axios from "axios";
 
@@ -71,6 +71,9 @@ const ButtonStatusFacility = (styleProps) => {
 
   const classes = useStyles(props);
   const [buttonType, setButtonType] = useState("");
+  const [idStatus, setIdStatus] = useState(null);
+  const [idRequest, setIdRequest] = useState(null);
+  const [modalOpenDefault, setModalOpenDefault] = useState(false);
 
   const disbledButton = async (props, data) => {
     const button = document.querySelector(`#buttonCheck-${props}`);
@@ -95,6 +98,10 @@ const ButtonStatusFacility = (styleProps) => {
         button.setAttribute("disabled", true);
         button.style.cursor = "not-allowed";
       }
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
       return;
     }
 
@@ -109,11 +116,66 @@ const ButtonStatusFacility = (styleProps) => {
     }
   };
 
+  const statusChange = async (props, data) => {
+    setIdStatus(props);
+    setIdRequest(data.id);
+    setModalOpenDefault(true);
+  };
+
+  const submitStatus = async () => {
+    let ticket = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/updated-ticket-status/${idRequest}`;
+
+    await axios
+      .patch(ticket, {
+        status_id: parseInt(idStatus),
+      })
+      .then((response) => {
+        alert(response.data.status);
+        setTimeout(() => {
+          setIdStatus(null);
+          window.location.reload();
+        }, 1000);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // console.log(idStatus);
+    // console.log(idRequest);
+  };
+
+  const modalClose = () => {
+    setModalOpenDefault(false);
+  };
+
+  const bodyModalDefault = (
+    <>
+      <Fade in={modalOpenDefault}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to changed status request</h3>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalClose}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={submitStatus}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <button
         onMouseEnter={() => disbledButton(styleProps.idStatus, styleProps.data)}
         id={`buttonCheck-${styleProps.idStatus}`}
+        onClick={() => statusChange(styleProps.idStatus, styleProps.data)}
         className={`${
           styleProps.status === styleProps.nameBtn
             ? classes.rootActive
@@ -121,6 +183,15 @@ const ButtonStatusFacility = (styleProps) => {
         }`}>
         {styleProps.nameBtn}
       </button>
+      <Modal
+        open={modalOpenDefault}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalDefault}
+      </Modal>
     </>
   );
 };

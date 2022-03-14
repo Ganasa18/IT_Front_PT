@@ -58,6 +58,10 @@
   right: 40%;
 }
 
+.button-approve .approve-btn:hover {
+  background-color: #2196534b;
+}
+
 .button-creat-user .creat-user-btn:hover {
   background-color: #2196534b;
 }

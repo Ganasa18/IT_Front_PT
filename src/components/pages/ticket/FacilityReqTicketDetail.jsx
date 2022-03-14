@@ -23,6 +23,8 @@ import AddIcon from "@material-ui/icons/Add";
 import InformationTicketFac from "./facnavigation/InformationTicketFac";
 import ChatFacility from "../../asset/ChatFacility";
 import ButtonStatusFacility from "../../asset/ButtonStatusFacility";
+import PurchaseTicketFac from "./facnavigation/PurchaseTicketFac";
+import CreateTicketPurchase from "./navigation/CreateTicketPurchase";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -107,6 +109,34 @@ const FacilityReqTicketDetail = () => {
     getTicket();
     getStatus();
   }, []);
+
+  const modalPop = () => {
+    if (ticketData[0].status_id.id === 21) {
+      setModalOpen(true);
+      return;
+    }
+    alert("must changed status request first");
+  };
+
+  const modalClose = () => {
+    setModalOpen(false);
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <CreateTicketPurchase dataTicket={ticketData} />
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalClose}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
 
   const getTicket = async () => {
     let act_req = `${FacEndPoint[0].url}${
@@ -343,6 +373,61 @@ const FacilityReqTicketDetail = () => {
                   {text}
                 </NavLink>
               ))}
+          <Button
+            onClick={modalPop}
+            variant="contained"
+            color="primary"
+            className={classes.buttonAdd}
+            startIcon={<AddIcon />}>
+            Create New
+          </Button>
+          <Grid container spacing={3}>
+            {isLoading ? null : (
+              <Grid item xs={12} className={classes.cardPadding}>
+                <PurchaseTicketFac ticketData={ticketData} />
+              </Grid>
+            )}
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter((row) => [4, 11, 12, 19, 21].includes(row.id))
+                      .map((row) => (
+                        <ButtonStatusFacility
+                          idStatus={row.id}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                          data={ticketData[0]}
+                        />
+                      ))}
+                  </div>
+                )}
+                <br />
+              </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatFacility />
+            </Grid>
+          </Grid>
+          <Modal
+            open={modalOpen}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+              timeout: 500,
+            }}>
+            {bodyModal}
+          </Modal>
         </>
       );
     default:

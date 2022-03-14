@@ -29,6 +29,7 @@ import {
   pathEndPoint,
   prEndPoint,
   invEndPoint,
+  FacEndPoint,
 } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
@@ -456,6 +457,56 @@ const CreateTicketPurchase = ({ dataTicket }) => {
     let pr_img = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/upload-img`;
+
+    if (dataReq[0].action_req_code === undefined) {
+      let fr = `${FacEndPoint[0].url}${
+        FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+      }/api/v1/facility-req/updated-ticket-status/${dataReq[0].id}`;
+
+      if (todos.length === 0) {
+        alert("cannot empty list");
+        return;
+      }
+      const jsonString = JSON.stringify(todos);
+
+      todos.forEach(function (item) {
+        const imageFormData = new FormData();
+        imageFormData.append("attachment", item.attachment);
+        (async () => {
+          await axios
+            .post(pr_img, imageFormData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then((response) => {
+              console.log(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })();
+      });
+
+      await axios.post(pr, {
+        action_req_code: dataReq[0].facility_req_code,
+        purchase_req_code: "MKDPR" + lastNumber,
+        status_id: 10,
+        request_list: jsonString,
+        request_by: requestBy,
+        created_by: createdBy,
+      });
+
+      await axios.patch(fr, {
+        status_id: 19,
+      });
+      setToast(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
+      return;
+    }
 
     let ar = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { invEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
+import {
+  invEndPoint,
+  prEndPoint,
+  authEndPoint,
+  FacEndPoint,
+} from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 
 import {
@@ -380,6 +385,34 @@ const RequestApprove = () => {
 
     const origin = window.location.origin;
 
+    let type_req = parseObject.action_req_code.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      await axios
+        .patch(deny_pr, dataUpdated)
+        .then((response) => {
+          setToast(true);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      await axios
+        .patch(ticket, {
+          status_id: 8,
+        })
+        .then((response) => {
+          console.log(response.data.status);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      setTimeout(() => {
+        window.location.href = `${origin}/procurement-approval`;
+      }, 2000);
+      return;
+    }
+
     await axios
       .patch(deny_pr, dataUpdated)
       .then((response) => {
@@ -389,8 +422,12 @@ const RequestApprove = () => {
         console.error(error);
       });
 
+    let fr = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/updated-ticket-status/${dataRequest[0].id}`;
+
     await axios
-      .patch(ticket, {
+      .patch(fr, {
         status_id: 8,
       })
       .then((response) => {
@@ -482,29 +519,63 @@ const RequestApprove = () => {
   };
 
   const getInfoPR = async () => {
-    let act_req = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/`;
+    let type_req = parseObject.action_req_code.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      let act_req = `${invEndPoint[0].url}${
+        invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+      }/api/v1/action-req/`;
+      await axios
+        .get(act_req)
+        .then((response) => {
+          let newDataRequest = response.data.data.request_tiket;
+
+          newDataRequest = newDataRequest.map((item) => ({
+            id: item.id,
+            action_req_code: item.action_req_code,
+            req_created: item.createdAt,
+            user_id: item.user_id,
+          }));
+
+          newDataRequest = newDataRequest.filter(
+            (item) => item.action_req_code === parseObject.action_req_code
+          );
+          setDataRequest(newDataRequest);
+
+          let jsonList = JSON.parse(parseObject.request_list);
+          setPurchaseList(jsonList);
+
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      return;
+    }
+
+    let act_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
+
     await axios
       .get(act_req)
       .then((response) => {
-        let newDataRequest = response.data.data.request_tiket;
+        let newDataRequest = response.data.data.request_facility;
 
         newDataRequest = newDataRequest.map((item) => ({
           id: item.id,
-          action_req_code: item.action_req_code,
+          facility_req_code: item.facility_req_code,
           req_created: item.createdAt,
           user_id: item.user_id,
         }));
 
         newDataRequest = newDataRequest.filter(
-          (item) => item.action_req_code === parseObject.action_req_code
+          (item) => item.facility_req_code === parseObject.action_req_code
         );
         setDataRequest(newDataRequest);
 
         let jsonList = JSON.parse(parseObject.request_list);
         setPurchaseList(jsonList);
-
         setIsLoading(false);
       })
       .catch((error) => {
@@ -575,7 +646,6 @@ const RequestApprove = () => {
                 <small>
                   Not send yet ?
                   <span className="resend" onClick={resendOTP}>
-                    {" "}
                     Resend
                   </span>
                 </small>
@@ -717,9 +787,8 @@ const RequestApprove = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Request Date</p>
-                <p className="wrap-paraf">
-                  {calbill(dataRequest[0].req_created)}
-                </p>
+                {console.log(parseObject)}
+                <p className="wrap-paraf">{calbill(parseObject.createdAt)}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Image</p>

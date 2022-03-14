@@ -91,14 +91,7 @@ const StatusButton = (styleProps) => {
       return;
     }
 
-    // if (buttonType === "damaged") {
-    //   alert("damaged");
-    //   return;
-    // }
     setModalOpenDefault(true);
-
-    // console.log(props, data);
-    // const button = document.querySelector(`#buttonCheck-${props}`);
   };
 
   const disbledButton = async (props, data) => {

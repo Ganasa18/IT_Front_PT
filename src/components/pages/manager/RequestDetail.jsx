@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { invEndPoint, authEndPoint, pathEndPoint } from "../../../assets/menu";
+import {
+  invEndPoint,
+  authEndPoint,
+  pathEndPoint,
+  FacEndPoint,
+} from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { makeStyles, Grid, Breadcrumbs, Typography } from "@material-ui/core";
 
@@ -76,6 +81,7 @@ const RequestDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [infoRequest, setInfoRequest] = useState([]);
+  const [infoFacility, setInfoFacility] = useState([]);
   const [userInfo, setUserInfo] = useState([]);
 
   useEffect(() => {
@@ -86,47 +92,150 @@ const RequestDetail = () => {
   }, []);
 
   const getInfoRequest = async () => {
-    let act_req = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/`;
+    let type_req = req_no.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      let act_req = `${invEndPoint[0].url}${
+        invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+      }/api/v1/action-req/`;
 
-    let inventory = `${pathEndPoint[0].url}${
+      let inventory = `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/inventory`;
+
+      const requestOne = await axios.get(act_req);
+      const requestTwo = await axios.get(inventory);
+
+      axios
+        .all([requestOne, requestTwo])
+        .then(
+          axios.spread((...responses) => {
+            const responseOne = responses[0];
+            const responseTwo = responses[1];
+
+            let newDataRequest = responseOne.data.data.request_tiket;
+            let newDataInventory = responseTwo.data.data.inventorys;
+
+            let arr_request = [...newDataRequest];
+            const arr_inventory = [...newDataInventory];
+
+            arr_request = arr_request.filter(
+              (item) => item.action_req_code === req_no
+            );
+
+            var inventmap = {};
+
+            arr_inventory.forEach(function (invent_id) {
+              inventmap[invent_id.id] = invent_id;
+            });
+
+            arr_request.forEach(function (request_id) {
+              request_id.invent_id = inventmap[request_id.asset_id];
+            });
+
+            // console.log(arr_request);
+            // localStorage.setItem("userId", arr_request[0].user_id);
+            setInfoRequest(arr_request);
+            setIsLoading(false);
+          })
+        )
+        .catch((errors) => {
+          // react on errors.
+
+          console.error(errors);
+        });
+
+      return;
+    }
+
+    let act_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
+
+    let status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/inventory`;
+    }/api/v1/status`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
 
     const requestOne = await axios.get(act_req);
-    const requestTwo = await axios.get(inventory);
+    const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(area);
+    const requestFour = await axios.get(departement);
+    const requestFive = await axios.get(subdepartement);
 
     axios
-      .all([requestOne, requestTwo])
+      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
+          const responesThree = responses[2];
+          const responesFour = responses[3];
+          const responesFive = responses[4];
 
-          let newDataRequest = responseOne.data.data.request_tiket;
-          let newDataInventory = responseTwo.data.data.inventorys;
+          let newDataRequest = responseOne.data.data.request_facility;
+          let newStatus = responseTwo.data.data.statuss;
+          let newDataArea = responesThree.data.data.areas;
+          let newDataDepartement = responesFour.data.data.departements;
+          let newDataSubDepartement = responesFive.data.data.subdepartements;
 
-          let arr_request = [...newDataRequest];
-          const arr_inventory = [...newDataInventory];
+          var arr_request = [...newDataRequest];
+          const arr_status = [...newStatus];
+          const arr_area = [...newDataArea];
+          const arr_departement = [...newDataDepartement];
+          const arr_subdepartement = [...newDataSubDepartement];
 
           arr_request = arr_request.filter(
-            (item) => item.action_req_code === req_no
+            (item) => item.facility_req_code === req_no
           );
 
-          var inventmap = {};
+          var statusmap = {};
 
-          arr_inventory.forEach(function (invent_id) {
-            inventmap[invent_id.id] = invent_id;
+          arr_status.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
           });
 
           arr_request.forEach(function (request_id) {
-            request_id.invent_id = inventmap[request_id.asset_id];
+            request_id.status_id = statusmap[request_id.status_id];
           });
 
-          // console.log(arr_request);
-          localStorage.setItem("userId", arr_request[0].user_id);
-          setInfoRequest(arr_request);
+          arr_area.forEach(function (area_id) {
+            statusmap[area_id.id] = area_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.area_id = statusmap[user.user_area];
+          });
+
+          arr_departement.forEach(function (depart_id) {
+            statusmap[depart_id.id] = depart_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.depart_id = statusmap[user.user_departement];
+          });
+
+          arr_subdepartement.forEach(function (subdepart_id) {
+            statusmap[subdepart_id.id] = subdepart_id;
+          });
+
+          arr_request.forEach(function (user) {
+            user.subdepart_id = statusmap[user.user_subdepartement];
+          });
+
+          console.log(arr_request);
+          setInfoFacility(arr_request);
+
           setIsLoading(false);
         })
       )
@@ -257,6 +366,28 @@ const RequestDetail = () => {
     return <Loading />;
   }
 
+  if (infoRequest.length === 0) {
+    return (
+      <>
+        <div className={classes.toolbar} />
+        <br />
+        <Breadcrumbs
+          onClick={function () {
+            const origin = window.location.origin;
+            window.location.href = `${origin}/procurement-approval`;
+          }}
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb">
+          <span className={"span_crumb"}>Procurement Approval</span>
+          <Typography color="textPrimary">{req_no}</Typography>
+        </Breadcrumbs>
+        <Grid container spacing={3}>
+          <DetailFacility dataStorage={infoFacility[0]} />
+        </Grid>
+      </>
+    );
+  }
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -369,6 +500,255 @@ const RequestDetail = () => {
           </Grid>
         </Grid>
       )}
+    </>
+  );
+};
+
+const DetailFacility = (props) => {
+  const classes = useStyles();
+  const { dataStorage } = props;
+  const [dataRequest] = useState(dataStorage);
+  const [generalRequest] = useState(JSON.parse(dataRequest.general_request));
+  const [applicationRequest] = useState(JSON.parse(dataRequest.aplication_req));
+
+  return (
+    <>
+      <Grid item xs={12} className={classes.cardPadding}>
+        <div className="card-asset-action">
+          <h4>Personal Data</h4>
+          <div className="row">
+            <div className="col-3">
+              <p className="label-asset">Request Number</p>
+              <p>{dataRequest.facility_req_code}</p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">New User</p>
+              <p>{dataRequest.user_name}</p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">Email</p>
+              <p>{dataRequest.user_email}</p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset ">Date Create</p>
+              <p className="">{`${calbill(dataRequest.createdAt)}`}</p>
+            </div>
+          </div>
+          <br />
+          <div className="row">
+            <div className="col-3">
+              <p className="label-asset">Area</p>
+              <p className="">
+                {dataRequest.area_id.area_name} -
+                {dataRequest.area_id.alias_name}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">Department</p>
+              <p>{dataRequest.depart_id.departement_name}</p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">Sub Department</p>
+              <p>
+                {!dataRequest.user_subdepartement
+                  ? " - "
+                  : dataRequest.user_subdepartement.subdepartement_name}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Grid>
+      <Grid item xs={12} className={classes.cardPadding}>
+        <div className="card-asset-action">
+          <h4>General Request</h4>
+          <div className="row">
+            <div className="col-3">
+              <p className="label-asset">
+                Computer
+                <span
+                  class="iconify check-class"
+                  data-icon="clarity:success-line"></span>
+              </p>
+              <p className="wrap-paraf">{generalRequest.comp_detail}</p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">
+                Telephone
+                {generalRequest.telephone === "yes" ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+              <p className="wrap-paraf">
+                {generalRequest.telephone_detail === ""
+                  ? "-"
+                  : generalRequest.telephone_detail}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">
+                Internet
+                {generalRequest.internetacc === "yes" ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+              <p className="wrap-paraf">
+                {generalRequest.internetacc_detail === ""
+                  ? "-"
+                  : generalRequest.internetacc_detail}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset wrap-paraf">Others</p>
+              <p className="wrap-paraf">
+                {generalRequest.other === "" ? "-" : generalRequest.other}
+              </p>
+            </div>
+          </div>
+          <br />
+          <div className="row">
+            <div className="col-3">
+              <p className="label-asset">
+                Email ID Internet
+                {generalRequest.emailid === "yes" ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+              <p className="wrap-paraf">
+                {generalRequest.emailid_detail === ""
+                  ? "-"
+                  : generalRequest.emailid_detail}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">
+                Printer Access
+                {generalRequest.printeracc === "yes" ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+              <p className="wrap-paraf">
+                {generalRequest.printeracc_detail === ""
+                  ? "-"
+                  : generalRequest.printeracc_detail}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="label-asset">
+                Wifi
+                {generalRequest.wifiaccess === "yes" ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+              <p className="wrap-paraf">
+                {generalRequest.wifiaccess_detail === ""
+                  ? "-"
+                  : generalRequest.wifiaccess_detail}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Grid>
+      <Grid item xs={12} className={classes.cardPadding}>
+        <div className="card-asset-action">
+          <h4>Application</h4>
+          <div className="row">
+            <div className="col-3">
+              <p className="">
+                Open ERP
+                {applicationRequest.openERP === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="">
+                Klick BCA bisnis
+                {applicationRequest.clickBca === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="">
+                Odoo
+                {applicationRequest.odoo === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+            <div className="col-3"></div>
+          </div>
+          <br />
+          <div className="row">
+            <div className="col-3">
+              <p className="">
+                Eskom
+                {applicationRequest.eskom === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="">
+                Randevoo
+                {applicationRequest.randevoo === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+
+            <div className="col-3">
+              <p className="wrap-paraf">Others </p>
+              {generalRequest.other === "" ? null : (
+                <p className="wrap-paraf">
+                  {generalRequest.other === "" ? "-" : generalRequest.other}
+                </p>
+              )}
+            </div>
+            <div className="col-3"></div>
+            <div className="col-3">
+              <p className="">
+                Accurate
+                {applicationRequest.accurate === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+            <div className="col-3">
+              <p className="">
+                Solution
+                {applicationRequest.solution === true ? (
+                  <span
+                    class="iconify check-class"
+                    data-icon="clarity:success-line"></span>
+                ) : null}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Grid>
     </>
   );
 };
