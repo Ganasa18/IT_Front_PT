@@ -1756,6 +1756,49 @@ input[type="radio"] {
   color: #c1c1c1;
 }
 
+.po-done-status {
+  margin: 10px 5px 5px 0;
+  color: #fff;
+  padding: 3px 12px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #219653;
+  color: #219653;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.po-done-status:hover {
+  color: white;
+  background-color: #219654;
+}
+
+.po-done-disabled {
+  margin: 10px 5px 5px 0;
+  color: #fff;
+  padding: 3px 12px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #b1b1b1;
+  color: #b1b1b1;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: not-allowed;
+}
+
 /* Purchase Approve*/
 
 .resend {

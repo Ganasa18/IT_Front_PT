@@ -20,6 +20,7 @@ import {
   Fade,
   Modal,
   Button,
+  Divider,
 } from "@material-ui/core";
 import axios from "axios";
 import "../../../../assets/master.css";
@@ -186,6 +187,23 @@ const useStyles2 = makeStyles((theme) => ({
       transform: "scale(0.9)",
     },
   },
+
+  paperPo: {
+    position: "fixed",
+    transform: "translate(-50%,-60%)",
+    top: "54%",
+    left: "50%",
+    width: 1200,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+      width: 700,
+    },
+  },
+
   cancelBtn: {
     color: "#EB5757",
     border: "1px solid #EB5757",
@@ -432,7 +450,7 @@ const PurchaseTicket = () => {
               usermap[request_id.id_user.departement];
           });
 
-          // console.log(arr_request);
+          console.log(arr_request);
 
           setTicketData(arr_request);
           setIsLoadingTicket(false);
@@ -530,7 +548,6 @@ const PurchaseTicket = () => {
             )}
           </Grid>
           <Grid item xs={12} className={classes.cardPadding}>
-            {console.log(dataPR)}
             <TablePurchaseOrder listData={dataPR} />
           </Grid>
         </>
@@ -668,8 +685,10 @@ const TablePurchaseList = ({ listData }) => {
 const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
   const classes = useStyles2();
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpenPo, setModalOpenPo] = useState(false);
   const [listScreenshot] = useState(listData);
   const [userTicket] = useState(ticketUser);
+  console.log(listData);
 
   function countTotalPo(listScreenshot) {
     var data = listScreenshot.map((item) => ({
@@ -690,6 +709,26 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
 
   const modalPop = () => {
     setModalOpen((prevModal) => !prevModal);
+  };
+
+  const handleUpdatePo = async () => {
+    let pr_req = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/updated-po-done/${listData[0].purchase_req_code}`;
+
+    await axios
+      .patch(pr_req, {
+        po_done: true,
+      })
+      .then((resp) => {
+        alert(resp.data.status);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        alert("something wrong");
+      });
   };
 
   const bodyModal = (
@@ -729,19 +768,56 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
     xhr.send();
   }
 
+  const modalPopPo = () => {
+    setModalOpenPo((prevModal) => !prevModal);
+  };
+
+  const bodyModalPo = (
+    <>
+      <Fade in={modalOpenPo}>
+        <div className={classes.paperPo}>
+          <h3>Are you sure want to changed status</h3>
+          <Divider />
+          <br />
+
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalPopPo}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleUpdatePo}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   // const [listImage] = useState(listData);
   return (
     <>
       <TableContainer className={classes.tableWidth}>
         <Paper>
           <Toolbar>
-            <div className="col-10">
+            <div className="col-2">
               <Typography
                 variant="h6"
                 component="div"
                 style={{ marginTop: "15px" }}>
                 Purchase Order {`${countTotalPo(listScreenshot)} / 5`}
               </Typography>
+            </div>
+            <div className="col-8">
+              <button
+                onClick={modalPopPo}
+                disabled={`${listData[0].po_done === true ? "disabled" : ""}`}
+                className={`${
+                  listData[0].po_done === true
+                    ? "po-done-disabled"
+                    : "po-done-status"
+                }`}>
+                complete PO
+              </button>
             </div>
             <div className="col-2">
               <button className="btn-create-po" onClick={modalPop}>
@@ -799,6 +875,15 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenPo}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalPo}
       </Modal>
     </>
   );

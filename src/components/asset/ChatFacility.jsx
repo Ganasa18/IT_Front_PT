@@ -353,6 +353,7 @@ const ChatFacility = () => {
             )}
           </div>
         </div>
+
         {isLoadingInput ? null : checkStatusData[0].status_id === 11 ||
           checkStatusData[0].status_id === 10 ||
           checkStatusData[0].status_id === 20 ? null : (

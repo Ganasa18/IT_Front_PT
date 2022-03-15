@@ -25,6 +25,7 @@ import ChatFacility from "../../asset/ChatFacility";
 import ButtonStatusFacility from "../../asset/ButtonStatusFacility";
 import PurchaseTicketFac from "./facnavigation/PurchaseTicketFac";
 import CreateTicketPurchase from "./navigation/CreateTicketPurchase";
+import GoodReceiveTicket from "./navigation/GoodReceiveTicket";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -428,6 +429,69 @@ const FacilityReqTicketDetail = () => {
             }}>
             {bodyModal}
           </Modal>
+        </>
+      );
+
+    case "/ticket-admin/facility-request/detail/good-receive":
+      return (
+        <>
+          <br />
+          <div className={classes.toolbar} />
+          <BreadcrumbComponent
+            Onclick={function () {
+              const origin = window.location.origin;
+              window.location.href = `${origin}/ticket-admin/facility-request/`;
+            }}
+            textSpan={"Facility Request"}
+            typographyText={req_no}
+          />
+          {links.map(({ url, text, index }) => (
+            <NavLink
+              key={index}
+              to={url}
+              className={"navigation-tabs"}
+              activeClassName="selected">
+              {text}
+            </NavLink>
+          ))}
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <GoodReceiveTicket dataTicket={ticketData[0]} />
+            </Grid>
+            <Grid item xs={4}>
+              <div className="card-status">
+                <h3>Change Status</h3>
+                <br />
+                {isLoading ? null : (
+                  <div className="card-status-item">
+                    {statusBtn
+                      .filter((row) => [13, 14, 15].includes(row.id))
+                      .sort((a, b) => (a.id > b.id ? 1 : -1))
+                      .map((row) => (
+                        <ButtonStatusFacility
+                          idStatus={row.id}
+                          status={`${
+                            ticketData[0].status_id.status_name ===
+                            row.status_name
+                              ? ticketData[0].status_id.status_name
+                              : ""
+                          }`}
+                          nameBtn={row.status_name}
+                          colorName={row.color_status}
+                          backgroundColor={row.color_status}
+                          data={ticketData[0]}
+                        />
+                      ))}
+                  </div>
+                )}
+                <br />
+              </div>
+            </Grid>
+            <Grid item xs={8}>
+              <ChatFacility />
+            </Grid>
+          </Grid>
         </>
       );
     default:

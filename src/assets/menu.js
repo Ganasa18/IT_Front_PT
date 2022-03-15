@@ -69,8 +69,13 @@ export const menuData = [
     // to: `/master`,
     subMenus: [
       {
-        name: "GR Asset",
+        name: "GR Action Request",
         to: "/gr/asset",
+        icon: "dashicons:category",
+      },
+      {
+        name: "GR Facility Request",
+        to: "/gr/asset-facility",
         icon: "dashicons:category",
       },
       {

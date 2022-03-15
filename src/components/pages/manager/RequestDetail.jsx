@@ -133,7 +133,7 @@ const RequestDetail = () => {
             });
 
             // console.log(arr_request);
-            // localStorage.setItem("userId", arr_request[0].user_id);
+            localStorage.setItem("userId", arr_request[0].user_id);
             setInfoRequest(arr_request);
             setIsLoading(false);
           })

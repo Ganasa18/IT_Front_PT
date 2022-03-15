@@ -4,6 +4,7 @@ import {
   prEndPoint,
   invEndPoint,
   authEndPoint,
+  FacEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import PropTypes from "prop-types";
@@ -188,7 +189,7 @@ function calbill(date) {
   return newdate;
 }
 
-const TableGR = () => {
+const TableGRFac = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -204,9 +205,9 @@ const TableGR = () => {
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/`;
 
-    let act_req = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/`;
+    let act_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
 
     let user = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
@@ -260,7 +261,7 @@ const TableGR = () => {
           const responseSix = responses[5];
           const responseSeven = responses[6];
           let newDataRequest = responseOne.data.data.request_purchase;
-          let newDataTicket = responseTwo.data.data.request_tiket;
+          let newDataTicket = responseTwo.data.data.request_facility;
           let newDataUser = responseThree.data.data.users;
           let newDataDepartement = responseFour.data.data.departements;
           let newDataSubDepartement = responseFive.data.data.subdepartements;
@@ -281,21 +282,19 @@ const TableGR = () => {
           var prmap = {};
 
           newDataRequest = newDataRequest.filter(
-            (item) => item.action_req_code.replace(/[0-9]/g, "") === "MKDAR"
+            (item) => item.action_req_code.replace(/[0-9]/g, "") === "MKDFR"
           );
 
           newDataTicket.forEach(function (request_id) {
-            prmap[request_id.action_req_code] = request_id;
+            prmap[request_id.facility_req_code] = request_id;
           });
 
           newDataRequest.forEach(function (purchase) {
             purchase.request_id = prmap[purchase.action_req_code];
           });
-
           getUser.forEach(function (id_user) {
             prmap[id_user.id] = id_user;
           });
-
           newDataRequest.forEach(function (purchase) {
             purchase.id_user = prmap[purchase.request_id.user_id];
           });
@@ -340,6 +339,7 @@ const TableGR = () => {
           );
 
           setDataGR(newDataFilter);
+
           setIsLoading(false);
         })
       )
@@ -404,7 +404,7 @@ const TableGR = () => {
                       {row.action_req_code}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.request_by}
+                      {row.request_id.user_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.id_departement_user.departement_name}
@@ -447,4 +447,4 @@ const TableGR = () => {
   );
 };
 
-export default TableGR;
+export default TableGRFac;

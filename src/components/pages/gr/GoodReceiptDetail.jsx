@@ -9,6 +9,7 @@ import "../../asset/chips.css";
 import StatusButton from "../../asset/StatusButton";
 import axios from "axios";
 import GoodReceiveTicket from "../ticket/navigation/GoodReceiveTicket";
+import ButtonStatusFacility from "../../asset/ButtonStatusFacility";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -73,6 +74,7 @@ const GoodReceiptDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataInfo, setDataInfo] = useState([]);
   const [statusBtn, setStatusBtn] = useState([]);
+  var gr_check = JSON.parse(grdata);
 
   useEffect(() => {
     getData();
@@ -102,7 +104,10 @@ const GoodReceiptDetail = () => {
           datagr.forEach(function (request_id) {
             request_id.status_id = statusmap[request_id.request_id.status_id];
           });
-          console.log(datagr);
+          // console.log(datagr);
+
+          // console.log(gr_check);
+
           setDataInfo(datagr);
           setIsLoading(false);
         })
@@ -124,18 +129,34 @@ const GoodReceiptDetail = () => {
     <>
       <div className={classes.toolbar} />
       <br />
-      <Breadcrumbs
-        onClick={function () {
-          const origin = window.location.origin;
-          window.location.href = `${origin}/gr/asset`;
-        }}
-        separator={<NavigateNextIcon fontSize="small" />}
-        aria-label="breadcrumb">
-        <span className={"span_crumb"}>Goods Receipt</span>
-        <Typography color="textPrimary">
-          {dataInfo[0].purchase_req_code}
-        </Typography>
-      </Breadcrumbs>
+
+      {gr_check.action_req_code.replace(/[0-9]/g, "") === "MKDFR" ? (
+        <Breadcrumbs
+          onClick={function () {
+            const origin = window.location.origin;
+            window.location.href = `${origin}/gr/asset-facility`;
+          }}
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb">
+          <span className={"span_crumb"}>Goods Receipt</span>
+          <Typography color="textPrimary">
+            {dataInfo[0].purchase_req_code}
+          </Typography>
+        </Breadcrumbs>
+      ) : (
+        <Breadcrumbs
+          onClick={function () {
+            const origin = window.location.origin;
+            window.location.href = `${origin}/gr/asset`;
+          }}
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb">
+          <span className={"span_crumb"}>Goods Receipt</span>
+          <Typography color="textPrimary">
+            {dataInfo[0].purchase_req_code}
+          </Typography>
+        </Breadcrumbs>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} className={classes.cardPadding}>
@@ -186,6 +207,12 @@ const GoodReceiptDetail = () => {
                 <p className="label-asset">Request By</p>
                 <p> {capitalizeFirstLetter(dataInfo[0].request_by)}</p>
               </div>
+              {gr_check.action_req_code.replace(/[0-9]/g, "") === "MKDFR" ? (
+                <div className="col-3">
+                  <p className="label-asset">Request For</p>
+                  <p> {capitalizeFirstLetter(gr_check.request_id.user_name)}</p>
+                </div>
+              ) : null}
               <div className="col-3">
                 <p className="label-asset">Departement</p>
                 <p>
@@ -241,18 +268,44 @@ const GoodReceiptDetail = () => {
                   .filter((row) => [13, 14, 15].includes(row.id))
                   .sort((a, b) => (a.id > b.id ? 1 : -1))
                   .map((row) => (
-                    <StatusButton
-                      idStatus={row.id}
-                      status={`${
-                        dataInfo[0].status_id.status_name === row.status_name
-                          ? dataInfo[0].status_id.status_name
-                          : ""
-                      }`}
-                      nameBtn={row.status_name}
-                      colorName={row.color_status}
-                      backgroundColor={row.color_status}
-                      data={dataInfo[0]}
-                    />
+                    <>
+                      {gr_check.action_req_code.replace(/[0-9]/g, "") ===
+                      "MKDFR" ? (
+                        <>
+                          {console.log(dataInfo)}
+                          <ButtonStatusFacility
+                            idStatus={row.id}
+                            status={`${
+                              dataInfo[0].status_id.status_name ===
+                              row.status_name
+                                ? dataInfo[0].status_id.status_name
+                                : ""
+                            }`}
+                            nameBtn={row.status_name}
+                            colorName={row.color_status}
+                            backgroundColor={row.color_status}
+                            data={dataInfo[0].request_id}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          {console.log(dataInfo)}
+                          <StatusButton
+                            idStatus={row.id}
+                            status={`${
+                              dataInfo[0].status_id.status_name ===
+                              row.status_name
+                                ? dataInfo[0].status_id.status_name
+                                : ""
+                            }`}
+                            nameBtn={row.status_name}
+                            colorName={row.color_status}
+                            backgroundColor={row.color_status}
+                            data={dataInfo[0]}
+                          />
+                        </>
+                      )}
+                    </>
                   ))}
               </div>
             )}

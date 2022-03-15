@@ -20,6 +20,7 @@ import {
   Fade,
   Modal,
   Button,
+  Divider,
 } from "@material-ui/core";
 import axios from "axios";
 import "../../../../assets/master.css";
@@ -30,7 +31,7 @@ import Loading from "../../../asset/Loading";
 import {
   pathEndPoint,
   prEndPoint,
-  invEndPoint,
+  FacEndPoint,
   authEndPoint,
 } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
@@ -39,6 +40,8 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
+import CreatePurchaseOrder from "../navigation/CreatePurchaseOrder";
+import TablePurchaseOrder from "../../../table/purchase/TablePurchaseOrder";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -183,6 +186,21 @@ const useStyles2 = makeStyles((theme) => ({
       transform: "scale(0.9)",
     },
   },
+  paperPo: {
+    position: "fixed",
+    transform: "translate(-50%,-60%)",
+    top: "54%",
+    left: "50%",
+    width: 1200,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(4, 10, 4),
+    [theme.breakpoints.down("lg")]: {
+      transform: "translate(-50%,-45%)",
+      width: 700,
+    },
+  },
   cancelBtn: {
     color: "#EB5757",
     border: "1px solid #EB5757",
@@ -252,11 +270,14 @@ const PurchaseTicketFac = (props) => {
   const [dataPR, setDataPR] = useState([]);
   const [lastNumber, setLastNumber] = useState("");
   const [isLoadingTicket, setIsLoadingTicket] = useState(true);
+  const [userData, setUserData] = useState([]);
 
   // console.log(ticketData);
   // console.log(req_no);
   useEffect(() => {
     getDataPR();
+    // getInfoUser();
+    getInvLatestId();
   }, []);
 
   const getDataPR = async () => {
@@ -268,17 +289,75 @@ const PurchaseTicketFac = (props) => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/status`;
 
+    let fac_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
+
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    let area = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/area`;
+
+    let role = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/role`;
+
+    let departement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/departement`;
+
+    let subdepartement = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/subdepartement`;
+
     const requestOne = await axios.get(pr_req);
     const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(fac_req);
+    const requestFour = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const requestFive = await axios.get(area);
+    const requestSix = await axios.get(departement);
+    const requestSeven = await axios.get(subdepartement);
+
+    const requestEight = await axios.get(role, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     axios
-      .all([requestOne, requestTwo])
+      .all([
+        requestOne,
+        requestTwo,
+        requestThree,
+        requestFour,
+        requestFive,
+        requestSix,
+        requestSeven,
+        requestEight,
+      ])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
+          const responseThree = responses[2];
+          const responseFour = responses[3];
+          const responseFive = responses[4];
+          const responseSix = responses[5];
+          const responseSeven = responses[6];
+          const responseEight = responses[7];
           let newDataRequest = responseOne.data.data.request_purchase;
           let newStatus = responseTwo.data.data.statuss;
+          let newDataFacility = responseThree.data.data.request_facility;
+          let newDataUser = responseFour.data.data.users;
+          let newDataArea = responseFive.data.data.areas;
+          let newDataRole = responseEight.data.data.roles;
+          let newDataDepartement = responseSix.data.data.departements;
+          let newDataSubDepartement = responseSeven.data.data.subdepartements;
+
           var arr_request = newDataRequest.filter(
             (row) => row.action_req_code === req_no
           );
@@ -302,18 +381,122 @@ const PurchaseTicketFac = (props) => {
             request_id.status_id = statusmap[request_id.status_id];
           });
 
-          console.log(arr_request[0].request_list);
-
           let jsonList = JSON.parse(arr_request[0].request_list);
+
           setDataPR(arr_request);
           setListReq(jsonList);
-
           setIsLoading(false);
+
+          newDataUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          var arr_facility = newDataFacility.filter(
+            (row) => row.facility_req_code === req_no
+          );
+
+          newDataUser = newDataUser.filter(
+            (item) =>
+              item.name === arr_facility[0].user_name &&
+              item.departement === arr_facility[0].user_departement
+          );
+
+          if (newDataUser.length === 0) {
+            alert("please create user before create PO");
+            setIsLoadingTicket(false);
+            return;
+          }
+
+          let arr_user = [...newDataUser];
+          let arr_area = [...newDataArea];
+          let arr_role = [...newDataRole];
+          let arr_departement = [...newDataDepartement];
+          let arr_subdepartement = [...newDataSubDepartement];
+
+          var usermap = {};
+
+          arr_area.forEach(function (id_area_user) {
+            usermap[id_area_user.id] = id_area_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_area_user = usermap[request_id.area];
+          });
+
+          arr_role.forEach(function (id_role_user) {
+            usermap[id_role_user.id] = id_role_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_role_user = usermap[request_id.role];
+          });
+
+          arr_departement.forEach(function (id_departement_user) {
+            usermap[id_departement_user.id] = id_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_departement_user = usermap[request_id.departement];
+          });
+
+          var subdepartement = {};
+
+          arr_subdepartement.forEach(function (id_sub_departement_user) {
+            subdepartement[id_sub_departement_user.id] =
+              id_sub_departement_user;
+          });
+
+          arr_user.forEach(function (request_id) {
+            request_id.id_sub_departement_user =
+              subdepartement[request_id.subdepartement];
+          });
+
+          setUserData(arr_user);
+          setIsLoadingTicket(false);
         })
       )
       .catch((errors) => {
         // react on errors.
         console.error(errors);
+      });
+  };
+
+  const getInvLatestId = async () => {
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/latestId`;
+
+    await axios
+      .get(inventory)
+      .then((response) => {
+        var text = response.data.data?.inventory[0]?.asset_number;
+        var numb = 0;
+        if (text === undefined) {
+          numb = parseInt(numb) + 1;
+          var str = "" + numb;
+          var pad = "000";
+          var ans = pad.substring(0, pad.length - str.length) + str;
+          setLastNumber(ans);
+          return;
+        }
+        text = text.split("-")[1].trim();
+        numb = text.match(/\d/g);
+        numb = numb.join("");
+        numb = parseInt(numb) + 1;
+        str = "" + numb;
+        pad = "000";
+        ans = pad.substring(0, pad.length - str.length) + str;
+        setLastNumber(ans);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -382,6 +565,27 @@ const PurchaseTicketFac = (props) => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
+
+      {dataPR[0].img_po !== null ? (
+        <>
+          <Grid item xs={12} className={classes.cardPadding}>
+            {isLoadingTicket ? (
+              <>
+                <Loading />
+              </>
+            ) : (
+              <TableScreenPO
+                getLastNumber={lastNumber}
+                listData={dataPR}
+                ticketUser={userData}
+              />
+            )}
+          </Grid>
+          <Grid item xs={12} className={classes.cardPadding}>
+            <TablePurchaseOrder listData={dataPR} />
+          </Grid>
+        </>
+      ) : null}
     </>
   );
 };
@@ -509,6 +713,214 @@ const TablePurchaseList = ({ listData }) => {
         </Table>
       </Paper>
     </TableContainer>
+  );
+};
+
+const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
+  const classes = useStyles2();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpenPo, setModalOpenPo] = useState(false);
+  const [listScreenshot] = useState(listData);
+  const [userTicket] = useState(ticketUser);
+
+  console.log(listData);
+
+  function countTotalPo(listScreenshot) {
+    var data = listScreenshot.map((item) => ({
+      value: [
+        item.purchase_order_code_1,
+        item.purchase_order_code_2,
+        item.purchase_order_code_3,
+        item.purchase_order_code_4,
+        item.purchase_order_code_5,
+      ],
+    }));
+
+    var len = data[0].value.filter(function (x) {
+      return x !== null;
+    }).length;
+    return len;
+  }
+
+  const modalPop = () => {
+    setModalOpen((prevModal) => !prevModal);
+  };
+
+  const handleUpdatePo = async () => {
+    let pr_req = `${prEndPoint[0].url}${
+      prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+    }/api/v1/purchase-req/updated-po-done/${listData[0].purchase_req_code}`;
+
+    await axios
+      .patch(pr_req, {
+        po_done: true,
+      })
+      .then((resp) => {
+        alert(resp.data.status);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        alert("something wrong");
+      });
+  };
+
+  const bodyModal = (
+    <>
+      <Fade in={modalOpen}>
+        <div className={classes.paper}>
+          <CreatePurchaseOrder
+            listData={listData}
+            lastNum={getLastNumber}
+            ticketUser={userTicket}
+          />
+          <Button
+            className={classes.cancelBtn}
+            onClick={modalPop}
+            variant="outlined">
+            Cancel
+          </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const modalPopPo = () => {
+    setModalOpenPo((prevModal) => !prevModal);
+  };
+
+  const bodyModalPo = (
+    <>
+      <Fade in={modalOpenPo}>
+        <div className={classes.paperPo}>
+          <h3>Are you sure want to changed status</h3>
+          <Divider />
+          <br />
+
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalPopPo}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleUpdatePo}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
+  function forceDownload(url, fileName) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "blob";
+    xhr.onload = function () {
+      var urlCreator = window.URL || window.webkitURL;
+      var imageUrl = urlCreator.createObjectURL(this.response);
+      var tag = document.createElement("a");
+      tag.href = imageUrl;
+      tag.download = fileName;
+      document.body.appendChild(tag);
+      tag.click();
+      document.body.removeChild(tag);
+    };
+    xhr.send();
+  }
+
+  // const [listImage] = useState(listData);
+  return (
+    <>
+      <TableContainer className={classes.tableWidth}>
+        <Paper>
+          <Toolbar>
+            <div className="col-2">
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ marginTop: "15px" }}>
+                Purchase Order {`${countTotalPo(listScreenshot)} / 5`}
+              </Typography>
+            </div>
+            <div className="col-8">
+              <button
+                onClick={modalPopPo}
+                disabled={`${listData[0].po_done === true ? "disabled" : ""}`}
+                className={`${
+                  listData[0].po_done === true
+                    ? "po-done-disabled"
+                    : "po-done-status"
+                }`}>
+                complete PO
+              </button>
+            </div>
+            <div className="col-2">
+              <button className="btn-create-po" onClick={modalPop}>
+                <span
+                  class="iconify icon-btn"
+                  data-icon="ant-design:plus-outlined"></span>
+                <span className="name-btn">Create PO</span>
+              </button>
+            </div>
+          </Toolbar>
+          <Table className={classes.table} aria-label="custom pagination table">
+            <TableHead classes={{ root: classes.thead }}>
+              <TableRow>
+                <StyledTableCell>Image</StyledTableCell>
+                <StyledTableCell>Date</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {JSON.parse(listScreenshot[0].img_po).map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell component="th" scope="row">
+                    <button
+                      className="btn-image-po"
+                      onClick={() =>
+                        forceDownload(
+                          `${prEndPoint[0].url}${
+                            prEndPoint[0].port !== ""
+                              ? ":" + prEndPoint[0].port
+                              : ""
+                          }/public/image/po/${row.img_po}`,
+                          `${row.img_po}`
+                        )
+                      }>
+                      {row.img_po}
+                    </button>
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {!row.date_img ? "-" : calbill(row.date_img)}
+                  </TableCell>
+                  {/* <TableCell component="th" scope="row" align="center">
+                    
+                  </TableCell> */}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Paper>
+      </TableContainer>
+      <Modal
+        open={modalOpen}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenPo}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalPo}
+      </Modal>
+    </>
   );
 };
 

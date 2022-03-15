@@ -4,6 +4,7 @@ import {
   authEndPoint,
   pathEndPoint,
   prEndPoint,
+  FacEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import {
@@ -263,6 +264,7 @@ const IncomingPRDetail = () => {
   const [inputPoNumber3, setInputPoNumber3] = useState("");
   const [inputPoNumber4, setInputPoNumber4] = useState("");
   const [selectedButton, setSelectedButton] = useState("PO 1");
+  let type_req = purchaseData.action_req_code.replace(/[0-9]/g, "");
 
   useEffect(() => {
     getDataInfo();
@@ -272,6 +274,10 @@ const IncomingPRDetail = () => {
     let act_req = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
     }/api/v1/action-req/`;
+
+    let fac_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
 
     let inventory = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -289,31 +295,126 @@ const IncomingPRDetail = () => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/subdepartement`;
 
-    const requestOne = await axios.get(act_req);
-    const requestTwo = await axios.get(inventory);
-    const requestThree = await axios.get(user, {
+    if (type_req === "MKDAR") {
+      const requestOne = await axios.get(act_req);
+      const requestTwo = await axios.get(inventory);
+      const requestThree = await axios.get(user, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const requestFour = await axios.get(departement);
+      const requestFive = await axios.get(subdepartement);
+
+      axios
+        .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
+        .then(
+          axios.spread((...responses) => {
+            const responseOne = responses[0];
+            const responseTwo = responses[1];
+            const responseThree = responses[2];
+            const responseFour = responses[3];
+            const responseFive = responses[4];
+
+            let newDataRequest = responseOne.data.data.request_tiket;
+
+            let newDataInventory = responseTwo.data.data.inventorys;
+            let newDataUser = responseThree.data.data.users;
+            let newDataDepartement = responseFour.data.data.departements;
+            let newDataSubDepartement = responseFive.data.data.subdepartements;
+
+            newDataUser = newDataUser.map((item) => ({
+              id: item.id,
+              name: item.username,
+              role: item.role,
+              departement: item.departement,
+              subdepartement: item.subdepartement,
+              area: item.area,
+              email: item.email,
+              employe: item.employe_status,
+            }));
+
+            let arr_request = [...newDataRequest];
+            const arr_inventory = [...newDataInventory];
+
+            arr_request = arr_request.filter(
+              (item) => item.action_req_code === purchaseData.action_req_code
+            );
+
+            newDataUser = newDataUser.filter(
+              (item) => item.id === parseInt(arr_request[0].user_id)
+            );
+
+            var inventmap = {};
+
+            arr_inventory.forEach(function (invent_id) {
+              inventmap[invent_id.id] = invent_id;
+            });
+
+            arr_request.forEach(function (request_id) {
+              request_id.invent_id = inventmap[request_id.asset_id];
+            });
+
+            let arr_user = [...newDataUser];
+            let arr_departement = [...newDataDepartement];
+            let arr_subdepartement = [...newDataSubDepartement];
+
+            var usermap = {};
+
+            arr_departement.forEach(function (id_departement_user) {
+              usermap[id_departement_user.id] = id_departement_user;
+            });
+
+            arr_user.forEach(function (request_id) {
+              request_id.id_departement_user = usermap[request_id.departement];
+            });
+
+            var subdepartement = {};
+
+            arr_subdepartement.forEach(function (id_sub_departement_user) {
+              subdepartement[id_sub_departement_user.id] =
+                id_sub_departement_user;
+            });
+
+            arr_user.forEach(function (request_id) {
+              request_id.id_sub_departement_user =
+                subdepartement[request_id.subdepartement];
+            });
+            let jsonList = JSON.parse(purchaseData.request_list);
+
+            setInfoRequest(arr_request);
+            setUserInfo(arr_user);
+            setPurchaseList(jsonList);
+            setIsLoading(false);
+          })
+        )
+        .catch((errors) => {
+          // react on errors.
+          console.error(errors);
+        });
+    }
+
+    const requestOne = await axios.get(fac_req);
+
+    const requestTwo = await axios.get(user, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const requestFour = await axios.get(departement);
-    const requestFive = await axios.get(subdepartement);
+    const requestThree = await axios.get(departement);
+    const requestFour = await axios.get(subdepartement);
 
     axios
-      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
+      .all([requestOne, requestTwo, requestThree, requestFour])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
           const responseThree = responses[2];
           const responseFour = responses[3];
-          const responseFive = responses[4];
 
-          let newDataRequest = responseOne.data.data.request_tiket;
-          let newDataInventory = responseTwo.data.data.inventorys;
-          let newDataUser = responseThree.data.data.users;
-          let newDataDepartement = responseFour.data.data.departements;
-          let newDataSubDepartement = responseFive.data.data.subdepartements;
-
+          let newDataRequest = responseOne.data.data.request_facility;
+          let newDataUser = responseTwo.data.data.users;
+          let newDataDepartement = responseThree.data.data.departements;
+          let newDataSubDepartement = responseFour.data.data.subdepartements;
           newDataUser = newDataUser.map((item) => ({
             id: item.id,
             name: item.username,
@@ -326,25 +427,14 @@ const IncomingPRDetail = () => {
           }));
 
           let arr_request = [...newDataRequest];
-          const arr_inventory = [...newDataInventory];
 
           arr_request = arr_request.filter(
-            (item) => item.action_req_code === purchaseData.action_req_code
+            (item) => item.facility_req_code === purchaseData.action_req_code
           );
 
           newDataUser = newDataUser.filter(
             (item) => item.id === parseInt(arr_request[0].user_id)
           );
-
-          var inventmap = {};
-
-          arr_inventory.forEach(function (invent_id) {
-            inventmap[invent_id.id] = invent_id;
-          });
-
-          arr_request.forEach(function (request_id) {
-            request_id.invent_id = inventmap[request_id.asset_id];
-          });
 
           let arr_user = [...newDataUser];
           let arr_departement = [...newDataDepartement];
@@ -373,9 +463,8 @@ const IncomingPRDetail = () => {
           });
           let jsonList = JSON.parse(purchaseData.request_list);
 
-          // console.log(arr_request);
-          // console.log(arr_user);
-          // console.log(jsonList);
+          console.log(arr_request);
+
           setInfoRequest(arr_request);
           setUserInfo(arr_user);
           setPurchaseList(jsonList);
@@ -486,23 +575,46 @@ const IncomingPRDetail = () => {
     //   purchase_req_code: purchaseData.purchase_req_code,
     // }
 
-    let ticket = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/action-req/updated-ticket-status/${purchaseData.action_req_code}`;
+    if (type_req === "MKDAR") {
+      let ticket = `${invEndPoint[0].url}${
+        invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+      }/api/v1/action-req/updated-ticket-status/${
+        purchaseData.action_req_code
+      }`;
+
+      await axios
+        .patch(ticket, {
+          status_id: 13,
+          trouble_title: null,
+          trouble_detail: null,
+          close_remark: null,
+        })
+        .then((response) => {
+          console.log(response.data.status);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
+    let fr = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/updated-ticket-status/${infoRequest[0].id}`;
 
     await axios
-      .patch(ticket, {
+      .patch(fr, {
         status_id: 13,
-        trouble_title: null,
-        trouble_detail: null,
-        close_remark: null,
       })
       .then((response) => {
         console.log(response.data.status);
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
       });
+
+    setTimeout(() => {
+      window.location.href = `${origin}/procurement-approval`;
+    }, 2000);
   };
 
   const handleSelectButton = (e) => {
@@ -565,6 +677,13 @@ const IncomingPRDetail = () => {
                 <p className="label-asset">Request Name</p>
                 <p>{capitalizeFirstLetter(purchaseData.request_by)}</p>
               </div>
+              {type_req === "MKDFR" ? (
+                <div className="col-3">
+                  <p className="label-asset">Request For</p>
+                  <p>{capitalizeFirstLetter(infoRequest[0].user_name)}</p>
+                </div>
+              ) : null}
+
               <div className="col-3">
                 <p className="label-asset">Sub Department</p>
                 <p>

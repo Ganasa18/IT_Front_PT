@@ -42,6 +42,7 @@ import FacilityApproved from "../pages/lead/FacilityApproved";
 import FacilityApproveDetail from "../pages/lead/FacilityApproveDetail";
 import FacilityTicket from "../pages/ticket/FacilityTicket";
 import FacilityReqTicketDetail from "../pages/ticket/FacilityReqTicketDetail";
+import GoodReceiptFacility from "../pages/gr/GoodReceiptFacility";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -157,6 +158,18 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <GoodReceiptDetail {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/gr/asset-facility"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <GoodReceiptFacility {...props} />
           ) : (
             <Redirect to="/" />
           )

@@ -229,7 +229,7 @@ const GoodReceiveTicket = () => {
           }
           setDataGR(dataSet);
           setIsLoading(false);
-          console.log(dataSet);
+          // console.log(dataSet);
         } else {
           var dataGet = [];
 

@@ -233,10 +233,11 @@ const CreatePurchaseOrder = (props) => {
   const getInitialRef = React.useRef(null);
   const priceRef = React.useRef(null);
   const [subTotal, setSubTotal] = useState(0);
+  const req_no = localStorage.getItem("req_no");
 
   const { ticketUser, lastNum, listData } = props;
 
-  // console.log(listData);
+  console.log(req_no);
 
   localStorage.setItem("last_number", lastNum);
 
@@ -407,7 +408,13 @@ const CreatePurchaseOrder = (props) => {
       return;
     }
 
-    var used_user = typeasset.value === "user" ? ticketUser[0].user_id : null;
+    let type_req = req_no.replace(/[0-9]/g, "");
+    var used_user = null;
+    if (type_req === "MKDAR") {
+      used_user = typeasset.value === "user" ? ticketUser[0].user_id : null;
+    } else {
+      used_user = typeasset.value === "user" ? ticketUser[0].id : null;
+    }
 
     const data = {
       id: generateId(),
@@ -436,7 +443,7 @@ const CreatePurchaseOrder = (props) => {
       used_by: used_user,
     };
 
-    // console.log(data);
+    console.log(data);
     setTodos([...todos, data]);
 
     setTimeout(() => {
@@ -474,6 +481,8 @@ const CreatePurchaseOrder = (props) => {
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-order/`;
 
+    console.log(data);
+
     await axios
       .post(po, data)
       .then((response) => {
@@ -485,8 +494,6 @@ const CreatePurchaseOrder = (props) => {
       .catch((error) => {
         console.error(error);
       });
-
-    console.log(data);
   };
 
   function removeHandler(todoId) {
