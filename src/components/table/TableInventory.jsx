@@ -214,6 +214,7 @@ const TableInventory = () => {
 
   useEffect(() => {
     getInventory();
+    l;
   }, []);
 
   const getInventory = async () => {
@@ -580,7 +581,7 @@ const TableInventory = () => {
                         className="btn-edit"
                         onClick={(e) => editHandle(row)}>
                         <span
-                          class="iconify icon-btn"
+                          className="iconify icon-btn"
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
