@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Grid,
@@ -27,7 +28,6 @@ import {
   authEndPoint,
   pathEndPoint,
   prEndPoint,
-  invEndPoint,
 } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
@@ -477,11 +477,13 @@ const CreatePurchaseOrder = (props) => {
       subtotal_price: parseInt(subTotal),
     };
 
+    document.getElementById("overlay").style.display = "block";
+
     let po = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-order/`;
 
-    console.log(data);
+    // console.log(data);
 
     await axios
       .post(po, data)
@@ -493,6 +495,7 @@ const CreatePurchaseOrder = (props) => {
       })
       .catch((error) => {
         console.error(error);
+        alert("somethin wrong");
       });
   };
 
@@ -959,6 +962,15 @@ const CreatePurchaseOrder = (props) => {
       <br />
       <br />
       <br />
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 };

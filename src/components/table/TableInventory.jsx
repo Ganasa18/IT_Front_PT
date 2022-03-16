@@ -214,7 +214,6 @@ const TableInventory = () => {
 
   useEffect(() => {
     getInventory();
-    l;
   }, []);
 
   const getInventory = async () => {

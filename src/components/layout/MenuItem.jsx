@@ -74,7 +74,7 @@ const MenuItem = (props) => {
       <li className="main-menu">
         <NavLink
           exact={exact}
-          to={to || []}
+          to={to || {}}
           className="menu-item"
           onClick={handler}>
           <div className="menu-icon">
@@ -95,7 +95,7 @@ const MenuItem = (props) => {
         <ul ref={liRef} className={`sub-menu ${expand ? "active" : ""}`}>
           {subMenus.map((menu, index) => (
             <li key={index}>
-              <NavLink to={menu.to || []}>
+              <NavLink to={menu.to || {}}>
                 {/* <span
                   data-icon={"mdi:inbox-arrow-down"}
                   className="menu-icon iconify"

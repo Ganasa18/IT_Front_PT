@@ -173,7 +173,6 @@ a {
 }
 
 .card-profile {
-  height: 35vh;
   width: 100%;
   border-radius: 5px;
   background: rgb(255 255 255);
@@ -181,7 +180,19 @@ a {
   padding: 5px 35px;
 }
 
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .card-profile {
+    height: 48vh;
+  }
+}
+
 @media only screen and (min-width: 1400px) and (max-width: 1500px) {
+  .card-profile {
+    height: 43vh;
+  }
+}
+
+@media only screen and (min-width: 1600px) and (max-width: 1980px) {
   .card-profile {
     height: 42vh;
   }
@@ -303,6 +314,18 @@ a {
 .footer-modal {
   display: flex;
   justify-content: space-between;
+}
+
+.footer-modal-ar {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .footer-modal-ar {
+    position: relative;
+    top: -115px;
+  }
 }
 
 .form-input {
@@ -1575,6 +1598,27 @@ input[type="radio"] {
 .form-input-inv:focus {
   outline: none;
   border: 1px solid rgb(0, 0, 0);
+}
+
+.wrapper-create-inv {
+  position: relative;
+  height: 450px;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.wrapper-create-inv::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.wrapper-create-inv::-webkit-scrollbar-track {
+  box-shadow: inset rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.wrapper-create-inv::-webkit-scrollbar-thumb {
+  background-color: rgb(134, 130, 130);
+  outline: none;
 }
 
 @media only screen and (min-width: 1366px) and (max-width: 1366px) {

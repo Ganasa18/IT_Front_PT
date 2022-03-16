@@ -29,7 +29,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 // import NotificationsIcon from "@material-ui/icons/Notifications";
 import classNames from "classnames";
 import logo from "../../assets/new_logo.png";
-// import user from "../../assets/img.jpg";
+
 import "../../assets/master.css";
 import {
   menuData,
@@ -240,10 +240,6 @@ const PersistentDrawer = (props) => {
     } else {
       setMenuDatas(menuDataUser);
     }
-
-    // document.addEventListener("contextmenu", (e) => {
-    //   e.preventDefault();
-    // });
   }, []);
 
   // const checkUser = () => {
@@ -305,10 +301,6 @@ const PersistentDrawer = (props) => {
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
-  // const handleClick = () => {
-  //   SetCollapse(!collapse);
-  // };
 
   const handleDrawerClose = () => {
     setOpen(false);

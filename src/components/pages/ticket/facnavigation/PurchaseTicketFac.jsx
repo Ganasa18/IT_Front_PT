@@ -271,9 +271,8 @@ const PurchaseTicketFac = (props) => {
   const [lastNumber, setLastNumber] = useState("");
   const [isLoadingTicket, setIsLoadingTicket] = useState(true);
   const [userData, setUserData] = useState([]);
+  const [ticketStatus, setTicketStatus] = useState([]);
 
-  // console.log(ticketData);
-  // console.log(req_no);
   useEffect(() => {
     getDataPR();
     // getInfoUser();
@@ -361,6 +360,7 @@ const PurchaseTicketFac = (props) => {
           var arr_request = newDataRequest.filter(
             (row) => row.action_req_code === req_no
           );
+
           arr_request = [...arr_request];
 
           if (arr_request.length === 0) {
@@ -384,6 +384,7 @@ const PurchaseTicketFac = (props) => {
           let jsonList = JSON.parse(arr_request[0].request_list);
 
           setDataPR(arr_request);
+
           setListReq(jsonList);
           setIsLoading(false);
 
@@ -398,9 +399,13 @@ const PurchaseTicketFac = (props) => {
             employe: item.employe_status,
           }));
 
-          var arr_facility = newDataFacility.filter(
+          let arr_facility = [...newDataFacility];
+
+          arr_facility = newDataFacility.filter(
             (row) => row.facility_req_code === req_no
           );
+
+          setTicketStatus(arr_facility);
 
           newDataUser = newDataUser.filter(
             (item) =>
@@ -575,6 +580,7 @@ const PurchaseTicketFac = (props) => {
               </>
             ) : (
               <TableScreenPO
+                ticketStat={ticketStatus}
                 getLastNumber={lastNumber}
                 listData={dataPR}
                 ticketUser={userData}
@@ -716,14 +722,12 @@ const TablePurchaseList = ({ listData }) => {
   );
 };
 
-const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
+const TableScreenPO = ({ listData, ticketUser, ticketStat, getLastNumber }) => {
   const classes = useStyles2();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenPo, setModalOpenPo] = useState(false);
   const [listScreenshot] = useState(listData);
   const [userTicket] = useState(ticketUser);
-
-  console.log(listData);
 
   function countTotalPo(listScreenshot) {
     var data = listScreenshot.map((item) => ({
@@ -854,14 +858,18 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
                 complete PO
               </button>
             </div>
-            <div className="col-2">
-              <button className="btn-create-po" onClick={modalPop}>
-                <span
-                  class="iconify icon-btn"
-                  data-icon="ant-design:plus-outlined"></span>
-                <span className="name-btn">Create PO</span>
-              </button>
-            </div>
+
+            {ticketStat[0].status_id === 11 ||
+            userTicket[0].status_id === 15 ? null : (
+              <div className="col-2">
+                <button className="btn-create-po" onClick={modalPop}>
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="ant-design:plus-outlined"></span>
+                  <span className="name-btn">Create PO</span>
+                </button>
+              </div>
+            )}
           </Toolbar>
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>

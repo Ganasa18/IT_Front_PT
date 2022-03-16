@@ -227,6 +227,7 @@ const FacilityReqTicketDetail = () => {
           });
 
           setTicketData(arr_request);
+
           setIsLoading(false);
         })
       )

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { pathEndPoint, prEndPoint, authEndPoint } from "../../../assets/menu";
-import Loading from "../../asset/Loading";
+import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Grid,
@@ -260,6 +260,14 @@ function calbill(date) {
   return newdate;
 }
 
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  document.getElementById("overlay").style.display = "block";
+  setTimeout(() => {
+    window.location.href = `${origin}/disposal-asset-approval`;
+  }, 2000);
+};
+
 const DisposalApproveDetail = () => {
   const classes = useStyles();
   const dataStorage = localStorage.getItem("ticketDispos");
@@ -418,7 +426,7 @@ const DisposalApproveDetail = () => {
           </div>
           <Divider />
           <br />
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="row">
               <div className="col-5">
                 <p style={{ fontWeight: "bold" }}>Submit OTP</p>
@@ -471,6 +479,15 @@ const DisposalApproveDetail = () => {
           <br />
         </div>
       </Fade>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 

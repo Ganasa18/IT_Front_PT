@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Grid,
@@ -60,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     position: "fixed",
-    transform: "translate(-50%,-50%)",
+    transform: "translate(-50%,-40%)",
     top: "40%",
     left: "50%",
     width: 1000,
@@ -68,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 4, 3),
+    [theme.breakpoints.down("lg")]: {
+      zoom: "95%",
+    },
   },
   cancelBtn: {
     color: "#EB5757",

@@ -172,7 +172,7 @@ const useStyles2 = makeStyles((theme) => ({
   },
   paper: {
     position: "fixed",
-    transform: "translate(-50%,-50%)",
+    transform: "translate(-50%,-35%)",
     top: "30%",
     left: "50%",
     width: 850,

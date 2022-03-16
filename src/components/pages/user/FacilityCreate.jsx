@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
 import "../../../assets/master.css";
+import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Stepper,
@@ -356,6 +357,7 @@ const FacilityCreate = (props) => {
         user_id: parseInt(userData[0].id),
       };
 
+      document.getElementById("overlay").style.display = "block";
       await axios
         .post(fac_req, data)
         .then((response) => {
@@ -442,6 +444,15 @@ const FacilityCreate = (props) => {
             </div>
           )}
         </div>
+      </div>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
       </div>
     </>
   );

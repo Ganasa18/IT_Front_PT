@@ -336,7 +336,9 @@ const TableGR = () => {
           });
 
           let newDataFilter = newDataRequest.filter(
-            (item) => parseInt(item.request_id.status_id) !== 15
+            (item) =>
+              parseInt(item.request_id.status_id) === 13 ||
+              parseInt(item.request_id.status_id) === 14
           );
 
           setDataGR(newDataFilter);

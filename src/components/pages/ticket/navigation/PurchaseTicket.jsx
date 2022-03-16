@@ -450,8 +450,6 @@ const PurchaseTicket = () => {
               usermap[request_id.id_user.departement];
           });
 
-          console.log(arr_request);
-
           setTicketData(arr_request);
           setIsLoadingTicket(false);
         })
@@ -688,7 +686,6 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
   const [modalOpenPo, setModalOpenPo] = useState(false);
   const [listScreenshot] = useState(listData);
   const [userTicket] = useState(ticketUser);
-  console.log(listData);
 
   function countTotalPo(listScreenshot) {
     var data = listScreenshot.map((item) => ({
@@ -819,14 +816,17 @@ const TableScreenPO = ({ listData, ticketUser, getLastNumber }) => {
                 complete PO
               </button>
             </div>
-            <div className="col-2">
-              <button className="btn-create-po" onClick={modalPop}>
-                <span
-                  class="iconify icon-btn"
-                  data-icon="ant-design:plus-outlined"></span>
-                <span className="name-btn">Create PO</span>
-              </button>
-            </div>
+            {userTicket[0].status_id === 11 ||
+            userTicket[0].status_id === 15 ? null : (
+              <div className="col-2">
+                <button className="btn-create-po" onClick={modalPop}>
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="ant-design:plus-outlined"></span>
+                  <span className="name-btn">Create PO</span>
+                </button>
+              </div>
+            )}
           </Toolbar>
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>

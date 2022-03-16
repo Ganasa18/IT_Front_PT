@@ -4,6 +4,7 @@ import {
   authEndPoint,
   pathEndPoint,
   prEndPoint,
+  FacEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import {
@@ -259,7 +260,6 @@ const PurchaseDoneDetail = () => {
   const [infoRequest, setInfoRequest] = useState([]);
   const [purchaseList, setPurchaseList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  console.log(purchaseData);
 
   useEffect(() => {
     getDataInfo();
@@ -269,6 +269,10 @@ const PurchaseDoneDetail = () => {
     let act_req = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
     }/api/v1/action-req/`;
+
+    let fac_req = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/`;
 
     let inventory = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -290,7 +294,13 @@ const PurchaseDoneDetail = () => {
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/`;
 
-    const requestOne = await axios.get(act_req);
+    const requestOne = await axios.get(
+      `${
+        purchaseData.ticket_number.replace(/[0-9]/g, "") === "MKDAR"
+          ? act_req
+          : fac_req
+      }`
+    );
     const requestTwo = await axios.get(inventory);
     const requestThree = await axios.get(user, {
       headers: { Authorization: `Bearer ${token}` },
@@ -319,8 +329,11 @@ const PurchaseDoneDetail = () => {
           const responseFive = responses[4];
           const responseSix = responses[5];
 
-          let newDataRequest = responseOne.data.data.request_tiket;
-          let newDataInventory = responseTwo.data.data.inventorys;
+          let newDataRequest =
+            purchaseData.ticket_number.replace(/[0-9]/g, "") === "MKDAR"
+              ? responseOne.data.data.request_tiket
+              : responseOne.data.data.request_facility;
+
           let newDataUser = responseThree.data.data.users;
           let newDataDepartement = responseFour.data.data.departements;
           let newDataSubDepartement = responseFive.data.data.subdepartements;
@@ -342,25 +355,22 @@ const PurchaseDoneDetail = () => {
           }));
 
           let arr_request = [...newDataRequest];
-          const arr_inventory = [...newDataInventory];
 
-          arr_request = arr_request.filter(
-            (item) => item.action_req_code === purchaseData.ticket_number
-          );
+          if (purchaseData.ticket_number.replace(/[0-9]/g, "") === "MKDAR") {
+            arr_request = arr_request.filter(
+              (item) => item.action_req_code === purchaseData.ticket_number
+            );
+          } else {
+            arr_request = arr_request.filter(
+              (item) => item.facility_req_code === purchaseData.ticket_number
+            );
+          }
+
+          console.log(arr_request);
 
           newDataUser = newDataUser.filter(
             (item) => item.id === parseInt(arr_request[0].user_id)
           );
-
-          var inventmap = {};
-
-          arr_inventory.forEach(function (invent_id) {
-            inventmap[invent_id.id] = invent_id;
-          });
-
-          arr_request.forEach(function (request_id) {
-            request_id.invent_id = inventmap[request_id.asset_id];
-          });
 
           let arr_user = [...newDataUser];
           let arr_departement = [...newDataDepartement];
@@ -443,11 +453,17 @@ const PurchaseDoneDetail = () => {
             <br />
             <div className="row">
               <div className="col-3">
-                <p className="label-asset">Request Name</p>
+                <p className="label-asset">Request By</p>
                 <p>
                   {capitalizeFirstLetter(purchaseData.request_id.request_by)}
                 </p>
               </div>
+              {purchaseData.ticket_number.replace(/[0-9]/g, "") === "MKDFR" ? (
+                <div className="col-3">
+                  <p className="label-asset">Request For</p>
+                  <p>{capitalizeFirstLetter(infoRequest[0].user_name)}</p>
+                </div>
+              ) : null}
               <div className="col-3">
                 <p className="label-asset">Sub Department</p>
                 <p>

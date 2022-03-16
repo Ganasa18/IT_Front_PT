@@ -70,7 +70,11 @@ const useStyles = makeStyles((theme) => ({
     display: "block",
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 6, 3),
+    padding: theme.spacing(2, 8, 3),
+
+    [theme.breakpoints.down("lg")]: {
+      height: "82%",
+    },
   },
 }));
 
@@ -406,8 +410,7 @@ const ActionReq = () => {
                 </div>
               </div>
             </div>
-
-            <div className="footer-modal">
+            <div className="footer-modal-ar">
               <button className={"btn-cancel"} onClick={modalClose}>
                 Cancel
               </button>

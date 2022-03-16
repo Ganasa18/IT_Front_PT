@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("lg")]: {
       width: theme.spacing(27),
       height: theme.spacing(27),
-      transform: "translate(25%, 10%);",
+      transform: "translate(25%, 50%);",
     },
   },
   paper: {

@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     height: "40px",
     left: "50%",
     top: "50%",
-    transform: "translate(200%, 120%)",
+    transform: "translate(200%, 140%)",
     [theme.breakpoints.down("lg")]: {
       width: "130px",
       height: "40px",

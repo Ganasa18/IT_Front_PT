@@ -6,7 +6,7 @@ import {
   FacEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
-
+import Loader from "react-loader-spinner";
 import {
   makeStyles,
   Grid,
@@ -348,6 +348,7 @@ const RequestApprove = () => {
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/approve-pr`;
     const origin = window.location.origin;
+    document.getElementById("overlay").style.display = "block";
 
     await axios
       .patch(approve_pr, dataUpdated)
@@ -681,6 +682,15 @@ const RequestApprove = () => {
           <br />
         </div>
       </Fade>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 

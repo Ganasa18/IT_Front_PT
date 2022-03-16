@@ -640,7 +640,7 @@ const GoodReceiveTicket = () => {
                             {row.asset_name}
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.desc_po}
+                            <div className="text-hide">{row.desc_po}</div>
                           </TableCell>
                           <TableCell component="th" scope="row">
                             {row.qty}
