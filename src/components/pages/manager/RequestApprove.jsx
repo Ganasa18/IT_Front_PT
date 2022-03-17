@@ -277,7 +277,7 @@ const RequestApprove = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenDeny, setModalOpenDeny] = useState(false);
   const [dataUser, setDataUser] = useState([]);
-  const [inputOTP, setInputOTP] = useState("");
+  // const [inputOTP, setInputOTP] = useState("");
   const [timer, setTimer] = useState(null);
   const [buttonAllow, setButtonAllow] = useState(false);
   const [comment, setComment] = useState("");
@@ -308,9 +308,6 @@ const RequestApprove = () => {
     }
     setTimer(
       setTimeout(() => {
-        setInputOTP(e);
-        // console.log(Otp.classList);
-        // console.log(otpNow);
         if (e !== otpNow) {
           if (Otp.classList[1] !== undefined) {
             Otp.classList.remove("success");
@@ -324,7 +321,6 @@ const RequestApprove = () => {
 
         setButtonAllow(true);
         Otp.classList.add("success");
-        console.log(e);
       }, 3000)
     );
   };
