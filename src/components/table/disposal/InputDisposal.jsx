@@ -187,7 +187,7 @@ const InputDisposal = ({ dataDisposal, userProp }) => {
   const [lastNumber, setLastNumber] = useState("");
   const [userProfile] = useState(userProp);
 
-  console.log(userProfile);
+  // console.log(userProfile);
 
   const [dataImg, onChange, onDone, onRemoveOne] = useUploadImg();
 

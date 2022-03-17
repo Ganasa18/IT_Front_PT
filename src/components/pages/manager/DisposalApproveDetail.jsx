@@ -260,14 +260,6 @@ function calbill(date) {
   return newdate;
 }
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  document.getElementById("overlay").style.display = "block";
-  setTimeout(() => {
-    window.location.href = `${origin}/disposal-asset-approval`;
-  }, 2000);
-};
-
 const DisposalApproveDetail = () => {
   const classes = useStyles();
   const dataStorage = localStorage.getItem("ticketDispos");
@@ -277,16 +269,44 @@ const DisposalApproveDetail = () => {
   const [dataUser, setDataUser] = useState([]);
   const [toast, setToast] = useState(false);
   const [isLoadingOTP, setIsLoadingOTP] = useState(true);
-  const [inputOTP, setInputOTP] = useState("");
+  // const [inputOTP, setInputOTP] = useState("");
   const [buttonAllow, setButtonAllow] = useState(false);
   const [timer, setTimer] = useState(null);
   const [modalGaleryOpen, setModalGaleryOpen] = useState(false);
-
+  const [areaInput, setAreaInput] = useState(null);
   // console.log(JSON.parse(parseObject.item_list));
+
+  // console.log(parseObject);
+  // console.log(dataUser);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    document.getElementById("overlay").style.display = "block";
+
+    const dataUpdated = {
+      disposal_code: parseObject.disposal_code,
+      pic_name: dataUser[0].username,
+      pic_comment: areaInput,
+      status_approval: 12,
+    };
+
+    setTimeout(() => {
+      //  window.location.href = `${origin}/disposal-asset-approval`;
+      document.getElementById("overlay").style.display = "none";
+    }, 2000);
+  };
 
   useEffect(() => {
     getInfoUser();
   }, []);
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setToast(false);
+  };
 
   const handleOtp = (e) => {
     const Otp = document.querySelector("#OtpNumber");
@@ -299,8 +319,6 @@ const DisposalApproveDetail = () => {
     }
     setTimer(
       setTimeout(() => {
-        setInputOTP(e);
-        // console.log(Otp.classList);
         if (e !== otpNow) {
           if (Otp.classList[1] !== undefined) {
             Otp.classList.remove("success");
@@ -415,6 +433,59 @@ const DisposalApproveDetail = () => {
     setModalOpen(false);
   };
 
+  const handleModalDeny = () => {
+    setModalOpenDeny((prevModal) => !prevModal);
+  };
+
+  let updatedsp = `${pathEndPoint[0].url}${
+    pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+  }/api/v1/disposal/updated-status-dispos`;
+
+  const handleDeny = async () => {
+    const host = window.location.origin;
+
+    const dataUpdated = {
+      disposal_code: parseObject.disposal_code,
+      pic_name: dataUser[0].username,
+      status_approval: 20,
+    };
+
+    await axios
+      .patch(updatedsp, dataUpdated)
+      .then((response) => {
+        console.log("success");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("something wrong");
+      });
+
+    const listDisp = JSON.parse(parseObject.item_list);
+
+    listDisp.forEach((el) => {
+      // Updated Status
+      axios
+        .patch(
+          `${pathEndPoint[0].url}${
+            pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+          }/api/v1/inventory/updated-status/${el.id}/disposal/`,
+          {
+            disposal: false,
+          }
+        )
+        .then((response) => {
+          console.log("success");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+    setToast(true);
+    setTimeout(() => {
+      window.location = `${host}/disposal-asset-approval/`;
+    }, 3000);
+  };
+
   const bodyModal = (
     <>
       <Fade in={modalOpen}>
@@ -448,7 +519,6 @@ const DisposalApproveDetail = () => {
                 <small>
                   Not send yet ?
                   <span className="resend" onClick={resendOTP}>
-                    {" "}
                     Resend
                   </span>
                 </small>
@@ -457,6 +527,8 @@ const DisposalApproveDetail = () => {
               <div className="col-6">
                 <label style={{ fontWeight: "bold" }}>Leave Comment</label>
                 <textarea
+                  value={areaInput}
+                  onChange={(e) => setAreaInput(e.target.value)}
                   className="form-input-area"
                   placeholder="Comment here... "
                   cols="30"
@@ -491,6 +563,26 @@ const DisposalApproveDetail = () => {
     </>
   );
 
+  const bodyDeny = (
+    <>
+      <Fade in={modalOpenDeny}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to deny {parseObject.disposal_code}</h3>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={handleModalDeny}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={handleDeny}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -518,7 +610,10 @@ const DisposalApproveDetail = () => {
                   className="approve-btn">
                   Approve
                 </button>
-                <button type="button" className="deny-btn">
+                <button
+                  type="button"
+                  onClick={handleModalDeny}
+                  className="deny-btn">
                   Deny
                 </button>
               </div>
@@ -596,6 +691,24 @@ const DisposalApproveDetail = () => {
         }}>
         {bodyModal}
       </Modal>
+      <Modal
+        open={modalOpenDeny}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyDeny}
+      </Modal>
+      <Snackbar
+        autoHideDuration={5000}
+        open={toast}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert onClose={handleClose} severity="success">
+          submit successful
+        </Alert>
+      </Snackbar>
     </>
   );
 };
