@@ -43,6 +43,7 @@ import FacilityApproveDetail from "../pages/lead/FacilityApproveDetail";
 import FacilityTicket from "../pages/ticket/FacilityTicket";
 import FacilityReqTicketDetail from "../pages/ticket/FacilityReqTicketDetail";
 import GoodReceiptFacility from "../pages/gr/GoodReceiptFacility";
+import TableAssetUserMore from "../table/user/TableAssetUserMore";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -219,6 +220,12 @@ const Routes = () => {
       <Route
         path="/facility-acc/detail"
         component={(props) => <FacilityReqDetail {...props} />}
+      />
+
+      <Route
+        exact
+        path="/asset-user/more"
+        component={(props) => <TableAssetUserMore {...props} />}
       />
 
       <Route

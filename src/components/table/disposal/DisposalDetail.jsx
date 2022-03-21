@@ -532,8 +532,14 @@ const DisposalDetail = () => {
               </div>
               <div className="col-2">
                 <p className="label-asset">PIC</p>
-                <p>{dataDisposal.user_name}</p>
+                <p>{dataDisposal.pic_name}</p>
               </div>
+              {dataDisposal.pic_comment !== null ? (
+                <div className="col-3">
+                  <p className="label-asset">Comment PIC</p>
+                  <p className="wrap-paraf">{dataDisposal.pic_comment}</p>
+                </div>
+              ) : null}
               {dataDisposal.img_list !== null ? (
                 <div className="col-2">
                   <p className="label-asset">Image</p>

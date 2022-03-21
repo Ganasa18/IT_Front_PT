@@ -2114,6 +2114,14 @@ input[type="radio"] {
   color: #ffffff;
 }
 
+@media only screen and (min-width: 1366px) and (max-width: 1366px) {
+  .po-button-select {
+    width: 45px;
+    height: 24px;
+    font-size: 11px;
+  }
+}
+
 /* Facility Acc */
 
 .wrapper-facility {

@@ -2,6 +2,16 @@ import React from "react";
 import { makeStyles, Grid, Paper, Typography } from "@material-ui/core";
 import "../../assets/master.css";
 import "../../assets/dashboard.css";
+import Cookies from "universal-cookie";
+import DashboardAdmin from "./dashboard/DashboardAdmin";
+import DashboardLead from "./dashboard/DashboardLead";
+import DashboardUser from "./dashboard/DashboardUser";
+import DashboardManagement from "./dashboard/DashboardManagement";
+import DashboardPurchase from "./dashboard/DashboardPurchase";
+const cookies = new Cookies();
+const roleUser = cookies.get("role");
+
+console.log(roleUser);
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -31,40 +41,42 @@ const Home = () => {
           </Typography>
         </Grid>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
-            <div className="card-dashboard">
-              <div className="container-head">
-                <p className="title-card">Action Request Approval</p>
-                <div className="grow"></div>
-                <p>
-                  <span
-                    className="iconify icon-dashboard"
-                    data-icon="wpf:approval"></span>
-                </p>
-              </div>
-              <div className="container-body">
-                <p className="total-request">10</p>
-                <p className="total-title">Request need to approve</p>
-              </div>
-            </div>
-          </Grid>
-          <Grid item xs={6}>
-            <div className="card-dashboard">
-              <div className="container-head">
-                <p className="title-card">Facility & Access Approval</p>
-                <div className="grow"></div>
-                <p>
-                  <span
-                    className="iconify icon-dashboard"
-                    data-icon="wpf:approval"></span>
-                </p>
-              </div>
-              <div className="container-body">
-                <p className="total-request">10</p>
-                <p className="total-title">Request need to approve</p>
-              </div>
-            </div>
-          </Grid>
+          {roleUser === "1" ? (
+            <>
+              <Grid item xs={12}>
+                <Paper style={{ padding: "50px" }}>
+                  <Typography variant="h5" style={{ marginLeft: "5px" }}>
+                    Action Request
+                  </Typography>
+                  <DashboardAdmin />
+                </Paper>
+              </Grid>
+            </>
+          ) : roleUser === "3" ? (
+            <>
+              <Grid item xs={12}>
+                <DashboardLead />
+              </Grid>
+            </>
+          ) : roleUser === "2" ? (
+            <>
+              <Grid item xs={12}>
+                <DashboardUser />
+              </Grid>
+            </>
+          ) : roleUser === "4" ? (
+            <>
+              <Grid item xs={12}>
+                <DashboardManagement />
+              </Grid>
+            </>
+          ) : roleUser === "5" || roleUser === "6" ? (
+            <>
+              <Grid item xs={12}>
+                <DashboardPurchase />
+              </Grid>
+            </>
+          ) : null}
         </Grid>
       </Grid>
     </div>

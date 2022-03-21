@@ -415,6 +415,20 @@
   grid-row-gap: 20px;
 }
 
+/* Dashboard */
+.asset-user-more {
+  margin-left: 5px;
+}
+
+.asset-user-more:hover {
+  color: #1653a6;
+  cursor: pointer;
+}
+
+.asset-departement-more {
+  margin-left: 10px;
+}
+
 @media only screen and (min-width: 1366px) and (max-width: 1366px) {
   .card-asset {
     height: 42vh;

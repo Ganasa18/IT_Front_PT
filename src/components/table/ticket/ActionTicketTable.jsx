@@ -298,7 +298,7 @@ const ActionTicketTable = () => {
                 <StyledTableCell>Asset Name</StyledTableCell>
                 <StyledTableCell>Date Created</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
 
@@ -342,7 +342,8 @@ const ActionTicketTable = () => {
                       </span>
                     </TableCell>
 
-                    <TableCell
+                    {/* Response Action  */}
+                    {/* <TableCell
                       align="center"
                       component="th"
                       scope="row"
@@ -366,7 +367,7 @@ const ActionTicketTable = () => {
                           <span className="name-btn">Change Status</span>
                         </button>
                       )}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (

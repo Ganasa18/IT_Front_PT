@@ -283,16 +283,29 @@ const DisposalApproveDetail = () => {
     e.preventDefault();
     document.getElementById("overlay").style.display = "block";
 
+    let updatedsp = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/disposal/updated-status-dispos`;
+
     const dataUpdated = {
       disposal_code: parseObject.disposal_code,
       pic_name: dataUser[0].username,
       pic_comment: areaInput,
-      status_approval: 12,
+      status_approval: 7,
     };
 
+    await axios
+      .patch(updatedsp, dataUpdated)
+      .then((response) => {
+        alert("success");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("something wrong");
+      });
+
     setTimeout(() => {
-      //  window.location.href = `${origin}/disposal-asset-approval`;
-      document.getElementById("overlay").style.display = "none";
+      window.location.href = `${origin}/disposal-asset-approval`;
     }, 2000);
   };
 
@@ -603,20 +616,24 @@ const DisposalApproveDetail = () => {
             <div className="flex-card">
               <h3>Information</h3>
 
-              <div className="button-approve">
-                <button
-                  type="button"
-                  onClick={handleModal}
-                  className="approve-btn">
-                  Approve
-                </button>
-                <button
-                  type="button"
-                  onClick={handleModalDeny}
-                  className="deny-btn">
-                  Deny
-                </button>
-              </div>
+              {parseObject.status_id.id === 10 && (
+                <>
+                  <div className="button-approve">
+                    <button
+                      type="button"
+                      onClick={handleModal}
+                      className="approve-btn">
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleModalDeny}
+                      className="deny-btn">
+                      Deny
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
             <div className="row">
               <div className="col-3">

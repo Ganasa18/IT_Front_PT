@@ -19,6 +19,7 @@ import {
   withStyles,
 } from "@material-ui/core";
 import "../../../assets/master.css";
+import "../../asset/chips.css";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -265,6 +266,7 @@ const TableIncomingPR = () => {
                 <StyledTableCell>Create by</StyledTableCell>
                 <StyledTableCell>Request For</StyledTableCell>
                 <StyledTableCell>PR Date</StyledTableCell>
+                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -300,6 +302,35 @@ const TableIncomingPR = () => {
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {calbill(row.createdAt)}
+                    </TableCell>
+                    <TableCell width={200} component="th" scope="row">
+                      {row.purchase_order_code_1 !== null ||
+                      row.purchase_order_code_2 !== null ||
+                      row.purchase_order_code_3 !== null ||
+                      row.purchase_order_code_4 !== null ||
+                      row.purchase_order_code_5 !== null ? (
+                        <p className="text-center">
+                          <span
+                            class="chip-action"
+                            style={{
+                              background: `#1653A64C`,
+                              color: `#1653A6FF`,
+                            }}>
+                            Progress
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="text-center">
+                          <span
+                            class="chip-action"
+                            style={{
+                              background: `#EB57574C`,
+                              color: `#EB5757FF`,
+                            }}>
+                            Not Fill
+                          </span>
+                        </p>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

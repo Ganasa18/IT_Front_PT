@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { makeStyles, Grid, Paper } from "@material-ui/core";
-import "../../assets/master.css";
-import "../../assets/dashboard.css";
+import { makeStyles, Grid, Paper, Typography } from "@material-ui/core";
+import "../../../assets/master.css";
+import "../../../assets/dashboard.css";
+import TableActionReq from "../../table/user/TableActionReq";
+import FacilityTicketTable from "../../table/user/TableFacilityAcc";
+import TableAssetUser from "../../table/user/TableAssetUser";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -18,13 +21,28 @@ const DashboardUser = () => {
   const classes = useStyles();
   return (
     <>
-      <div className={classes.toolbar} />
       <Grid container spacing={3}>
-        <Grid item xs={6}>
-          <Paper className={classes.paper}>xs=12</Paper>
+        <Grid item xs={12}>
+          <TableAssetUser />
         </Grid>
-        <Grid item xs={6}>
-          <Paper className={classes.paper}>xs=12</Paper>
+        <Grid item xs={12} sm={12}>
+          <Paper style={{ padding: "50px" }}>
+            <div className="row">
+              <Typography variant="h5" style={{ marginLeft: "20px" }}>
+                Action Request
+              </Typography>
+              <TableActionReq />
+            </div>
+            <br />
+            <br />
+            <br />
+            <div className="row">
+              <Typography variant="h5" style={{ marginLeft: "20px" }}>
+                Facility & Access
+              </Typography>
+              <FacilityTicketTable />
+            </div>
+          </Paper>
         </Grid>
       </Grid>
     </>
