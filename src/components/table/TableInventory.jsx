@@ -373,31 +373,6 @@ const TableInventory = () => {
     var newInvent = dataInventory;
     newInvent = newInvent.filter((row) => newArrDisposal.includes(row.id));
     setSelectedDisposal(newInvent);
-
-    // const checkbox = document.querySelectorAll("#check-value .Mui-checked");
-    // const table = document.querySelectorAll("tbody #check-value");
-    // const arr = [...checkbox];
-    // // const arr2 = [...table];
-    // // const arr = [...table];
-    // var newArray = [];
-    // arr.forEach((element) => {
-    //   const valueId = parseInt(element.children[0].children[0].value);
-    //   newArray.push(valueId);
-    // });
-    // var filteredArray = selectInventory.filter((i) => newArray.includes(i.id));
-    // console.log(selectInventory);
-    // console.log(filteredArray);
-    // const arrLength = arr;
-    // arr2.forEach((element) => {
-    //   console.log(checkbox);
-    //   console.log(element);
-    // });
-    // console.log(arrLength.length);
-    // for (i = 0; i < table.length; i++) {
-    //   const checkbox = document.querySelectorAll("td input[type=checkbox]");
-    //   console.log(checkbox);
-    //   // console.log(table[i]);
-    // }
   };
 
   const bodyModal = (

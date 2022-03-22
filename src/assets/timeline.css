@@ -59,6 +59,10 @@
   cursor: pointer;
 }
 
+.scroll .card-timeline.active {
+  background-color: #1652a64f;
+}
+
 .scroll .card-inner {
   align-items: center;
   text-align: center;

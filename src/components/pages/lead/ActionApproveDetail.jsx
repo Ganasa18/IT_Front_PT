@@ -203,6 +203,7 @@ const ActionApproveDetail = () => {
         dataRequest.id_area_user.area_name +
         "-" +
         dataRequest.id_area_user.alias_name,
+      ticketCreated: Date.now(),
     };
     // console.log(log_data);
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
-import { invEndPoint } from "../../assets/menu";
+import { invEndPoint, logsEndPoint } from "../../assets/menu";
 import { makeStyles, Modal, Backdrop, Fade, Divider } from "@material-ui/core";
 import axios from "axios";
 
@@ -75,6 +75,7 @@ const StatusButton = (styleProps) => {
   const [modalOpenDefault, setModalOpenDefault] = useState(false);
   const [buttonType, setButtonType] = useState("");
   const [idRequest, setIdRequest] = useState(null);
+  const [logsData, setLogsData] = useState(null);
   const [idStatus, setIdStatus] = useState(null);
   const [troubleTitle, setTroubleTitle] = useState("");
   const [remark, setRemark] = useState("");
@@ -82,6 +83,8 @@ const StatusButton = (styleProps) => {
   const statusChange = async (props, data) => {
     setIdStatus(props);
     setIdRequest(data.action_req_code);
+    setLogsData(data);
+
     if (buttonType === "troubleshoot") {
       setModalOpen2(true);
       return;
@@ -90,6 +93,10 @@ const StatusButton = (styleProps) => {
       setModalOpen(true);
       return;
     }
+    // console.log(data);
+    // console.log(new Date(data.logs_id.ticketCreated));
+
+    // console.log(log_data);
 
     setModalOpenDefault(true);
   };
@@ -255,6 +262,27 @@ const StatusButton = (styleProps) => {
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
     }/api/v1/action-req/updated-ticket-status/${idRequest}`;
 
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+
+    const log_data = {
+      request_number: logsData.logs_id.request_number,
+      asset_number: logsData.logs_id.asset_number,
+      asset_name: logsData.logs_id.asset_name,
+      status_ar: parseInt(idStatus),
+      request_by: logsData.logs_id.request_by,
+      status_user: logsData.logs_id.status_user,
+      departement_user: logsData.logs_id.departement_user,
+      subdepartement_user: logsData.logs_id.subdepartement_user,
+      role_user: logsData.logs_id.role_user,
+      area_user: logsData.logs_id.area_user,
+      ticketCreated: new Date(logsData.logs_id.ticketCreated),
+      trouble_title: troubleTitle,
+      trouble_detail: buttonType === "troubleshoot" ? remark : null,
+      close_remark: buttonType === "closed" ? remark : null,
+    };
+
     await axios
       .patch(ticket, {
         status_id: idStatus,
@@ -264,6 +292,7 @@ const StatusButton = (styleProps) => {
       })
       .then((response) => {
         alert(response.data.status);
+        axios.post(Logs, log_data);
         setTimeout(() => {
           setIdRequest(null);
           setIdStatus(null);

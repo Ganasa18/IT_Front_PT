@@ -106,6 +106,30 @@ const ChatHistory = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [commentData, setCommentData] = useState([]);
 
+  useEffect(() => {
+    getComment();
+  }, []);
+
+  const getComment = async () => {
+    let act_comment = `${invEndPoint[0].url}${
+      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+    }/api/v1/message-req`;
+
+    await axios
+      .get(act_comment)
+      .then((response) => {
+        const messageData = response.data.data.request_message;
+        let filterMessage = messageData.filter(
+          (item) => item.action_req_code === req_no
+        );
+        setCommentData(filterMessage);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <div className="card-comment">

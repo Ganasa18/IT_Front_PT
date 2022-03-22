@@ -12,7 +12,7 @@ import {
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
-import { pathEndPoint, invEndPoint } from "../../../assets/menu";
+import { pathEndPoint, invEndPoint, logsEndPoint } from "../../../assets/menu";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import InformationTicket from "./navigation/InformationTicket";
@@ -118,22 +118,33 @@ const ActionReqTicketDetail = () => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/status`;
 
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-ar-history`;
+
     const requestOne = await axios.get(act_req);
     const requestTwo = await axios.get(status);
+    const requestThree = await axios.get(logs);
 
     axios
-      .all([requestOne, requestTwo])
+      .all([requestOne, requestTwo, requestThree])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
+          const responseThree = responses[2];
           let newDataRequest = responseOne.data.data.request_tiket;
           let newStatus = responseTwo.data.data.statuss;
+          let newDataLog = responseThree.data.data.ar_log;
           var arr_request = [...newDataRequest];
           const arr_status = [...newStatus];
 
           arr_request = arr_request.filter(
             (item) => item.action_req_code === req_no
+          );
+
+          newDataLog = newDataLog.filter(
+            (item) => item.request_number === req_no
           );
 
           var statusmap = {};
@@ -144,6 +155,16 @@ const ActionReqTicketDetail = () => {
 
           arr_request.forEach(function (request_id) {
             request_id.status_id = statusmap[request_id.status_id];
+          });
+
+          var logsmap = {};
+
+          newDataLog.forEach(function (logs_id) {
+            logsmap[logs_id.request_number] = logs_id;
+          });
+
+          arr_request.forEach(function (request_id) {
+            request_id.logs_id = logsmap[request_id.action_req_code];
           });
 
           setTicketData(arr_request);

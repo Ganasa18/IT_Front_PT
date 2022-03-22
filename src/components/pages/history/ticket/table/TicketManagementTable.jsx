@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  pathEndPoint,
-  authEndPoint,
-  prEndPoint,
-} from "../../../../../assets/menu";
+import { pathEndPoint, logsEndPoint } from "../../../../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../../../../asset/Loading";
@@ -189,30 +185,56 @@ const TicketManagementTable = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(false);
-  //   const [dataHistoryTicket, setDataHistoryTicket] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataHistoryTicket, setDataHistoryTicket] = useState([]);
 
-  const dataHistoryTicket = [
-    {
-      id: 1,
-      request_ticket: "43253422",
-      asset_no: "MKDLPHO01",
-      asset_name: "Laptop HP 123",
-      createdAt: "20 Oct 2021",
-      status: 7,
-    },
-    {
-      id: 2,
-      request_ticket: "43253423",
-      asset_no: "MKDLPHO02",
-      asset_name: "Laptop HP 124",
-      createdAt: "21 Oct 2021",
-      status: 8,
-    },
-  ];
+  useEffect(() => {
+    getDataHistory();
+  }, []);
+
+  const getDataHistory = async () => {
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-ar-history`;
+
+    const status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    const requestOne = await axios.get(logs);
+    const requestTwo = await axios.get(status);
+
+    await axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+
+          let newDataLog = responseOne.data.data.ar_log;
+          let newStatus = responseTwo.data.data.statuss;
+
+          var statusmap = {};
+          newStatus.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_ar];
+          });
+
+          setDataHistoryTicket(newDataLog);
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
 
   const saveStorage = (row) => {
-    localStorage.setItem("req_no", row.request_ticket);
+    localStorage.setItem("req_no", row.request_number);
   };
 
   const emptyRows =
@@ -238,7 +260,7 @@ const TicketManagementTable = () => {
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
-                <StyledTableCell>Status</StyledTableCell>
+                <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -258,20 +280,27 @@ const TicketManagementTable = () => {
                       <Link
                         to="/history/ticket/action-req/detail/information"
                         onClick={() => saveStorage(row)}>
-                        {row.request_ticket}
+                        {row.request_number}
                       </Link>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.asset_no}
+                      {row.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.createdAt}
+                      {calbill(row.ticketCreated)}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      open
+                    <TableCell align="center" component="th" scope="row">
+                      <span
+                        class="chip"
+                        style={{
+                          background: `${row.status_id.color_status}4C`,
+                          color: `${row.status_id.color_status}FF`,
+                        }}>
+                        {capitalizeFirstLetter(row.status_id.status_name)}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

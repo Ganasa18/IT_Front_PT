@@ -24,7 +24,6 @@ const ModalGalery = (props) => {
   //   },
   // ];
 
-  console.log(props.imgList);
   let jsonImg = JSON.parse(props.imgList);
   jsonImg = JSON.parse(props.imgList);
 
