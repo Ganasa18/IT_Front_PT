@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Loader from "react-loader-spinner";
 import {
-  pathEndPoint,
-  authEndPoint,
+  logsEndPoint,
   prEndPoint,
+  pathEndPoint,
 } from "../../../../../../assets/menu";
 import AddIcon from "@material-ui/icons/Add";
 import Loading from "../../../../../asset/Loading";
@@ -213,11 +214,103 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const HistoryPurchase = () => {
+const HistoryPurchase = (props) => {
   const classes = useStyles();
   const [isLoading, setIsLoading] = useState(true);
+  const [ticketData, setTicketData] = useState([]);
   const req_no = localStorage.getItem("req_no");
   const [listReq, setListReq] = useState([]);
+  const { dataLogPR, dateNow } = props;
+
+  useEffect(() => {
+    getDataHistory();
+  }, [dateNow]);
+
+  const getDataHistory = async () => {
+    // document.getElementById("overlay").style.display = "block";
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+
+    const status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    const requestOne = await axios.get(logs);
+    const requestTwo = await axios.get(status);
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          let newDataLog = responseOne.data.data.log_ar;
+          let newStatus = responseTwo.data.data.statuss;
+          newDataLog = newDataLog.filter(
+            (item) => item.request_number === req_no
+          );
+
+          if (dataLogPR.length === 0) {
+            return console.log("no data");
+          }
+
+          newDataLog = newDataLog.filter((item) => item.createdAt === dateNow);
+
+          var statusmap = {};
+          newStatus.forEach(function (status_id_pr) {
+            statusmap[status_id_pr.id] = status_id_pr;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.status_id_pr = statusmap[request_id.status_pr];
+          });
+          console.log(newDataLog);
+          setListReq(JSON.parse(newDataLog[0].pr_item));
+          setTicketData(newDataLog);
+          setIsLoading(false);
+          document.getElementById("overlay").style.display = "none";
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+
+    // console.log(dateNow);
+  };
+
+  if (dataLogPR.length === 0) {
+    return (
+      <>
+        <Grid item xs={12} className={classes.cardPadding}>
+          <div className="card-asset-action ">
+            <h3>Purchase Information</h3>
+            <div className="flex-item-direction">
+              <span
+                class="iconify icon-direction"
+                data-icon="clarity:pencil-solid"></span>
+              <p>No Data</p>
+            </div>
+          </div>
+        </Grid>
+      </>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       <Grid item xs={12} className={classes.cardPadding}>
@@ -226,23 +319,20 @@ const HistoryPurchase = () => {
           <div className="row">
             <div className="col-3">
               <p className="label-asset">PR No</p>
-              <p>-</p>
+              <p>{ticketData[0].pr_number}</p>
             </div>
-            <div className="col-3">
-              <p className="label-asset">Po No</p>
-              <p>-</p>
-            </div>
-
             <div className="col-3">
               <p className="label-asset">Status</p>
               <p className="">
                 <span
                   class="chip-action"
                   style={{
-                    background: `#2196534C`,
-                    color: `#219653FF`,
+                    background: `${ticketData[0].status_id_pr.color_status}4C`,
+                    color: `${ticketData[0].status_id_pr.color_status}FF`,
                   }}>
-                  {capitalizeFirstLetter("Open")}
+                  {capitalizeFirstLetter(
+                    ticketData[0].status_id_pr.status_name
+                  )}
                 </span>
               </p>
             </div>
@@ -251,15 +341,12 @@ const HistoryPurchase = () => {
           <div className="row">
             <div className="col-3">
               <p className="label-asset">PR Date</p>
-              <p>26 Okt 2022</p>
+              <p>{calbill(ticketData[0].createdAt)}</p>
             </div>
-            <div className="col-3">
-              <p className="label-asset">PO Date</p>
-              <p> - </p>
-            </div>
+
             <div className="col-3">
               <p className="label-asset">Request No</p>
-              <p>123124444</p>
+              <p>{ticketData[0].request_number}</p>
             </div>
             <div className="col-3"></div>
           </div>
@@ -268,6 +355,15 @@ const HistoryPurchase = () => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 };

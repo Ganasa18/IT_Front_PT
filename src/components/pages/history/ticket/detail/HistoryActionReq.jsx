@@ -110,6 +110,8 @@ const HistoryActionReq = () => {
   const [ticketDataDate, setTicketDataDate] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateSelect, setDateSelect] = useState(null);
+  const [dateSelectPR, setDateSelectPR] = useState(null);
+  const [dateSelectPRNow, setDateSelectPRNow] = useState(null);
   const [activeLink, setActiveLink] = useState(null);
 
   useEffect(() => {
@@ -151,9 +153,28 @@ const HistoryActionReq = () => {
             request_id.status_id = statusmap[request_id.status_ar];
           });
 
+          newStatus.forEach(function (status_id_pr) {
+            statusmap[status_id_pr.id] = status_id_pr;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.status_id_pr = statusmap[request_id.status_pr];
+          });
+
+          // PR Filter
+          const newDataLogPR = newDataLog.filter(
+            (item) => item.status_pr !== null
+          );
+
+          if (newDataLogPR.length === 0) {
+            setDateSelectPRNow(null);
+          } else {
+            setDateSelectPRNow(newDataLogPR[0].createdAt);
+          }
           setDateSelect(newDataLog[0].createdAt);
           setActiveLink(newDataLog[0].id);
           setTicketDataDate(newDataLog);
+          setDateSelectPR(newDataLogPR);
 
           setIsLoading(false);
         })
@@ -283,9 +304,12 @@ const HistoryActionReq = () => {
                   onMouseMove={HandleMouseMove}>
                   {ticketDataDate.map((row) => (
                     <div
-                      className="card-timeline"
+                      className={`card-timeline ${
+                        activeLink === row.id ? "active" : ""
+                      }`}
                       onClick={function () {
                         setDateSelect(row.createdAt);
+                        setActiveLink(row.id);
                       }}>
                       <div className="card-inner">
                         <p className="text-center">
@@ -320,7 +344,7 @@ const HistoryActionReq = () => {
               ))}
             </Grid>
             <Grid item xs={12} className={classes.cardPadding}>
-              <HistoryInventory />
+              <HistoryInventory dateNow={dateSelect} />
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={8}>
@@ -353,21 +377,26 @@ const HistoryActionReq = () => {
                   onMouseLeave={HandleMouseLeave}
                   onMouseDown={HandleMouseDown}
                   onMouseMove={HandleMouseMove}>
-                  {ticketDataDate.map((row) => (
+                  {dateSelectPR.map((row) => (
                     <div
-                      className="card-timeline"
+                      className={`card-timeline ${
+                        activeLink === row.id ? "active" : ""
+                      }`}
                       onClick={function () {
-                        setDateSelect(row.createdAt);
+                        setDateSelectPRNow(row.createdAt);
+                        setActiveLink(row.id);
                       }}>
                       <div className="card-inner">
                         <p className="text-center">
                           <span
                             class="chip"
                             style={{
-                              background: `${row.status_id.color_status}4C`,
-                              color: `${row.status_id.color_status}FF`,
+                              background: `${row.status_id_pr.color_status}4C`,
+                              color: `${row.status_id_pr.color_status}FF`,
                             }}>
-                            {capitalizeFirstLetter(row.status_id.status_name)}
+                            {capitalizeFirstLetter(
+                              row.status_id_pr.status_name
+                            )}
                           </span>
                         </p>
                         <br />
@@ -392,7 +421,10 @@ const HistoryActionReq = () => {
               ))}
             </Grid>
             <Grid item xs={12} className={classes.cardPadding}>
-              <HistoryPurchase />
+              <HistoryPurchase
+                dataLogPR={dateSelectPR}
+                dateNow={dateSelectPRNow}
+              />
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={8}>
@@ -427,9 +459,12 @@ const HistoryActionReq = () => {
                   onMouseMove={HandleMouseMove}>
                   {ticketDataDate.map((row) => (
                     <div
-                      className="card-timeline"
+                      className={`card-timeline ${
+                        activeLink === row.id ? "active" : ""
+                      }`}
                       onClick={function () {
                         setDateSelect(row.createdAt);
+                        setActiveLink(row.id);
                       }}>
                       <div className="card-inner">
                         <p className="text-center">

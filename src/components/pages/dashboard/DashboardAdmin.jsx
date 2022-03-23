@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { makeStyles, Grid, Typography } from "@material-ui/core";
 import "../../../assets/master.css";
 import ActionTicketTable from "../../table/ticket/ActionTicketTable";
+import FacilityTicketTable from "../../table/ticket/FacilityTicketTable";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -67,7 +68,7 @@ const DashboardAdmin = () => {
           <Typography variant="h5" style={{ marginLeft: "20px" }}>
             Facility & Access
           </Typography>
-          <ActionTicketTable />
+          <FacilityTicketTable />
         </div>
       </Grid>
     </>

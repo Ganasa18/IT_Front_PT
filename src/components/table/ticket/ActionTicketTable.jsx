@@ -231,7 +231,10 @@ const ActionTicketTable = () => {
           const arr_inventory = [...newInvent];
 
           arr_request = arr_request.filter(
-            (item) => item.status_id !== 10 && item.status_id !== 20
+            (item) =>
+              item.status_id !== 10 &&
+              item.status_id !== 20 &&
+              item.status_id !== 11
           );
 
           var statusmap = {};

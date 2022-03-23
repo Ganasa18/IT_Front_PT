@@ -1,5 +1,4 @@
 import React from "react";
-
 import { makeStyles, Grid } from "@material-ui/core";
 
 import "../../../../assets/master.css";
@@ -25,6 +24,13 @@ const useStyles = makeStyles((theme) => ({
 
 const InventoryTicket = ({ dataTicket }) => {
   const classes = useStyles();
+
+  const url =
+    window.location.origin + `/ticket-admin/action-request/detail/information`;
+
+  if (!dataTicket) {
+    return (window.location.href = url);
+  }
 
   return (
     <>

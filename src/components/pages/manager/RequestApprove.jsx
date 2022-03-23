@@ -4,6 +4,7 @@ import {
   prEndPoint,
   authEndPoint,
   FacEndPoint,
+  logsEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import Loader from "react-loader-spinner";
@@ -273,6 +274,7 @@ const RequestApprove = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingOTP, setIsLoadingOTP] = useState(true);
   const [dataRequest, setDataRequest] = useState([]);
+  const [dataRequestLog, setDataRequestLog] = useState([]);
   const [purchaseList, setPurchaseList] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpenDeny, setModalOpenDeny] = useState(false);
@@ -343,6 +345,28 @@ const RequestApprove = () => {
     let approve_pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/approve-pr`;
+
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+
+    const log_data = {
+      request_number: dataRequestLog[0].request_number,
+      asset_number: dataRequestLog[0].asset_number,
+      asset_name: dataRequestLog[0].asset_name,
+      status_ar: parseInt(19),
+      request_by: dataRequestLog[0].request_by,
+      status_user: dataRequestLog[0].status_user,
+      departement_user: dataRequestLog[0].departement_user,
+      subdepartement_user: dataRequestLog[0].subdepartement_user,
+      role_user: dataRequestLog[0].role_user,
+      area_user: dataRequestLog[0].area_user,
+      ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+      pr_number: dataRequestLog[0].pr_number,
+      status_pr: 7,
+      pr_item: dataRequestLog[0].pr_item,
+    };
+
     const origin = window.location.origin;
     document.getElementById("overlay").style.display = "block";
 
@@ -350,6 +374,7 @@ const RequestApprove = () => {
       .patch(approve_pr, dataUpdated)
       .then((response) => {
         console.log(response);
+        axios.post(Logs, log_data);
         setToast(true);
         setTimeout(() => {
           window.location.href = `${origin}/procurement-approval`;
@@ -384,9 +409,31 @@ const RequestApprove = () => {
 
     let type_req = parseObject.action_req_code.replace(/[0-9]/g, "");
     if (type_req === "MKDAR") {
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-ar`;
+
+      const log_data = {
+        request_number: dataRequestLog[0].request_number,
+        asset_number: dataRequestLog[0].asset_number,
+        asset_name: dataRequestLog[0].asset_name,
+        status_ar: parseInt(19),
+        request_by: dataRequestLog[0].request_by,
+        status_user: dataRequestLog[0].status_user,
+        departement_user: dataRequestLog[0].departement_user,
+        subdepartement_user: dataRequestLog[0].subdepartement_user,
+        role_user: dataRequestLog[0].role_user,
+        area_user: dataRequestLog[0].area_user,
+        ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+        pr_number: dataRequestLog[0].pr_number,
+        status_pr: 20,
+        pr_item: dataRequestLog[0].pr_item,
+      };
+
       await axios
         .patch(deny_pr, dataUpdated)
         .then((response) => {
+          axios.post(Logs, log_data);
           setToast(true);
         })
         .catch((error) => {
@@ -521,31 +568,76 @@ const RequestApprove = () => {
       let act_req = `${invEndPoint[0].url}${
         invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
       }/api/v1/action-req/`;
+
+      const logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/get-latest-ar-history`;
+
+      const requestOne = await axios.get(act_req);
+      const requestTwo = await axios.get(logs);
+
       await axios
-        .get(act_req)
-        .then((response) => {
-          let newDataRequest = response.data.data.request_tiket;
+        .all([requestOne, requestTwo])
+        .then(
+          axios.spread((...responses) => {
+            const responseOne = responses[0];
+            const responseTwo = responses[1];
 
-          newDataRequest = newDataRequest.map((item) => ({
-            id: item.id,
-            action_req_code: item.action_req_code,
-            req_created: item.createdAt,
-            user_id: item.user_id,
-          }));
+            let newDataRequest = responseOne.data.data.request_tiket;
+            let newDataLog = responseTwo.data.data.ar_log;
+            newDataRequest = newDataRequest.map((item) => ({
+              id: item.id,
+              action_req_code: item.action_req_code,
+              req_created: item.createdAt,
+              user_id: item.user_id,
+            }));
 
-          newDataRequest = newDataRequest.filter(
-            (item) => item.action_req_code === parseObject.action_req_code
-          );
-          setDataRequest(newDataRequest);
+            newDataRequest = newDataRequest.filter(
+              (item) => item.action_req_code === parseObject.action_req_code
+            );
 
-          let jsonList = JSON.parse(parseObject.request_list);
-          setPurchaseList(jsonList);
+            newDataLog = newDataLog.filter(
+              (item) => item.request_number === parseObject.action_req_code
+            );
+            setDataRequest(newDataRequest);
+            setDataRequestLog(newDataLog);
 
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error(error);
+            let jsonList = JSON.parse(parseObject.request_list);
+            setPurchaseList(jsonList);
+
+            setIsLoading(false);
+          })
+        )
+        .catch((errors) => {
+          // react on errors.
+          console.error(errors);
         });
+
+      // await axios
+      //   .get(act_req)
+      //   .then((response) => {
+      //     let newDataRequest = response.data.data.request_tiket;
+
+      //     newDataRequest = newDataRequest.map((item) => ({
+      //       id: item.id,
+      //       action_req_code: item.action_req_code,
+      //       req_created: item.createdAt,
+      //       user_id: item.user_id,
+      //     }));
+
+      //     newDataRequest = newDataRequest.filter(
+      //       (item) => item.action_req_code === parseObject.action_req_code
+      //     );
+      //     setDataRequest(newDataRequest);
+
+      //     let jsonList = JSON.parse(parseObject.request_list);
+      //     setPurchaseList(jsonList);
+
+      //     setIsLoading(false);
+      //   })
+      //   .catch((error) => {
+      //     console.error(error);
+      //   });
 
       return;
     }

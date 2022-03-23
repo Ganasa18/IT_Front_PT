@@ -30,6 +30,7 @@ import {
   prEndPoint,
   invEndPoint,
   FacEndPoint,
+  logsEndPoint,
 } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
@@ -545,6 +546,29 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       request_by: requestBy,
       created_by: createdBy,
     });
+
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+
+    const log_data = {
+      request_number: dataReq[0].action_req_code,
+      asset_number: dataReq[0].logs_id.asset_number,
+      asset_name: dataReq[0].logs_id.asset_name,
+      status_ar: parseInt(19),
+      request_by: dataReq[0].logs_id.request_by,
+      status_user: dataReq[0].logs_id.status_user,
+      departement_user: dataReq[0].logs_id.departement_user,
+      subdepartement_user: dataReq[0].logs_id.subdepartement_user,
+      role_user: dataReq[0].logs_id.role_user,
+      area_user: dataReq[0].logs_id.area_user,
+      ticketCreated: new Date(dataReq[0].logs_id.ticketCreated),
+      pr_number: "MKDPR" + lastNumber,
+      status_pr: 10,
+      pr_item: jsonString,
+    };
+
+    axios.post(Logs, log_data);
 
     await axios.patch(ar, {
       status_id: 19,

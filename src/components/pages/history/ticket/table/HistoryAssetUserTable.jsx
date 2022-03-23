@@ -174,12 +174,23 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const HistoryAssetUserTable = () => {
+const HistoryAssetUserTable = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [dataAsset, setDataAsset] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [userAsset, setUserAsset] = useState([]);
+  const { dataAsset } = props;
+
+  useEffect(() => {
+    handleAsset();
+  }, [dataAsset]);
+
+  const handleAsset = () => {
+    if (dataAsset === "null") {
+      return setUserAsset([]);
+    }
+    setUserAsset(JSON.parse(dataAsset));
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -191,7 +202,7 @@ const HistoryAssetUserTable = () => {
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataAsset.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, userAsset.length - page * rowsPerPage);
 
   return (
     <>
@@ -212,55 +223,46 @@ const HistoryAssetUserTable = () => {
               <TableRow>
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
-                <StyledTableCell>Unit/Parts</StyledTableCell>
                 <StyledTableCell>Category</StyledTableCell>
-                <StyledTableCell>Sub Category</StyledTableCell>
+                <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
             </TableHead>
-
-            {isLoading ? (
-              <Loading />
-            ) : (
-              <TableBody>
-                {(rowsPerPage > 0
-                  ? dataAsset.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                  : dataAsset
-                ).map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell component="th" scope="row">
-                      Asset No
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      Asset Name
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      Part
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      Komputer
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      Sub Category
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {emptyRows > 0 && (
-                  <TableRow style={{ height: 20 * emptyRows }}>
-                    <TableCell colSpan={6} />
-                  </TableRow>
-                )}
-              </TableBody>
-            )}
+            <TableBody>
+              {(rowsPerPage > 0
+                ? userAsset.slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
+                : userAsset
+              ).map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row">
+                    {row.asset_number}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {row.asset_name}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {row.asset_category}
+                  </TableCell>
+                  <TableCell component="th" scope="row" align="center">
+                    {row.type_action}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 20 * emptyRows }}>
+                  <TableCell colSpan={4} />
+                </TableRow>
+              )}
+            </TableBody>
 
             <TableFooter className={classes.posPagination}>
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataAsset.length}
+                  count={userAsset.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

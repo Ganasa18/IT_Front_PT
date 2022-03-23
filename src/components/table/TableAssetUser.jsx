@@ -3,7 +3,7 @@ import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../assets/select-search.css";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint, authEndPoint } from "../../assets/menu";
+import { pathEndPoint, authEndPoint, logsEndPoint } from "../../assets/menu";
 import AddIcon from "@material-ui/icons/Add";
 
 import Loading from "../asset/Loading";
@@ -216,7 +216,7 @@ const useStyles2 = makeStyles((theme) => ({
     },
     [theme.breakpoints.between("xlm", "xl")]: {
       width: "150px",
-      left: "10%",
+      left: "24%",
       top: "8px",
     },
     fontSize: 12,
@@ -255,6 +255,7 @@ const TableAssetUser = (props) => {
 
   const getAssetUser = async () => {
     localStorage.setItem("userData", JSON.stringify(dataUser));
+
     const dataNow = localStorage.getItem("userData");
     const userNow = JSON.parse(dataNow);
 
@@ -417,11 +418,23 @@ const TableAssetUser = (props) => {
       type_asset: "user",
       status_asset: true,
     };
-    // console.log(dataAsset[0].user_id.id);
-    // console.log(dataAsset[0].user_id.departement);
-    // console.log(dataAsset[0].user_id.subdepartement);
-    // console.log(assetSelected[0]);
-    // console.log(data);
+
+    if (dataUser.logs_id !== undefined) {
+      const dataLogs = {
+        request_number: dataUser.logs_id.request_number,
+        status_ar: dataUser.logs_id.status_ar,
+        asset_number: assetSelected[1].code,
+        asset_name: assetSelected[1].name,
+        asset_category: assetSelected[1].category,
+        type_action: "add asset",
+      };
+
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/update-inv-logs`;
+
+      axios.patch(Logs, dataLogs);
+    }
 
     let inventory = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -446,6 +459,7 @@ const TableAssetUser = (props) => {
   const handleModalRemove = (row) => {
     setModalRemove(true);
     setRemoveItem(row);
+    console.log(row);
   };
 
   const handleDelete = async () => {
@@ -463,6 +477,23 @@ const TableAssetUser = (props) => {
         setTimeout(() => {
           setModalRemove(false);
           alert("success");
+
+          if (dataUser.logs_id !== undefined) {
+            const dataLogs = {
+              request_number: dataUser.logs_id.request_number,
+              status_ar: dataUser.logs_id.status_ar,
+              asset_number: removeItem.asset_number,
+              asset_name: removeItem.asset_name,
+              asset_category: removeItem.category_name,
+              type_action: "remove asset",
+            };
+
+            const Logs = `${logsEndPoint[0].url}${
+              logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+            }/api/v1/logs-login/update-inv-logs`;
+
+            axios.patch(Logs, dataLogs);
+          }
         }, 1500);
       })
       .catch((error) => {
@@ -645,6 +676,11 @@ const TableAssetUser = (props) => {
                 startIcon={<AddIcon />}>
                 Create New
               </Button>
+
+              {/* <button className="btn-inv-create" onClick={modalPop}>
+                <span class="iconify icon-btn" data-icon="carbon:add"></span>
+                <span className="name-btn">Create New</span>
+              </button> */}
             </div>
           </Toolbar>
           <div className="display-disposal">
