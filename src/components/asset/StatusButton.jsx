@@ -281,6 +281,13 @@ const StatusButton = (styleProps) => {
       trouble_title: troubleTitle,
       trouble_detail: buttonType === "troubleshoot" ? remark : null,
       close_remark: buttonType === "closed" ? remark : null,
+      pr_number: logsData.logs_id.pr_number ? logsData.logs_id.pr_number : null,
+      status_pr: logsData.logs_id.status_pr ? logsData.logs_id.status_pr : null,
+      pr_item: logsData.logs_id.pr_item ? logsData.logs_id.pr_item : null,
+      sub_total_po: logsData.logs_id.sub_total_po
+        ? parseInt(logsData.logs_id.sub_total_po)
+        : null,
+      gr_item: logsData.logs_id.gr_item ? logsData.logs_id.gr_item : null,
     };
 
     await axios

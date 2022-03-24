@@ -85,6 +85,14 @@ const ButtonStatusFacility = (styleProps) => {
       return;
     }
 
+    if (data.status_id.id === 4) {
+      if (button.innerHTML === "purchase") {
+        button.setAttribute("disabled", true);
+        button.style.cursor = "not-allowed";
+      }
+      return;
+    }
+
     if (data.status_id.id === 12) {
       if (button.innerHTML === "request") {
         button.setAttribute("disabled", true);

@@ -25,7 +25,11 @@ import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
 import _ from "lodash";
 import Loading from "../../../asset/Loading";
-import { prEndPoint, pathEndPoint } from "../../../../assets/menu";
+import {
+  prEndPoint,
+  pathEndPoint,
+  logsEndPoint,
+} from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
@@ -184,15 +188,46 @@ const GoodReceiveTicket = () => {
   const [dataGRTemp, setDataGRTemp] = useState([]);
   const [lastNumber, setLastNumber] = useState("");
   const [lastNumberPR, setLastNumberPR] = useState("");
+  const [dataRequestLog, setDataRequestLog] = useState([]);
   // const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
     getDataPO();
-
+    getLogsData();
     setInterval(() => {
       getInvLatestId();
     }, 2000);
   }, []);
+
+  const getLogsData = async () => {
+    let type_req = req_no.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      const logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/get-latest-ar-history`;
+
+      const requestOne = await axios.get(logs);
+
+      await axios
+        .all([requestOne])
+        .then(
+          axios.spread((...responses) => {
+            const responseOne = responses[0];
+            let newDataLog = responseOne.data.data.ar_log;
+            newDataLog = newDataLog.filter(
+              (item) => item.request_number === req_no
+            );
+            console.log(newDataLog);
+            setDataRequestLog(newDataLog);
+          })
+        )
+        .catch((errors) => {
+          // react on errors.
+          console.error(errors);
+        });
+      return;
+    }
+  };
 
   const getDataPO = async () => {
     let poData = `${prEndPoint[0].url}${
@@ -366,9 +401,6 @@ const GoodReceiveTicket = () => {
 
     setDataGRTemp(newInvent);
 
-    // console.log(newInvent);
-    // const countData = document.querySelector('.item-count')
-
     const checkbox = document.querySelectorAll("#check-value .Mui-checked");
     const table = document.querySelectorAll("tbody #check-value");
     const arr = [...checkbox];
@@ -434,8 +466,6 @@ const GoodReceiveTicket = () => {
       x = x + 1;
     });
 
-    // console.log(dataNew);
-    // var el = 0;
     dataNew.forEach((element, index) => {
       var arrayEmpty = [...dataGR];
 
@@ -449,14 +479,40 @@ const GoodReceiveTicket = () => {
       console.log("After update: ", arrayEmpty[objIndex]);
     });
 
-    // console.log(newInvent);
+    console.log(dataGR);
 
     var updateTemp = newInvent.map((item) => ({
       ticket_number: item.id_gr,
       gr_list: dataGR,
     }));
 
-    // console.log(updateTemp);
+    let type_req = req_no.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-ar`;
+
+      const log_data = {
+        request_number: dataRequestLog[0].request_number,
+        asset_number: dataRequestLog[0].asset_number,
+        asset_name: dataRequestLog[0].asset_name,
+        status_ar: parseInt(dataRequestLog[0].status_ar),
+        request_by: dataRequestLog[0].request_by,
+        status_user: dataRequestLog[0].status_user,
+        departement_user: dataRequestLog[0].departement_user,
+        subdepartement_user: dataRequestLog[0].subdepartement_user,
+        role_user: dataRequestLog[0].role_user,
+        area_user: dataRequestLog[0].area_user,
+        ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+        pr_number: dataRequestLog[0].pr_number,
+        status_pr: parseInt(dataRequestLog[0].status_pr),
+        pr_item: dataRequestLog[0].pr_item,
+        sub_total_po: dataRequestLog[0].sub_total_po,
+        gr_item: JSON.stringify(dataGR),
+      };
+
+      axios.post(Logs, log_data);
+    }
 
     let gr_updated = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
@@ -479,18 +535,8 @@ const GoodReceiveTicket = () => {
 
     setTimeout(() => {
       document.getElementById("overlay").style.display = "none";
-      window.location.reload();
+      // window.location.reload();
     }, 1800);
-
-    // const data = {
-    //   ticket_number: req_no,
-    //   gr_list: dataGR,
-    // };
-
-    // console.log(newArray);
-    // var filteredArray = selectGR.filter((i) => newArray.includes(i.id));
-    // console.log(selectGR);
-    // console.log(filteredArray);
   };
 
   const getInvLatestId = async () => {

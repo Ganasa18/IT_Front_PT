@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../../../../asset/Loading";
 import "../../../../asset/chips.css";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../../../../../assets/master.css";
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";

@@ -15,6 +15,7 @@ import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import TicketManagementTable from "./table/TicketManagementTable";
+import TicketManagementFacilityTable from "./table/TicketManagementFacilityTable";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -126,7 +127,9 @@ const HistoryFaciltyAccess = () => {
           </div>
         </Grid>
         <Grid item xs={12} sm={12}>
-          <div className="row"></div>
+          <div className="row">
+            <TicketManagementFacilityTable />
+          </div>
         </Grid>
       </Grid>
     </>

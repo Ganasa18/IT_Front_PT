@@ -457,13 +457,13 @@ const HistoryActionReq = () => {
                   onMouseLeave={HandleMouseLeave}
                   onMouseDown={HandleMouseDown}
                   onMouseMove={HandleMouseMove}>
-                  {ticketDataDate.map((row) => (
+                  {dateSelectPR.map((row) => (
                     <div
                       className={`card-timeline ${
                         activeLink === row.id ? "active" : ""
                       }`}
                       onClick={function () {
-                        setDateSelect(row.createdAt);
+                        setDateSelectPRNow(row.createdAt);
                         setActiveLink(row.id);
                       }}>
                       <div className="card-inner">
@@ -499,7 +499,10 @@ const HistoryActionReq = () => {
               ))}
             </Grid>
             <Grid item xs={12} className={classes.cardPadding}>
-              <HistoryGoodReceived />
+              <HistoryGoodReceived
+                dataLogPR={dateSelectPR}
+                dateNow={dateSelectPRNow}
+              />
             </Grid>
             <Grid item xs={4}></Grid>
             <Grid item xs={8}>

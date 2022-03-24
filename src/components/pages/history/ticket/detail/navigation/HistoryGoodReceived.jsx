@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Loader from "react-loader-spinner";
 import {
   pathEndPoint,
   authEndPoint,
-  prEndPoint,
+  logsEndPoint,
 } from "../../../../../../assets/menu";
 import AddIcon from "@material-ui/icons/Add";
 import Loading from "../../../../../asset/Loading";
@@ -213,11 +214,76 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const HistoryGoodReceived = () => {
+const HistoryGoodReceived = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [listGR, setListGR] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const req_no = localStorage.getItem("req_no");
+  const { dataLogPR, dateNow } = props;
+
+  useEffect(() => {
+    getDataHistory();
+  }, [dateNow]);
+
+  const getDataHistory = async () => {
+    // document.getElementById("overlay").style.display = "block";
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-ar`;
+
+    const status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+
+    const requestOne = await axios.get(logs);
+    const requestTwo = await axios.get(status);
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          let newDataLog = responseOne.data.data.log_ar;
+          let newStatus = responseTwo.data.data.statuss;
+          newDataLog = newDataLog.filter(
+            (item) => item.request_number === req_no
+          );
+
+          if (dataLogPR.length === 0) {
+            return console.log("no data");
+          }
+
+          newDataLog = newDataLog.filter((item) => item.createdAt === dateNow);
+
+          var statusmap = {};
+          newStatus.forEach(function (status_id_pr) {
+            statusmap[status_id_pr.id] = status_id_pr;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.status_id_pr = statusmap[request_id.status_pr];
+          });
+
+          if (newDataLog[0].gr_item !== null) {
+            setListGR(JSON.parse(newDataLog[0].gr_item));
+          } else {
+            setListGR([]);
+          }
+
+          setIsLoading(false);
+          document.getElementById("overlay").style.display = "none";
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+
+    // console.log(dateNow);
+  };
+
   const emptyRows =
     rowsPerPage - Math.min(rowsPerPage, listGR.length - page * rowsPerPage);
 
@@ -229,6 +295,20 @@ const HistoryGoodReceived = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  if (isLoading) {
+    return (
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -264,16 +344,16 @@ const HistoryGoodReceived = () => {
               ).map((row) => (
                 <TableRow key={row.id}>
                   <TableCell style={{ width: 550 }} component="th" scope="row">
-                    {"MKDMSHO01"}
+                    {row.asset_po_number}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {"RAM 16GB"}
+                    {row.asset_number}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {"Butuh karena sudha tidak bisa di perbaiki lagi."}
+                    <div className="text-hide">{row.desc_po}</div>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {"2"}
+                    {row.qty}
                   </TableCell>
                 </TableRow>
               ))}
@@ -305,6 +385,15 @@ const HistoryGoodReceived = () => {
           </Table>
         </Paper>
       </TableContainer>
+      <div id="overlay">
+        <Loader
+          className="loading-data"
+          type="Rings"
+          color="#CECECE"
+          height={550}
+          width={80}
+        />
+      </div>
     </>
   );
 };

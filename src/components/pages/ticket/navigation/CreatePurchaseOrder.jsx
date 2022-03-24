@@ -27,6 +27,7 @@ import "../../../../assets/select-search.css";
 import {
   authEndPoint,
   pathEndPoint,
+  logsEndPoint,
   prEndPoint,
 } from "../../../../assets/menu";
 import IconButton from "@material-ui/core/IconButton";
@@ -234,19 +235,50 @@ const CreatePurchaseOrder = (props) => {
   const priceRef = React.useRef(null);
   const [subTotal, setSubTotal] = useState(0);
   const req_no = localStorage.getItem("req_no");
+  const [dataRequestLog, setDataRequestLog] = useState([]);
 
   const { ticketUser, lastNum, listData } = props;
 
-  console.log(req_no);
+  console.log(ticketUser);
 
   localStorage.setItem("last_number", lastNum);
 
   useEffect(() => {
     getCategoryList();
+    getLogsData();
     setTimeout(() => {
       checkTodos();
     }, 800);
   }, [todos]);
+
+  const getLogsData = async () => {
+    let type_req = req_no.replace(/[0-9]/g, "");
+    if (type_req === "MKDAR") {
+      const logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/get-latest-ar-history`;
+
+      const requestOne = await axios.get(logs);
+
+      await axios
+        .all([requestOne])
+        .then(
+          axios.spread((...responses) => {
+            const responseOne = responses[0];
+            let newDataLog = responseOne.data.data.ar_log;
+            newDataLog = newDataLog.filter(
+              (item) => item.request_number === req_no
+            );
+            setDataRequestLog(newDataLog);
+          })
+        )
+        .catch((errors) => {
+          // react on errors.
+          console.error(errors);
+        });
+      return;
+    }
+  };
 
   const checkTodos = () => {
     var finalArray = todos.map(function (obj) {
@@ -477,13 +509,39 @@ const CreatePurchaseOrder = (props) => {
       subtotal_price: parseInt(subTotal),
     };
 
+    let type_req = req_no.replace(/[0-9]/g, "");
+
+    if (type_req === "MKDAR") {
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-ar`;
+
+      const log_data = {
+        request_number: dataRequestLog[0].request_number,
+        asset_number: dataRequestLog[0].asset_number,
+        asset_name: dataRequestLog[0].asset_name,
+        status_ar: parseInt(13),
+        request_by: dataRequestLog[0].request_by,
+        status_user: dataRequestLog[0].status_user,
+        departement_user: dataRequestLog[0].departement_user,
+        subdepartement_user: dataRequestLog[0].subdepartement_user,
+        role_user: dataRequestLog[0].role_user,
+        area_user: dataRequestLog[0].area_user,
+        ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+        pr_number: dataRequestLog[0].pr_number,
+        status_pr: parseInt(dataRequestLog[0].status_pr),
+        pr_item: dataRequestLog[0].pr_item,
+        sub_total_po: parseInt(subTotal),
+        gr_item: JSON.stringify(todos),
+      };
+      axios.post(Logs, log_data);
+    }
+
     document.getElementById("overlay").style.display = "block";
 
     let po = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-order/`;
-
-    // console.log(data);
 
     await axios
       .post(po, data)

@@ -346,27 +346,6 @@ const RequestApprove = () => {
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
     }/api/v1/purchase-req/approve-pr`;
 
-    const Logs = `${logsEndPoint[0].url}${
-      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
-    }/api/v1/logs-login/history-ar`;
-
-    const log_data = {
-      request_number: dataRequestLog[0].request_number,
-      asset_number: dataRequestLog[0].asset_number,
-      asset_name: dataRequestLog[0].asset_name,
-      status_ar: parseInt(19),
-      request_by: dataRequestLog[0].request_by,
-      status_user: dataRequestLog[0].status_user,
-      departement_user: dataRequestLog[0].departement_user,
-      subdepartement_user: dataRequestLog[0].subdepartement_user,
-      role_user: dataRequestLog[0].role_user,
-      area_user: dataRequestLog[0].area_user,
-      ticketCreated: new Date(dataRequestLog[0].ticketCreated),
-      pr_number: dataRequestLog[0].pr_number,
-      status_pr: 7,
-      pr_item: dataRequestLog[0].pr_item,
-    };
-
     const origin = window.location.origin;
     document.getElementById("overlay").style.display = "block";
 
@@ -374,7 +353,32 @@ const RequestApprove = () => {
       .patch(approve_pr, dataUpdated)
       .then((response) => {
         console.log(response);
-        axios.post(Logs, log_data);
+
+        let type_req = parseObject.action_req_code.replace(/[0-9]/g, "");
+        if (type_req === "MKDAR") {
+          const Logs = `${logsEndPoint[0].url}${
+            logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+          }/api/v1/logs-login/history-ar`;
+
+          const log_data = {
+            request_number: dataRequestLog[0].request_number,
+            asset_number: dataRequestLog[0].asset_number,
+            asset_name: dataRequestLog[0].asset_name,
+            status_ar: parseInt(19),
+            request_by: dataRequestLog[0].request_by,
+            status_user: dataRequestLog[0].status_user,
+            departement_user: dataRequestLog[0].departement_user,
+            subdepartement_user: dataRequestLog[0].subdepartement_user,
+            role_user: dataRequestLog[0].role_user,
+            area_user: dataRequestLog[0].area_user,
+            ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+            pr_number: dataRequestLog[0].pr_number,
+            status_pr: 7,
+            pr_item: dataRequestLog[0].pr_item,
+          };
+          axios.post(Logs, log_data);
+        }
+
         setToast(true);
         setTimeout(() => {
           window.location.href = `${origin}/procurement-approval`;

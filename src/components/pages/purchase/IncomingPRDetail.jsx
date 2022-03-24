@@ -613,7 +613,7 @@ const IncomingPRDetail = () => {
       });
 
     setTimeout(() => {
-      window.location.href = `${origin}/procurement-approval`;
+      window.location.href = `${origin}/in-coming-pr`;
     }, 2000);
   };
 

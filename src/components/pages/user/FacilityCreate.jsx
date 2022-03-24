@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
+import { pathEndPoint, FacEndPoint, logsEndPoint } from "../../../assets/menu";
 import "../../../assets/master.css";
 import Loader from "react-loader-spinner";
 import {
@@ -84,7 +84,6 @@ const FacilityCreate = (props) => {
 
   const { userData, leadEmail } = props;
 
-  console.log(userData);
   // console.log(leadEmail);
 
   useEffect(() => {
@@ -102,6 +101,7 @@ const FacilityCreate = (props) => {
         const DataArea = response.data.data.areas;
 
         const arr = [...DataArea];
+        console.log(arr);
         const newArr = arr.map((row) => ({
           value: row.id,
           name: row.area_name,
@@ -113,8 +113,8 @@ const FacilityCreate = (props) => {
       });
   };
 
-  const handleArea = async (e) => {
-    setValueArea(e);
+  const handleArea = async (...e) => {
+    setValueArea(e[0]);
     await axios
       .get(
         `${pathEndPoint[0].url}${
@@ -124,7 +124,7 @@ const FacilityCreate = (props) => {
       .then((response) => {
         const DepartementList = response.data.data.departements;
         const depart = [...DepartementList];
-        const idDepart = depart.filter((item) => item.id_area === e);
+        const idDepart = depart.filter((item) => item.id_area === e[0]);
         if (idDepart === undefined || idDepart.length === 0) {
           setDataDepartement([]);
         } else {
@@ -140,8 +140,9 @@ const FacilityCreate = (props) => {
       });
   };
 
-  const handleSubDepartement = async (e) => {
-    setValueDepartement(e);
+  const handleSubDepartement = async (...e) => {
+    localStorage.setItem("departementUser", e[1].name);
+    setValueDepartement(e[1].value);
     await axios
       .get(
         `${pathEndPoint[0].url}${
@@ -240,6 +241,9 @@ const FacilityCreate = (props) => {
         return;
       }
 
+      // const subdepart = localStorage.getItem("subdepartementUserId");
+      // setValueSubDepartement(!subdepart ? null : parseInt(subdepart));
+
       localStorage.setItem("emailVal", email.value);
       localStorage.setItem("nameVal", name.value);
       localStorage.setItem("statusVal", status.value);
@@ -337,6 +341,11 @@ const FacilityCreate = (props) => {
       let fac_req = `${FacEndPoint[0].url}${
         FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
       }/api/v1/facility-req`;
+
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-fr`;
+
       const urlHost = window.location.origin;
 
       const data = {
@@ -345,7 +354,8 @@ const FacilityCreate = (props) => {
         user_email: emailVal,
         user_area: valueArea,
         user_departement: valueDepartement,
-        user_subdepartement: valueSubDepartement,
+        user_subdepartement:
+          valueSubDepartement === "" ? null : valueSubDepartement,
         user_status: statusVal,
         general_request: dataGeneral,
         aplication_req: subdataApplication,
@@ -362,6 +372,31 @@ const FacilityCreate = (props) => {
         .post(fac_req, data)
         .then((response) => {
           alert(response.data.status);
+          if (userData[0].role === 3) {
+            const log_data = {
+              request_number: response.data.data.fac_req.facility_req_code,
+              user_name: nameVal,
+              user_email: emailVal,
+              user_area:
+                userData[0].area_id.area_name +
+                "-" +
+                userData[0].area_id.alias_name,
+              status_ar: 12,
+              request_by: userData[0].name,
+              status_user: userData[0].employe,
+              departement_user: userData[0].depart_id.departement_name,
+              subdepartement_user:
+                userData[0].subdepart_id !== undefined
+                  ? userData[0].subdepart_id.subdepartement_name
+                  : "none",
+              role_user: userData[0].role_id.role_name,
+              general_request: dataGeneral,
+              aplication_req: subdataApplication,
+              ticketCreated: Date.now(),
+            };
+            axios.post(Logs, log_data);
+          }
+
           setTimeout(() => {
             window.location.reload();
           }, 1500);
@@ -414,6 +449,7 @@ const FacilityCreate = (props) => {
                   dataSubDepartement,
                   valueSubDepartement,
                   handleSubDepartement,
+                  setValueSubDepartement,
                   handleDetail1,
                   handleDetail2,
                   handleDetail3,
@@ -468,6 +504,7 @@ function getStepContent(
   dataSubDepartement,
   valueSubDepartement,
   handleSubDepartement,
+  setValueSubDepartement,
   handleDetail,
   handleDetail2,
   handleDetail3,
@@ -553,6 +590,10 @@ function getStepContent(
                       options={dataSubDepartement}
                       value={dataSubDepartement}
                       filterOptions={fuzzySearch}
+                      onChange={function (...e) {
+                        setValueSubDepartement(e[0]);
+                        localStorage.setItem("subdepartementUser", e[0].name);
+                      }}
                       search
                       placeholder="Search Sub Departement"
                     />

@@ -34,6 +34,7 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import HistoryPurchaseOrder from "../../table/HistoryPurchaseOrder";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -355,6 +356,13 @@ const HistoryPurchase = (props) => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
+
+      {ticketData[0].gr_item !== null ? (
+        <Grid item xs={12} className={classes.cardPadding}>
+          <HistoryPurchaseOrder poDataLog={ticketData} />
+        </Grid>
+      ) : null}
+
       <div id="overlay">
         <Loader
           className="loading-data"

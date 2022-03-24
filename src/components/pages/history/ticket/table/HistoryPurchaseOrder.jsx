@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { prEndPoint, logsEndPoint } from "../../../../../assets/menu";
+import PropTypes from "prop-types";
+import axios from "axios";
+import Loading from "../../../../asset/Loading";
+import "../../../../asset/chips.css";
+
+import "../../../../../assets/master.css";
+import IconButton from "@material-ui/core/IconButton";
+import FirstPageIcon from "@material-ui/icons/FirstPage";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+import LastPageIcon from "@material-ui/icons/LastPage";
 import {
+  useTheme,
   makeStyles,
-  Grid,
-  Typography,
-  Divider,
-  Paper,
   Table,
   TableBody,
   TableHead,
@@ -12,25 +21,12 @@ import {
   TableContainer,
   TableFooter,
   TablePagination,
-  TableRow,
-  useTheme,
-  withStyles,
   Toolbar,
+  TableRow,
+  Typography,
+  Paper,
+  withStyles,
 } from "@material-ui/core";
-import PropTypes from "prop-types";
-import "../../../assets/master.css";
-import "../../../assets/asset_user.css";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import "../../../assets/select-search.css";
-import { prEndPoint } from "../../../assets/menu";
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
-import axios from "axios";
-import AddIcon from "@material-ui/icons/Add";
-import Loading from "../../asset/Loading";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -225,17 +221,28 @@ function calbill(date) {
   return newdate;
 }
 
-const TablePurchaseOrder = (props) => {
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const HistoryPurchaseOrder = (props) => {
   const classes = useStyles();
   const [dataPO, setDataPO] = useState([]);
   const [isLoading, setIsloading] = useState(true);
-  const { listData } = props;
+  const [totalRp, setTotalRp] = useState(0);
+  const { poDataLog } = props;
 
-  // console.log(listData);
+  const totalformatRupiah = (money) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(money);
+  };
 
   useEffect(() => {
     getDataPO();
-  }, []);
+  }, [poDataLog]);
 
   const getDataPO = async () => {
     let poData = `${prEndPoint[0].url}${
@@ -246,12 +253,19 @@ const TablePurchaseOrder = (props) => {
       .get(poData)
       .then((response) => {
         let PoData = response.data.data.purchase_order;
-
         PoData = PoData.filter(
-          (row) => row.pr_number === listData[0].purchase_req_code
+          (row) => row.pr_number === poDataLog[0].pr_number
         );
+
+        let money = JSON.parse(poDataLog[0].gr_item);
+
+        let arr = [];
+
+        money.forEach((item) => arr.push(item.total_price_int));
+        const sum = arr.reduce((partialSum, a) => partialSum + a, 0);
+        setTotalRp(sum);
+
         setDataPO(PoData);
-        // setOrderData(JSON.parse(PoData[0].po_list));
         setIsloading(false);
       })
       .catch((error) => {
@@ -259,31 +273,11 @@ const TablePurchaseOrder = (props) => {
       });
   };
 
-  const totalformatRupiah = (money) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(money);
-  };
-
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   setRowsPerPage(parseInt(event.target.value, 10));
-  //   setPage(0);
-  // };
-
-  // const emptyRows =
-  //   rowsPerPage - Math.min(rowsPerPage, orderData.length - page * rowsPerPage);
-
   if (isLoading) return <Loading />;
 
   return (
     <>
-      {dataPO.map((row, index) => (
+      {poDataLog.map((row) => (
         <>
           <TableContainer className={classes.tableWidth}>
             <Paper className={classes.paperTable}>
@@ -293,7 +287,7 @@ const TablePurchaseOrder = (props) => {
                     variant="h6"
                     component="div"
                     style={{ marginTop: "15px" }}>
-                    Purchase Order {index + 1}
+                    Purchase Order
                   </Typography>
                 </div>
                 <div className="col-2">
@@ -318,7 +312,7 @@ const TablePurchaseOrder = (props) => {
                 </TableHead>
 
                 <TableBody>
-                  {JSON.parse(row.po_list).map((row) => (
+                  {JSON.parse(poDataLog[0].gr_item).map((row) => (
                     <TableRow key={row.id}>
                       <TableCell component="th" scope="row">
                         {row.asset_name}
@@ -364,7 +358,7 @@ const TablePurchaseOrder = (props) => {
                       variant="h6"
                       component="div"
                       style={{ color: "#1653A6", fontWeight: "bold" }}>
-                      {totalformatRupiah(row.subtotal_price)}
+                      {totalformatRupiah(totalRp)}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -374,100 +368,8 @@ const TablePurchaseOrder = (props) => {
           <br />
         </>
       ))}
-
-      {/* <TableContainer className={classes.tableWidth}>
-        <Paper className={classes.paperTable}>
-          <Toolbar>
-            <div className="col-10">
-              <Typography
-                variant="h6"
-                component="div"
-                style={{ marginTop: "15px" }}>
-                Purchase Order
-              </Typography>
-            </div>
-          </Toolbar>
-
-          <Table className={classes.table} aria-label="custom pagination table">
-            <TableHead classes={{ root: classes.thead }}>
-              <TableRow>
-                <StyledTableCell>Asset No</StyledTableCell>
-                <StyledTableCell>Item Name</StyledTableCell>
-                <StyledTableCell>User/Dept</StyledTableCell>
-                <StyledTableCell>Ctg</StyledTableCell>
-                <StyledTableCell>Sub Cat.</StyledTableCell>
-                <StyledTableCell>Desc</StyledTableCell>
-                <StyledTableCell>Unit Price</StyledTableCell>
-                <StyledTableCell>QTY</StyledTableCell>
-                <StyledTableCell align="center">Total</StyledTableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {(rowsPerPage > 0
-                ? orderData.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
-                : orderData
-              ).map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.asset_number}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.asset_name}
-                  </TableCell>
-
-                  <TableCell component="th" scope="row">
-                    {row.type_asset}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.category}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.subcategory}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <div className="text-hide"> {row.desc_po} </div>
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.price_unit}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.qty}
-                  </TableCell>
-                  <TableCell style={{ width: 100 }} align="center">
-                    {row.total_price_unit}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-
-            <TableRow>
-              <TableCell rowSpan={3} />
-              <TableCell colSpan={6} align="right">
-                <Typography
-                  variant="subtitle1"
-                  component="div"
-                  style={{ fontSize: 13 }}>
-                  Total All
-                </Typography>
-              </TableCell>
-              <TableCell colSpan={2} align="right">
-                <Typography
-                  variant="h6"
-                  component="div"
-                  style={{ color: "#1653A6", fontWeight: "bold" }}>
-                  {totalformatRupiah(dataPO[0].subtotal_price)}
-                </Typography>
-              </TableCell>
-            </TableRow>
-          </Table>
-        </Paper>
-      </TableContainer> */}
     </>
   );
 };
 
-export default TablePurchaseOrder;
+export default HistoryPurchaseOrder;
