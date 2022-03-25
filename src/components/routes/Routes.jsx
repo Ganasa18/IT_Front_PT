@@ -44,6 +44,7 @@ import FacilityTicket from "../pages/ticket/FacilityTicket";
 import FacilityReqTicketDetail from "../pages/ticket/FacilityReqTicketDetail";
 import GoodReceiptFacility from "../pages/gr/GoodReceiptFacility";
 import TableAssetUserMore from "../table/user/TableAssetUserMore";
+import HistoryFacilityReq from "../pages/history/ticket/detail/HistoryFacilityReq";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -349,6 +350,17 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <HistoryFaciltyAccess {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        path="/history/ticket/facility-req/detail/"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <HistoryFacilityReq {...props} />
           ) : (
             <Redirect to="/" />
           )

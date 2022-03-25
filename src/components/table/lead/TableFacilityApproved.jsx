@@ -300,7 +300,6 @@ const TableFacilityApproved = () => {
           });
 
           setDataRequest(arr_request);
-          console.log(arr_request);
 
           setIsLoading(false);
         })

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
-import { FacEndPoint } from "../../assets/menu";
+import { FacEndPoint, logsEndPoint } from "../../assets/menu";
 import { makeStyles, Modal, Backdrop, Fade, Divider } from "@material-ui/core";
 import axios from "axios";
 
@@ -74,6 +74,7 @@ const ButtonStatusFacility = (styleProps) => {
   const [idStatus, setIdStatus] = useState(null);
   const [idRequest, setIdRequest] = useState(null);
   const [modalOpenDefault, setModalOpenDefault] = useState(false);
+  const [logsData, setLogsData] = useState(null);
 
   const disbledButton = async (props, data) => {
     const button = document.querySelector(`#buttonCheck-${props}`);
@@ -128,13 +129,46 @@ const ButtonStatusFacility = (styleProps) => {
     setIdStatus(props);
     setIdRequest(data.id);
     setModalOpenDefault(true);
+    setLogsData(data);
+    console.log(data);
   };
 
   const submitStatus = async () => {
+    const log_data = {
+      request_number: logsData.logs_id.request_number,
+      user_name: logsData.logs_id.user_name,
+      user_email: logsData.logs_id.user_email,
+      user_area: logsData.logs_id.user_area,
+      status_ar: parseInt(idStatus),
+      request_by: logsData.logs_id.request_by,
+      status_user: logsData.logs_id.status_user,
+      departement_user: logsData.logs_id.departement_user,
+      subdepartement_user: logsData.logs_id.subdepartement_user,
+      leader_name: logsData.logs_id.leader_name
+        ? logsData.logs_id.leader_name
+        : null,
+      leader_comment: logsData.logs_id.leader_comment
+        ? logsData.logs_id.leader_comment
+        : null,
+      user_create: logsData.logs_id.user_create,
+      general_request: logsData.logs_id.general_request,
+      aplication_req: logsData.logs_id.aplication_req,
+      ticketCreated: new Date(logsData.logs_id.ticketCreated),
+      pr_number: logsData.logs_id.pr_number ? logsData.logs_id.pr_number : null,
+      status_pr: logsData.logs_id.status_pr ? logsData.logs_id.status_pr : null,
+      pr_item: logsData.logs_id.pr_item ? logsData.logs_id.pr_item : null,
+      sub_total_po: logsData.logs_id.sub_total_po
+        ? parseInt(logsData.logs_id.sub_total_po)
+        : null,
+      gr_item: logsData.logs_id.gr_item ? logsData.logs_id.gr_item : null,
+    };
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-fr`;
+
     let ticket = `${FacEndPoint[0].url}${
       FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
     }/api/v1/facility-req/updated-ticket-status/${idRequest}`;
-
     await axios
       .patch(ticket, {
         status_id: parseInt(idStatus),
@@ -143,15 +177,13 @@ const ButtonStatusFacility = (styleProps) => {
         alert(response.data.status);
         setTimeout(() => {
           setIdStatus(null);
+          axios.post(Logs, log_data);
           window.location.reload();
         }, 1000);
       })
       .catch((error) => {
         console.log(error);
       });
-
-    // console.log(idStatus);
-    // console.log(idRequest);
   };
 
   const modalClose = () => {

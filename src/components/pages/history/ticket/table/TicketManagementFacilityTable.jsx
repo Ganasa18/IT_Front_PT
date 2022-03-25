@@ -188,7 +188,49 @@ const TicketManagementFacilityTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataHistoryTicket, setDataHistoryTicket] = useState([]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    getDataHistory();
+  }, []);
+
+  const getDataHistory = async () => {
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-fr-history`;
+
+    const status = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/status`;
+    const requestOne = await axios.get(logs);
+    const requestTwo = await axios.get(status);
+
+    await axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+
+          let newDataLog = responseOne.data.data.fr_log;
+          let newStatus = responseTwo.data.data.statuss;
+
+          var statusmap = {};
+          newStatus.forEach(function (status_id) {
+            statusmap[status_id.id] = status_id;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.status_id = statusmap[request_id.status_ar];
+          });
+
+          setDataHistoryTicket(newDataLog);
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
 
   const saveStorage = (row) => {
     localStorage.setItem("req_no", row.request_number);
@@ -237,7 +279,7 @@ const TicketManagementFacilityTable = () => {
                     <TableCell component="th" scope="row">
                       <Link
                         onClick={() => saveStorage(row)}
-                        to="/ticket-admin/facility-request/detail/information">
+                        to="/history/ticket/facility-req/detail/information">
                         {row.request_number}
                       </Link>
                     </TableCell>

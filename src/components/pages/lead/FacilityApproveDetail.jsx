@@ -13,7 +13,7 @@ import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
 import "../../asset/chips.css";
-import { authEndPoint, FacEndPoint } from "../../../assets/menu";
+import { authEndPoint, FacEndPoint, logsEndPoint } from "../../../assets/menu";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
@@ -85,6 +85,9 @@ const FacilityApproveDetail = () => {
   const [areaInput, setAreaInput] = useState(null);
   const [allDataUser, setAllDataUser] = useState([]);
   const [leadEmail, setLeadEmail] = useState(null);
+  const [leadData, setLeadData] = useState([]);
+
+  console.log(dataRequest);
 
   useEffect(() => {
     getUserList();
@@ -110,8 +113,12 @@ const FacilityApproveDetail = () => {
           area: item.area,
           email: item.email,
         }));
-
         setAllDataUser(AllData);
+        const getLeadData = AllData.filter(
+          (item) => item.id === parseInt(userID)
+        );
+        setLeadData(getLeadData);
+        console.log(getLeadData);
       })
       .catch((error) => {
         console.log(error);
@@ -125,7 +132,6 @@ const FacilityApproveDetail = () => {
 
     var arr = [];
     getDataAdmin.forEach((x) => arr.push(x.email));
-    console.log(arr);
     setLeadEmail(arr);
   };
 
@@ -185,6 +191,31 @@ const FacilityApproveDetail = () => {
       return;
     }
 
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-fr`;
+
+    const log_data = {
+      request_number: dataRequest.facility_req_code,
+      user_name: dataRequest.user_name,
+      user_email: dataRequest.user_email,
+      user_area:
+        dataRequest.area_id.area_name + "-" + dataRequest.area_id.alias_name,
+      status_ar: 12,
+      leader_name: leadData[0].name,
+      leader_comment: areaInput,
+      request_by: dataRequest.created_by,
+      status_user: dataRequest.user_status,
+      departement_user: dataRequest.depart_id.departement_name,
+      subdepartement_user:
+        dataRequest.subdepart_id !== undefined
+          ? dataRequest.subdepart_id.subdepartement_name
+          : "none",
+      general_request: dataRequest.general_request,
+      aplication_req: dataRequest.aplication_req,
+      ticketCreated: Date.now(),
+    };
+
     document.getElementById("overlay").style.display = "block";
 
     await axios
@@ -206,6 +237,7 @@ const FacilityApproveDetail = () => {
       )
       .then((response) => {
         alert(response.data.status);
+        axios.post(Logs, log_data);
         setTimeout(() => {
           window.location = `${host}/approval/facility-request/`;
         }, 1500);

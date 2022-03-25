@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "../../assets/master.css";
 import "../../assets/asset_user.css";
 import "../asset/chips.css";
-import { authEndPoint, invEndPoint } from "../../assets/menu";
+import { FacEndPoint, invEndPoint } from "../../assets/menu";
 import axios from "axios";
 import Loading from "./Loading";
 import Cookies from "universal-cookie";
@@ -111,16 +111,39 @@ const ChatHistory = () => {
   }, []);
 
   const getComment = async () => {
-    let act_comment = `${invEndPoint[0].url}${
-      invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
-    }/api/v1/message-req`;
+    let type_req = req_no.replace(/[0-9]/g, "");
+
+    if (type_req === "MKDAR") {
+      let act_comment = `${invEndPoint[0].url}${
+        invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
+      }/api/v1/message-req`;
+
+      await axios
+        .get(act_comment)
+        .then((response) => {
+          const messageData = response.data.data.request_message;
+          let filterMessage = messageData.filter(
+            (item) => item.action_req_code === req_no
+          );
+          setCommentData(filterMessage);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      return;
+    }
+
+    let act_comment = `${FacEndPoint[0].url}${
+      FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
+    }/api/v1/facility-req/message-get`;
 
     await axios
       .get(act_comment)
       .then((response) => {
         const messageData = response.data.data.request_message;
         let filterMessage = messageData.filter(
-          (item) => item.action_req_code === req_no
+          (item) => item.facility_req_code === req_no
         );
         setCommentData(filterMessage);
         setIsLoading(false);

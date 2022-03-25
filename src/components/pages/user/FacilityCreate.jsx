@@ -389,7 +389,6 @@ const FacilityCreate = (props) => {
                 userData[0].subdepart_id !== undefined
                   ? userData[0].subdepart_id.subdepartement_name
                   : "none",
-              role_user: userData[0].role_id.role_name,
               general_request: dataGeneral,
               aplication_req: subdataApplication,
               ticketCreated: Date.now(),
