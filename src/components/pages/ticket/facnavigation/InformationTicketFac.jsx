@@ -40,10 +40,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
 function calbill(date) {
   const monthNames = [
     "Jan",
