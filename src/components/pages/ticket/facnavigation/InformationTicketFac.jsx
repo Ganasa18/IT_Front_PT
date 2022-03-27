@@ -8,7 +8,11 @@ import "../../../../assets/master.css";
 import "../../../../assets/asset_user.css";
 import "../../../asset/chips.css";
 
-import { authEndPoint, FacEndPoint } from "../../../../assets/menu";
+import {
+  authEndPoint,
+  FacEndPoint,
+  logsEndPoint,
+} from "../../../../assets/menu";
 import Cookies from "universal-cookie";
 
 const cookies = new Cookies();
@@ -76,7 +80,7 @@ const InformationTicketFac = (props) => {
   const [dataRole, setDataRole] = useState([]);
   const [valueEmail, setValueEmail] = useState("");
   const [valueRole, setValueRole] = useState("");
-  // console.log(dataRequest);
+  console.log(dataRequest);
 
   const modalHandle = () => {
     setModalOpen((prevModal) => !prevModal);
@@ -128,6 +132,10 @@ const InformationTicketFac = (props) => {
       FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
     }/api/v1/facility-req/updated-is-user-create/${dataRequest.id}`;
 
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-fr`;
+
     const dataUser = {
       username: dataRequest.user_name,
       email: valueEmail,
@@ -141,6 +149,39 @@ const InformationTicketFac = (props) => {
           : dataRequest.subdepart_id.id,
       employe_status: dataRequest.user_status,
       role: parseInt(valueRole),
+    };
+
+    const log_data = {
+      request_number: dataRequest.logs_id.request_number,
+      user_name: dataRequest.logs_id.user_name,
+      user_email: dataRequest.logs_id.user_email,
+      user_area: dataRequest.logs_id.user_area,
+      status_ar: parseInt(dataRequest.logs_id.status_ar),
+      request_by: dataRequest.logs_id.request_by,
+      status_user: dataRequest.logs_id.status_user,
+      departement_user: dataRequest.logs_id.departement_user,
+      subdepartement_user: dataRequest.logs_id.subdepartement_user,
+      leader_name: dataRequest.logs_id.leader_name
+        ? dataRequest.logs_id.leader_name
+        : null,
+      leader_comment: dataRequest.logs_id.leader_comment
+        ? dataRequest.logs_id.leader_comment
+        : null,
+      user_create: true,
+      general_request: dataRequest.logs_id.general_request,
+      aplication_req: dataRequest.logs_id.aplication_req,
+      ticketCreated: new Date(dataRequest.logs_id.ticketCreated),
+      pr_number: dataRequest.logs_id.pr_number
+        ? dataRequest.logs_id.pr_number
+        : null,
+      status_pr: dataRequest.logs_id.status_pr
+        ? dataRequest.logs_id.status_pr
+        : null,
+      pr_item: dataRequest.logs_id.pr_item ? dataRequest.logs_id.pr_item : null,
+      sub_total_po: dataRequest.logs_id.sub_total_po
+        ? parseInt(dataRequest.logs_id.sub_total_po)
+        : null,
+      gr_item: dataRequest.logs_id.gr_item ? dataRequest.logs_id.gr_item : null,
     };
 
     await axios
@@ -163,6 +204,7 @@ const InformationTicketFac = (props) => {
           })
           .then((resp) => {
             alert(resp.data.status);
+            axios.post(Logs, log_data);
             setTimeout(() => {
               setModalOpen(false);
               window.location.reload();
@@ -278,7 +320,8 @@ const InformationTicketFac = (props) => {
                 <button
                   onClick={modalHandle}
                   type="button"
-                  className="creat-user-btn">
+                  className="creat-user-btn"
+                >
                   Create Account
                 </button>
               </div>
@@ -286,7 +329,8 @@ const InformationTicketFac = (props) => {
               <p style={{ marginRight: "5px" }}>
                 <span
                   className="iconify iconSuccessFac"
-                  data-icon="clarity:success-standard-solid"></span>
+                  data-icon="clarity:success-standard-solid"
+                ></span>
                 Success Create Account
               </p>
             )}
@@ -313,7 +357,8 @@ const InformationTicketFac = (props) => {
                   style={{
                     background: `${dataRequest.status_id.color_status}4C`,
                     color: `${dataRequest.status_id.color_status}FF`,
-                  }}>
+                  }}
+                >
                   {dataRequest.status_id.status_name}
                 </span>
               </p>
@@ -364,7 +409,8 @@ const InformationTicketFac = (props) => {
                 Computer
                 <span
                   class="iconify check-class"
-                  data-icon="clarity:success-line"></span>
+                  data-icon="clarity:success-line"
+                ></span>
               </p>
               <p className="wrap-paraf">{generalRequest.comp_detail}</p>
             </div>
@@ -374,7 +420,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.telephone === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -389,7 +436,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.internetacc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -413,7 +461,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.emailid === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -428,7 +477,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.printeracc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -443,7 +493,8 @@ const InformationTicketFac = (props) => {
                 {generalRequest.wifiaccess === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -465,7 +516,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.openERP === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -475,7 +527,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.clickBca === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -485,7 +538,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.odoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -499,7 +553,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.eskom === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -509,7 +564,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.randevoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -529,7 +585,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.accurate === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -539,7 +596,8 @@ const InformationTicketFac = (props) => {
                 {applicationRequest.solution === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"></span>
+                    data-icon="clarity:success-line"
+                  ></span>
                 ) : null}
               </p>
             </div>
@@ -552,7 +610,8 @@ const InformationTicketFac = (props) => {
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
-        }}>
+        }}
+      >
         {bodyModal}
       </Modal>
     </>
