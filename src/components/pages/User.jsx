@@ -77,6 +77,18 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 4, 3),
   },
+
+  paperFilter: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "30%",
+    left: "50%",
+    width: 500,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 10, 3),
+  },
 }));
 
 const User = () => {
@@ -86,6 +98,7 @@ const User = () => {
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpenFilter, setModalOpenFilter] = useState(false);
   const [valueArea, setValueArea] = useState("");
   const [valueDepartement, setValueDepartement] = useState("");
   const [valueSubDepartement, setValueSubDepartement] = useState("");
@@ -94,6 +107,7 @@ const User = () => {
   const [valueEmail, setValueEmail] = useState("");
   const [valueNoHP, setValueNoHP] = useState("");
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
+  const [searchValue, SetSearchValue] = useState(null);
 
   useEffect(() => {
     getRoleList();
@@ -102,6 +116,10 @@ const User = () => {
 
   const modalPop = () => {
     setModalOpen(true);
+  };
+
+  const modalPopFilter = () => {
+    setModalOpenFilter(true);
   };
 
   const getRoleList = async () => {
@@ -151,81 +169,9 @@ const User = () => {
       });
   };
 
-  // const getJoinUser = async () => {
-  //   const newDataRole = dataRole;
-  //   const newDataArea = dataArea;
-  //   const newDataUser = dataUser;
-  //   const newDataDepartement = joinDepartement;
-  //   const newDataSubDepartement = joinSubDepartement;
-
-  //   const arr_user = [...newDataUser];
-  //   const arr_area = [...newDataArea];
-  //   const arr_departement = [...newDataDepartement];
-  //   const arr_subdepartement = [...newDataSubDepartement];
-  //   const arr_role = [...newDataRole];
-
-  //   var areamap = {};
-  //   arr_area.forEach(function (area_id) {
-  //     areamap[area_id.value] = area_id;
-  //   });
-
-  //   // now do the "join":
-  //   arr_user.forEach(function (user) {
-  //     user.area_id = areamap[user.area];
-  //   });
-  //   const JoinArea = arr_user;
-
-  //   var rolemap = {};
-  //   arr_role.forEach(function (role_id) {
-  //     rolemap[role_id.value] = role_id;
-  //   });
-
-  //   JoinArea.forEach(function (user) {
-  //     user.role_id = rolemap[user.role];
-  //   });
-  //   const JoinRole = JoinArea;
-
-  //   var departementmap = {};
-  //   arr_departement.forEach(function (departement_id) {
-  //     departementmap[departement_id.value] = departement_id;
-  //   });
-
-  //   JoinRole.forEach(function (user) {
-  //     user.departement_id = departementmap[user.departement];
-  //   });
-
-  //   const JoinDepartement = JoinRole;
-
-  //   var subdepartementmap = {};
-  //   arr_subdepartement.forEach(function (subdepartement_id) {
-  //     subdepartementmap[subdepartement_id.value] = subdepartement_id;
-  //   });
-
-  //   JoinDepartement.forEach(function (user) {
-  //     user.subdepartement_id = subdepartementmap[user.subdepartement];
-  //   });
-
-  //   setResultJoinUser(JoinDepartement);
-
-  //   // [{id:3124, name:"Mr. Smith", text:"wow", createdBy:"Mr. Jones"},
-  //   // {id:710, name:"Mrs. Jones", text:"amazing"}]*
-
-  //   // var results_selected = array1.joinWith(array2, 'id', ['id', 'text', 'name']);
-
-  //   // // [{id:3124, name:"Mr. Smith", text:"wow"},
-  //   // // {id:710, name:"Mrs. Jones", text:"amazing"}]*
-
-  //   // /* or equivalently, */
-  //   // var results_omitted = array1.joinWith(array2, 'id', ['createdBy'], 1);
-
-  //   // [{id:3124, name:"Mr. Smith", text:"wow"},
-  //   // {id:710, name:"Mrs. Jones", text:"amazing"}]*
-
-  //   // console.log(arr_user, arr_area, arr_role);
-  // };
-
   const modalClose = () => {
     setModalOpen(false);
+    setModalOpenFilter(false);
   };
 
   const handleChangeEmply = (event) => {
@@ -320,6 +266,31 @@ const User = () => {
       .catch((err) => {
         console.log(err.response);
       });
+  };
+
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
+
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
+
+  const handleFilter = (e) => {
+    e.preventDefault();
+
+    var arr = [];
+
+    arr.push(valueArea);
+    arr.push(valueRole);
+
+    console.log(arr);
   };
 
   const bodyModal = (
@@ -454,6 +425,66 @@ const User = () => {
     </>
   );
 
+  const bodyModalFilter = (
+    <>
+      <Fade in={modalOpenFilter}>
+        <div className={classes.paperFilter}>
+          <div className="row">
+            <div className="col-8">
+              <h2>Filter</h2>
+            </div>
+            <div className="col-4">
+              <a class="close-btn" role="button" onClick={modalClose}>
+                &times;
+              </a>
+            </div>
+          </div>
+          <form onSubmit={handleFilter}>
+            <div className="row">
+              <div className="col-12">
+                <label htmlFor="roleName">Role</label>
+                <SelectSearch
+                  options={dataRole}
+                  value={dataRole}
+                  onChange={(e) => {
+                    setValueRole(e);
+                  }}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Role"
+                />
+              </div>
+            </div>
+            <div className="row margin-top-3">
+              <div className="col-12">
+                <label htmlFor="roleName">Area</label>
+                <SelectSearch
+                  options={dataArea}
+                  value={dataArea}
+                  onChange={(e) => {
+                    setValueArea(e);
+                  }}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Area"
+                />
+              </div>
+            </div>
+            <br />
+            <br />
+            <div className="footer-modal">
+              <button className={"btn-reset-filter"}>Reset</button>
+              <button className={"btn-filter"} type={"submit"}>
+                Filter
+              </button>
+            </div>
+          </form>
+          <br />
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <div>
       <div className={classes.toolbar} />
@@ -474,13 +505,18 @@ const User = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
                   />
                 </div>
               </div>
-              <div className="col-4"></div>
+              <div className="col-4">
+                <button onClick={modalPopFilter} className="filter-btn">
+                  Filter
+                </button>
+              </div>
               <div className="col-4">
                 <Button
                   onClick={modalPop}
@@ -496,7 +532,7 @@ const User = () => {
         </Grid>
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableUser />
+            <TableUser searchValue={searchValue} />
           </div>
         </Grid>
       </Grid>
@@ -508,6 +544,15 @@ const User = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenFilter}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalFilter}
       </Modal>
     </div>
   );

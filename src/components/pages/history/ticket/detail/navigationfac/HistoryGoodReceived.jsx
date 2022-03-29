@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import Loader from "react-loader-spinner";
 import {
-  logsEndPoint,
-  prEndPoint,
   pathEndPoint,
+  authEndPoint,
+  logsEndPoint,
 } from "../../../../../../assets/menu";
 import AddIcon from "@material-ui/icons/Add";
 import Loading from "../../../../../asset/Loading";
@@ -34,7 +34,6 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import HistoryPurchaseOrder from "../../table/HistoryPurchaseOrder";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -215,12 +214,13 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const HistoryPurchase = (props) => {
-  const classes = useStyles();
+const HistoryGoodReceived = (props) => {
+  const classes = useStyles2();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [listGR, setListGR] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [ticketData, setTicketData] = useState([]);
   const req_no = localStorage.getItem("req_no");
-  const [listReq, setListReq] = useState([]);
   const { dataLogPR, dateNow } = props;
 
   useEffect(() => {
@@ -231,7 +231,7 @@ const HistoryPurchase = (props) => {
     // document.getElementById("overlay").style.display = "block";
     const logs = `${logsEndPoint[0].url}${
       logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
-    }/api/v1/logs-login/history-ar`;
+    }/api/v1/logs-login/history-fr`;
 
     const status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -245,7 +245,7 @@ const HistoryPurchase = (props) => {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          let newDataLog = responseOne.data.data.log_ar;
+          let newDataLog = responseOne.data.data.log_fr;
           let newStatus = responseTwo.data.data.statuss;
           newDataLog = newDataLog.filter(
             (item) => item.request_number === req_no
@@ -266,8 +266,12 @@ const HistoryPurchase = (props) => {
             request_id.status_id_pr = statusmap[request_id.status_pr];
           });
 
-          setListReq(JSON.parse(newDataLog[0].pr_item));
-          setTicketData(newDataLog);
+          if (newDataLog[0].gr_item !== null) {
+            setListGR(JSON.parse(newDataLog[0].gr_item));
+          } else {
+            setListGR([]);
+          }
+
           setIsLoading(false);
           document.getElementById("overlay").style.display = "none";
         })
@@ -280,23 +284,17 @@ const HistoryPurchase = (props) => {
     // console.log(dateNow);
   };
 
-  if (dataLogPR.length === 0) {
-    return (
-      <>
-        <Grid item xs={12} className={classes.cardPadding}>
-          <div className="card-asset-action ">
-            <h3>Purchase Information</h3>
-            <div className="flex-item-direction">
-              <span
-                class="iconify icon-direction"
-                data-icon="clarity:pencil-solid"></span>
-              <p>No Data</p>
-            </div>
-          </div>
-        </Grid>
-      </>
-    );
-  }
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, listGR.length - page * rowsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   if (isLoading) {
     return (
@@ -314,55 +312,83 @@ const HistoryPurchase = (props) => {
 
   return (
     <>
-      <Grid item xs={12} className={classes.cardPadding}>
-        <div className="card-asset-action">
-          <h3>Purchase Information</h3>
-          <div className="row">
-            <div className="col-3">
-              <p className="label-asset">PR No</p>
-              <p>{ticketData[0].pr_number}</p>
+      <TableContainer className={classes.tableWidth}>
+        <Paper>
+          <Toolbar>
+            <div className="col-10">
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ marginTop: "15px" }}>
+                Goods Received
+              </Typography>
             </div>
-            <div className="col-3">
-              <p className="label-asset">Status</p>
-              <p className="">
-                <span
-                  class="chip-action"
-                  style={{
-                    background: `${ticketData[0].status_id_pr.color_status}4C`,
-                    color: `${ticketData[0].status_id_pr.color_status}FF`,
-                  }}>
-                  {capitalizeFirstLetter(
-                    ticketData[0].status_id_pr.status_name
-                  )}
-                </span>
-              </p>
-            </div>
-          </div>
-          <br />
-          <div className="row">
-            <div className="col-3">
-              <p className="label-asset">PR Date</p>
-              <p>{calbill(ticketData[0].createdAt)}</p>
-            </div>
+          </Toolbar>
+          <Table className={classes.table} aria-label="custom pagination table">
+            <TableHead classes={{ root: classes.thead }}>
+              <TableRow>
+                <StyledTableCell>Item No</StyledTableCell>
+                <StyledTableCell>Name Item</StyledTableCell>
+                <StyledTableCell>Description</StyledTableCell>
+                <StyledTableCell>Left Over</StyledTableCell>
+                <StyledTableCell>Received</StyledTableCell>
+              </TableRow>
+            </TableHead>
 
-            <div className="col-3">
-              <p className="label-asset">Request No</p>
-              <p>{ticketData[0].request_number}</p>
-            </div>
-            <div className="col-3"></div>
-          </div>
-        </div>
-      </Grid>
-      <Grid item xs={12} className={classes.cardPadding}>
-        <TablePurchaseList listData={listReq} />
-      </Grid>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? listGR.slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
+                : listGR
+              ).map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell style={{ width: 550 }} component="th" scope="row">
+                    {row.asset_po_number}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {row.asset_name}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    <div className="text-hide">{row.desc_po}</div>
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {parseInt(row.qty)}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {parseInt(row.real_qty - row.qty)}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 20 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
 
-      {ticketData[0].gr_item !== null ? (
-        <Grid item xs={12} className={classes.cardPadding}>
-          <HistoryPurchaseOrder poDataLog={ticketData} />
-        </Grid>
-      ) : null}
-
+            <TableFooter className={classes.posPagination}>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                  colSpan={3}
+                  count={listGR.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  SelectProps={{
+                    inputProps: { "aria-label": "rows per page" },
+                    native: true,
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </Paper>
+      </TableContainer>
       <div id="overlay">
         <Loader
           className="loading-data"
@@ -376,130 +402,4 @@ const HistoryPurchase = (props) => {
   );
 };
 
-const TablePurchaseList = ({ listData }) => {
-  const classes = useStyles2();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [listPurchase] = useState(listData);
-
-  const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, listPurchase.length - page * rowsPerPage);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  return (
-    <TableContainer className={classes.tableWidth}>
-      <Paper>
-        <Toolbar>
-          <div className="col-10">
-            <Typography
-              variant="h6"
-              component="div"
-              style={{ marginTop: "15px" }}>
-              Purchase Request
-            </Typography>
-          </div>
-        </Toolbar>
-        <Table className={classes.table} aria-label="custom pagination table">
-          <TableHead classes={{ root: classes.thead }}>
-            <TableRow>
-              <StyledTableCell>Name Item</StyledTableCell>
-              <StyledTableCell>User/Dept</StyledTableCell>
-              <StyledTableCell>Category</StyledTableCell>
-              <StyledTableCell>Sub Category</StyledTableCell>
-              <StyledTableCell>Description</StyledTableCell>
-              <StyledTableCell>QTY</StyledTableCell>
-              <StyledTableCell align="center" np>
-                Attachment
-              </StyledTableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {(rowsPerPage > 0
-              ? listPurchase.slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-              : listPurchase
-            ).map((row) => (
-              <TableRow key={row.id}>
-                <TableCell style={{ width: 550 }} component="th" scope="row">
-                  {row.asset_name}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.type_asset}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.category}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.subcategory}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.description}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  {row.qty}
-                </TableCell>
-                <TableCell component="th" scope="row" align="center">
-                  {row.img_name ? (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="download-attch"
-                      href={`${prEndPoint[0].url}${
-                        prEndPoint[0].port !== ""
-                          ? ":" + prEndPoint[0].port
-                          : ""
-                      }/public/image/purchase/${row.img_name
-                        .split(".")
-                        .slice(0, -1)
-                        .join(".")}${".jpeg"}`}
-                      download>
-                      download
-                    </a>
-                  ) : null}
-                </TableCell>
-              </TableRow>
-            ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 20 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-          </TableBody>
-
-          <TableFooter className={classes.posPagination}>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={3}
-                count={listPurchase.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: { "aria-label": "rows per page" },
-                  native: true,
-                }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </Paper>
-    </TableContainer>
-  );
-};
-
-export default HistoryPurchase;
+export default HistoryGoodReceived;

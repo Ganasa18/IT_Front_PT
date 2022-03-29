@@ -20,9 +20,8 @@ import AddIcon from "@material-ui/icons/Add";
 import HistoryInformation from "./navigationfac/HistoryInformation";
 import ChatComponent from "../../../../asset/ChatComponent";
 import ChatHistory from "../../../../asset/ChatHistory";
-import HistoryInventory from "./navigation/HistoryInventory";
-import HistoryPurchase from "./navigation/HistoryPurchase";
-import HistoryGoodReceived from "./navigation/HistoryGoodReceived";
+import HistoryPurchase from "./navigationfac/HistoryPurchase";
+import HistoryGoodReceived from "./navigationfac/HistoryGoodReceived";
 import Loading from "../../../../asset/Loading";
 
 const useStyles = makeStyles((theme) => ({
@@ -292,6 +291,47 @@ const HistoryFacilityReq = () => {
           />
           <Grid container spacing={3}>
             <Grid item xs={12}>
+              <div className="container-timeline">
+                <div
+                  class="scroll"
+                  onMouseUp={HandleMouseUp}
+                  onMouseLeave={HandleMouseLeave}
+                  onMouseDown={HandleMouseDown}
+                  onMouseMove={HandleMouseMove}>
+                  {dateSelectPR.map((row) => (
+                    <div
+                      className={`card-timeline ${
+                        activeLink === row.id ? "active" : ""
+                      }`}
+                      onClick={function () {
+                        setDateSelectPRNow(row.createdAt);
+                        setActiveLink(row.id);
+                      }}>
+                      <div className="card-inner">
+                        <p className="text-center">
+                          <span
+                            class="chip"
+                            style={{
+                              background: `${row.status_id_pr.color_status}4C`,
+                              color: `${row.status_id_pr.color_status}FF`,
+                            }}>
+                            {capitalizeFirstLetter(
+                              row.status_id_pr.status_name
+                            )}
+                          </span>
+                        </p>
+                        <br />
+                        <p class="paragraph truncate">
+                          {calbill(row.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Grid>
+
+            <Grid item xs={12}>
               {links.map(({ url, text, index }) => (
                 <NavLink
                   key={index}
@@ -301,6 +341,16 @@ const HistoryFacilityReq = () => {
                   {text}
                 </NavLink>
               ))}
+            </Grid>
+            <Grid item xs={12}>
+              <HistoryPurchase
+                dataLogPR={dateSelectPR}
+                dateNow={dateSelectPRNow}
+              />
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <ChatHistory />
             </Grid>
           </Grid>
         </>
@@ -320,6 +370,44 @@ const HistoryFacilityReq = () => {
           />
           <Grid container spacing={3}>
             <Grid item xs={12}>
+              <div className="container-timeline">
+                <div
+                  class="scroll"
+                  onMouseUp={HandleMouseUp}
+                  onMouseLeave={HandleMouseLeave}
+                  onMouseDown={HandleMouseDown}
+                  onMouseMove={HandleMouseMove}>
+                  {dateSelectPR.map((row) => (
+                    <div
+                      className={`card-timeline ${
+                        activeLink === row.id ? "active" : ""
+                      }`}
+                      onClick={function () {
+                        setDateSelectPRNow(row.createdAt);
+                        setActiveLink(row.id);
+                      }}>
+                      <div className="card-inner">
+                        <p className="text-center">
+                          <span
+                            class="chip"
+                            style={{
+                              background: `${row.status_id.color_status}4C`,
+                              color: `${row.status_id.color_status}FF`,
+                            }}>
+                            {capitalizeFirstLetter(row.status_id.status_name)}
+                          </span>
+                        </p>
+                        <br />
+                        <p class="paragraph truncate">
+                          {calbill(row.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Grid>
+            <Grid item xs={12}>
               {links.map(({ url, text, index }) => (
                 <NavLink
                   key={index}
@@ -329,6 +417,16 @@ const HistoryFacilityReq = () => {
                   {text}
                 </NavLink>
               ))}
+            </Grid>
+            <Grid item xs={12} className={classes.cardPadding}>
+              <HistoryGoodReceived
+                dataLogPR={dateSelectPR}
+                dateNow={dateSelectPRNow}
+              />
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <ChatHistory />
             </Grid>
           </Grid>
         </>

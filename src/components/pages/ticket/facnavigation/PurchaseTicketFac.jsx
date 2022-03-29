@@ -587,6 +587,7 @@ const PurchaseTicketFac = (props) => {
               />
             )}
           </Grid>
+
           <Grid item xs={12} className={classes.cardPadding}>
             <TablePurchaseOrder listData={dataPR} />
           </Grid>
@@ -774,11 +775,16 @@ const TableScreenPO = ({ listData, ticketUser, ticketStat, getLastNumber }) => {
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
-          <CreatePurchaseOrder
-            listData={listData}
-            lastNum={getLastNumber}
-            ticketUser={userTicket}
-          />
+          {userTicket.length === 0 ? (
+            <h1> Create User Before Create PO </h1>
+          ) : (
+            <CreatePurchaseOrder
+              listData={listData}
+              lastNum={getLastNumber}
+              ticketUser={userTicket}
+            />
+          )}
+
           <Button
             className={classes.cancelBtn}
             onClick={modalPop}
@@ -860,7 +866,7 @@ const TableScreenPO = ({ listData, ticketUser, ticketStat, getLastNumber }) => {
             </div>
 
             {ticketStat[0].status_id === 11 ||
-            userTicket[0].status_id === 15 ? null : (
+            ticketStat[0].status_id === 15 ? null : (
               <div className="col-2">
                 <button className="btn-create-po" onClick={modalPop}>
                   <span

@@ -83,15 +83,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -101,8 +99,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -112,8 +109,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -558,6 +554,38 @@ const CreatePurchaseOrder = (props) => {
       };
       axios.post(Logs, log_data);
     }
+    if (type_req === "MKDFR") {
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-fr`;
+      const log_data = {
+        request_number: dataRequestLog[0].request_number,
+        user_name: dataRequestLog[0].user_name,
+        user_email: dataRequestLog[0].user_email,
+        user_area: dataRequestLog[0].user_area,
+        status_ar: parseInt(19),
+        request_by: dataRequestLog[0].request_by,
+        status_user: dataRequestLog[0].status_user,
+        departement_user: dataRequestLog[0].departement_user,
+        subdepartement_user: dataRequestLog[0].subdepartement_user,
+        leader_name: dataRequestLog[0].leader_name
+          ? dataRequestLog[0].leader_name
+          : null,
+        leader_comment: dataRequestLog[0].leader_comment
+          ? dataRequestLog[0].leader_comment
+          : null,
+        user_create: dataRequestLog[0].user_create,
+        general_request: dataRequestLog[0].general_request,
+        aplication_req: dataRequestLog[0].aplication_req,
+        ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+        pr_number: dataRequestLog[0].pr_number,
+        status_pr: parseInt(dataRequestLog[0].status_pr),
+        pr_item: dataRequestLog[0].pr_item,
+        sub_total_po: parseInt(subTotal),
+        gr_item: JSON.stringify(todos),
+      };
+      axios.post(Logs, log_data);
+    }
 
     document.getElementById("overlay").style.display = "block";
 
@@ -680,8 +708,7 @@ const CreatePurchaseOrder = (props) => {
               id="address_vendor"
               className="form-input-area"
               cols="30"
-              rows="8"
-            ></textarea>
+              rows="8"></textarea>
           </div>
         </div>
         <div className="row margin-top-0">
@@ -807,8 +834,7 @@ const CreatePurchaseOrder = (props) => {
                   <label
                     htmlFor="departement"
                     className="radio-label"
-                    style={{ fontSize: "13px" }}
-                  >
+                    style={{ fontSize: "13px" }}>
                     Departement
                   </label>
                 </div>
@@ -824,16 +850,14 @@ const CreatePurchaseOrder = (props) => {
               <button
                 type="button"
                 className="btn-plus"
-                onClick={() => setQuantity(quantity + 1)}
-              >
+                onClick={() => setQuantity(quantity + 1)}>
                 +
               </button>
               <span className="item-count">{quantity}</span>
               <button
                 type="button"
                 className="btn-min"
-                onClick={() => setQuantity(quantity === 0 ? 0 : quantity - 1)}
-              >
+                onClick={() => setQuantity(quantity === 0 ? 0 : quantity - 1)}>
                 -
               </button>
             </div>
@@ -856,8 +880,7 @@ const CreatePurchaseOrder = (props) => {
               id="desc_po"
               className="form-input-area"
               cols="30"
-              rows="10"
-            ></textarea>
+              rows="10"></textarea>
           </div>
         </div>
         <div className={classes.wrapperCategory}>
@@ -901,8 +924,7 @@ const CreatePurchaseOrder = (props) => {
             onClick={handleTodo}
             className={classes.addBtn}
             variant="outlined"
-            startIcon={<AddIcon />}
-          >
+            startIcon={<AddIcon />}>
             Add Item
           </Button>
         </div>
@@ -917,8 +939,7 @@ const CreatePurchaseOrder = (props) => {
                 <Table
                   size="small"
                   className={classes.table}
-                  aria-label="custom pagination table"
-                >
+                  aria-label="custom pagination table">
                   <TableHead classes={{ root: classes.thead }}>
                     <TableRow>
                       <StyledTableCell>Item Name</StyledTableCell>
@@ -987,12 +1008,10 @@ const CreatePurchaseOrder = (props) => {
                           {row.total_price_unit}
                           <button
                             className="btn-delete"
-                            onClick={removeHandler.bind(this, row.id)}
-                          >
+                            onClick={removeHandler.bind(this, row.id)}>
                             <span
                               class="iconify icon-btn"
-                              data-icon="ant-design:delete-filled"
-                            ></span>
+                              data-icon="ant-design:delete-filled"></span>
                             <span className="name-btn">Delete</span>
                           </button>
                         </TableCell>
@@ -1044,8 +1063,7 @@ const CreatePurchaseOrder = (props) => {
         onClick={handleSubmit}
         variant="contained"
         color="primary"
-        className={classes.btnSubmit}
-      >
+        className={classes.btnSubmit}>
         Submit
       </Button>
       <br />

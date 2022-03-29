@@ -330,7 +330,8 @@ const HistoryGoodReceived = (props) => {
                 <StyledTableCell>Item No</StyledTableCell>
                 <StyledTableCell>Name Item</StyledTableCell>
                 <StyledTableCell>Description</StyledTableCell>
-                <StyledTableCell>QTY</StyledTableCell>
+                <StyledTableCell>Left Over</StyledTableCell>
+                <StyledTableCell>Received</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -347,13 +348,16 @@ const HistoryGoodReceived = (props) => {
                     {row.asset_po_number}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {row.asset_number}
+                    {row.asset_name}
                   </TableCell>
                   <TableCell component="th" scope="row">
                     <div className="text-hide">{row.desc_po}</div>
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {row.qty}
+                    {parseInt(row.qty)}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {parseInt(row.real_qty - row.qty)}
                   </TableCell>
                 </TableRow>
               ))}

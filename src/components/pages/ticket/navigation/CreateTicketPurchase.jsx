@@ -93,15 +93,13 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
-        aria-label="first page"
-      >
+        aria-label="first page">
         {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
       </IconButton>
       <IconButton
         onClick={handleBackButtonClick}
         disabled={page === 0}
-        aria-label="previous page"
-      >
+        aria-label="previous page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowRight />
         ) : (
@@ -111,8 +109,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleNextButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
+        aria-label="next page">
         {theme.direction === "rtl" ? (
           <KeyboardArrowLeft />
         ) : (
@@ -122,8 +119,7 @@ function TablePaginationActions(props) {
       <IconButton
         onClick={handleLastPageButtonClick}
         disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
+        aria-label="last page">
         {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
       </IconButton>
     </div>
@@ -248,7 +244,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
   const [assetName, setAssetName] = useState("");
   const [description, setDescription] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(1);
   const [lastNumber, setLastNumber] = useState("");
   const [toast, setToast] = useState(false);
   const [createdBy, setCreatedBy] = useState("");
@@ -505,6 +501,35 @@ const CreateTicketPurchase = ({ dataTicket }) => {
         created_by: createdBy,
       });
 
+      const Logs = `${logsEndPoint[0].url}${
+        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+      }/api/v1/logs-login/history-fr`;
+
+      const log_data = {
+        request_number: dataReq[0].logs_id.request_number,
+        user_name: dataReq[0].logs_id.user_name,
+        user_email: dataReq[0].logs_id.user_email,
+        user_area: dataReq[0].logs_id.user_area,
+        status_ar: parseInt(19),
+        request_by: dataReq[0].logs_id.request_by,
+        status_user: dataReq[0].logs_id.status_user,
+        departement_user: dataReq[0].logs_id.departement_user,
+        subdepartement_user: dataReq[0].logs_id.subdepartement_user,
+        leader_name: dataReq[0].logs_id.leader_name
+          ? dataReq[0].logs_id.leader_name
+          : null,
+        leader_comment: dataReq[0].logs_id.leader_comment
+          ? dataReq[0].logs_id.leader_comment
+          : null,
+        user_create: dataReq[0].logs_id.user_create,
+        general_request: dataReq[0].logs_id.general_request,
+        aplication_req: dataReq[0].logs_id.aplication_req,
+        ticketCreated: new Date(dataReq[0].logs_id.ticketCreated),
+        pr_number: "MKDPR" + lastNumber,
+        status_pr: 10,
+        pr_item: jsonString,
+      };
+      axios.post(Logs, log_data);
       await axios.patch(fr, {
         status_id: 19,
       });
@@ -553,44 +578,29 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       request_by: requestBy,
       created_by: createdBy,
     });
-    let type_req = req_no.replace(/[0-9]/g, "");
-    if (type_req === "MKDAR") {
-      const Logs = `${logsEndPoint[0].url}${
-        logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
-      }/api/v1/logs-login/history-ar`;
-
-      const log_data = {
-        request_number: dataReq[0].action_req_code,
-        asset_number: dataReq[0].logs_id.asset_number,
-        asset_name: dataReq[0].logs_id.asset_name,
-        status_ar: parseInt(19),
-        request_by: dataReq[0].logs_id.request_by,
-        status_user: dataReq[0].logs_id.status_user,
-        departement_user: dataReq[0].logs_id.departement_user,
-        subdepartement_user: dataReq[0].logs_id.subdepartement_user,
-        role_user: dataReq[0].logs_id.role_user,
-        area_user: dataReq[0].logs_id.area_user,
-        ticketCreated: new Date(dataReq[0].logs_id.ticketCreated),
-        pr_number: "MKDPR" + lastNumber,
-        status_pr: 10,
-        pr_item: jsonString,
-      };
-
-      axios.post(Logs, log_data);
-      await axios.patch(ar, {
-        status_id: 19,
-      });
-      setToast(true);
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-
-      return;
-    }
 
     const Logs = `${logsEndPoint[0].url}${
       logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
-    }/api/v1/logs-login/history-fr`;
+    }/api/v1/logs-login/history-ar`;
+
+    const log_data = {
+      request_number: dataReq[0].action_req_code,
+      asset_number: dataReq[0].logs_id.asset_number,
+      asset_name: dataReq[0].logs_id.asset_name,
+      status_ar: parseInt(19),
+      request_by: dataReq[0].logs_id.request_by,
+      status_user: dataReq[0].logs_id.status_user,
+      departement_user: dataReq[0].logs_id.departement_user,
+      subdepartement_user: dataReq[0].logs_id.subdepartement_user,
+      role_user: dataReq[0].logs_id.role_user,
+      area_user: dataReq[0].logs_id.area_user,
+      ticketCreated: new Date(dataReq[0].logs_id.ticketCreated),
+      pr_number: "MKDPR" + lastNumber,
+      status_pr: 10,
+      pr_item: jsonString,
+    };
+
+    axios.post(Logs, log_data);
 
     await axios.patch(ar, {
       status_id: 19,
@@ -625,6 +635,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
       <Divider />
       <br />
       <br />
+
       <div className={`row ${classes.positionPaper}`}>
         <div className="col-6">
           <label htmlFor="">User/Dept.</label>
@@ -666,16 +677,14 @@ const CreateTicketPurchase = ({ dataTicket }) => {
             <button
               type="button"
               className="btn-plus"
-              onClick={() => setQuantity(quantity + 1)}
-            >
+              onClick={() => setQuantity(quantity + 1)}>
               +
             </button>
             <span className="item-count">{quantity}</span>
             <button
               type="button"
               className="btn-min"
-              onClick={() => setQuantity(quantity === 0 ? 0 : quantity - 1)}
-            >
+              onClick={() => setQuantity(quantity === 0 ? 0 : quantity - 1)}>
               -
             </button>
           </div>
@@ -700,8 +709,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
             cols="30"
             rows="8"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
+            onChange={(e) => setDescription(e.target.value)}></textarea>
         </div>
       </div>
       <div className={classes.wrapperCategory}>
@@ -755,11 +763,11 @@ const CreateTicketPurchase = ({ dataTicket }) => {
           onClick={handleTodo}
           className={classes.addBtn}
           variant="outlined"
-          startIcon={<AddIcon />}
-        >
+          startIcon={<AddIcon />}>
           Add Item
         </Button>
       </div>
+
       <br></br>
       <br></br>
       <br></br>
@@ -769,8 +777,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
             <Table
               size="small"
               className={classes.table}
-              aria-label="custom pagination table"
-            >
+              aria-label="custom pagination table">
               <TableHead classes={{ root: classes.thead }}>
                 <TableRow>
                   <StyledTableCell>Item Name</StyledTableCell>
@@ -815,20 +822,17 @@ const CreateTicketPurchase = ({ dataTicket }) => {
                       <a
                         className="download-attch"
                         href={`${URL.createObjectURL(row.attachment)}`}
-                        download
-                      >
+                        download>
                         download
                       </a>
                     </TableCell>
                     <TableCell style={{ width: 100 }} align="center">
                       <button
                         className="btn-delete"
-                        onClick={removeHandler.bind(this, row.id)}
-                      >
+                        onClick={removeHandler.bind(this, row.id)}>
                         <span
                           class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"
-                        ></span>
+                          data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
                     </TableCell>
@@ -867,8 +871,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
           variant="contained"
           color="primary"
           onClick={submitPR}
-          className={classes.btnSubmit}
-        >
+          className={classes.btnSubmit}>
           Submit
         </Button>
       </div>
@@ -881,8 +884,7 @@ const CreateTicketPurchase = ({ dataTicket }) => {
         autoHideDuration={5000}
         open={toast}
         onClose={handleClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}>
         <Alert onClose={handleClose} severity="success">
           submit successful
         </Alert>

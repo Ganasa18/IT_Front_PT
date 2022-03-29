@@ -329,8 +329,6 @@ const RequestApprove = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // localStorage.removeItem("otp");
-    // alert("remove otp");
     if (comment.length < 10) {
       alert("musth have 10 character minimal");
       return;
@@ -352,8 +350,6 @@ const RequestApprove = () => {
     await axios
       .patch(approve_pr, dataUpdated)
       .then((response) => {
-        console.log(response);
-
         let type_req = parseObject.action_req_code.replace(/[0-9]/g, "");
         if (type_req === "MKDAR") {
           const Logs = `${logsEndPoint[0].url}${
@@ -377,6 +373,37 @@ const RequestApprove = () => {
             pr_item: dataRequestLog[0].pr_item,
           };
           axios.post(Logs, log_data);
+        } else {
+          const Logs = `${logsEndPoint[0].url}${
+            logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+          }/api/v1/logs-login/history-fr`;
+
+          const log_data = {
+            request_number: dataRequestLog[0].request_number,
+            user_name: dataRequestLog[0].user_name,
+            user_email: dataRequestLog[0].user_email,
+            user_area: dataRequestLog[0].user_area,
+            status_ar: parseInt(19),
+            request_by: dataRequestLog[0].request_by,
+            status_user: dataRequestLog[0].status_user,
+            departement_user: dataRequestLog[0].departement_user,
+            subdepartement_user: dataRequestLog[0].subdepartement_user,
+            leader_name: dataRequestLog[0].leader_name
+              ? dataRequestLog[0].leader_name
+              : null,
+            leader_comment: dataRequestLog[0].leader_comment
+              ? dataRequestLog[0].leader_comment
+              : null,
+            user_create: dataRequestLog[0].user_create,
+            general_request: dataRequestLog[0].general_request,
+            aplication_req: dataRequestLog[0].aplication_req,
+            ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+            pr_number: dataRequestLog[0].pr_number,
+            status_pr: 7,
+            pr_item: dataRequestLog[0].pr_item,
+          };
+
+          axios.post(Logs, log_data);
         }
 
         setToast(true);
@@ -395,11 +422,6 @@ const RequestApprove = () => {
       director_name: dataUser[0].username,
       status_id: 20,
     };
-
-    // const ticketUpdated = {
-    //   ticket_code: parseObject.action_req_code,
-    //   status_id: 8,
-    // };
 
     let deny_pr = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
@@ -461,9 +483,39 @@ const RequestApprove = () => {
       return;
     }
 
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-fr`;
+
+    const log_data = {
+      request_number: dataRequestLog[0].request_number,
+      user_name: dataRequestLog[0].user_name,
+      user_email: dataRequestLog[0].user_email,
+      user_area: dataRequestLog[0].user_area,
+      status_ar: parseInt(19),
+      request_by: dataRequestLog[0].request_by,
+      status_user: dataRequestLog[0].status_user,
+      departement_user: dataRequestLog[0].departement_user,
+      subdepartement_user: dataRequestLog[0].subdepartement_user,
+      leader_name: dataRequestLog[0].leader_name
+        ? dataRequestLog[0].leader_name
+        : null,
+      leader_comment: dataRequestLog[0].leader_comment
+        ? dataRequestLog[0].leader_comment
+        : null,
+      user_create: dataRequestLog[0].user_create,
+      general_request: dataRequestLog[0].general_request,
+      aplication_req: dataRequestLog[0].aplication_req,
+      ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+      pr_number: dataRequestLog[0].pr_number,
+      status_pr: 20,
+      pr_item: dataRequestLog[0].pr_item,
+    };
+
     await axios
       .patch(deny_pr, dataUpdated)
       .then((response) => {
+        axios.post(Logs, log_data);
         setToast(true);
       })
       .catch((error) => {
@@ -476,7 +528,7 @@ const RequestApprove = () => {
 
     await axios
       .patch(fr, {
-        status_id: 8,
+        status_id: 21,
       })
       .then((response) => {
         console.log(response.data.status);
@@ -603,6 +655,7 @@ const RequestApprove = () => {
             newDataLog = newDataLog.filter(
               (item) => item.request_number === parseObject.action_req_code
             );
+
             setDataRequest(newDataRequest);
             setDataRequestLog(newDataLog);
 
@@ -617,32 +670,6 @@ const RequestApprove = () => {
           console.error(errors);
         });
 
-      // await axios
-      //   .get(act_req)
-      //   .then((response) => {
-      //     let newDataRequest = response.data.data.request_tiket;
-
-      //     newDataRequest = newDataRequest.map((item) => ({
-      //       id: item.id,
-      //       action_req_code: item.action_req_code,
-      //       req_created: item.createdAt,
-      //       user_id: item.user_id,
-      //     }));
-
-      //     newDataRequest = newDataRequest.filter(
-      //       (item) => item.action_req_code === parseObject.action_req_code
-      //     );
-      //     setDataRequest(newDataRequest);
-
-      //     let jsonList = JSON.parse(parseObject.request_list);
-      //     setPurchaseList(jsonList);
-
-      //     setIsLoading(false);
-      //   })
-      //   .catch((error) => {
-      //     console.error(error);
-      //   });
-
       return;
     }
 
@@ -650,29 +677,48 @@ const RequestApprove = () => {
       FacEndPoint[0].port !== "" ? ":" + FacEndPoint[0].port : ""
     }/api/v1/facility-req/`;
 
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-fr-history`;
+
+    const requestOne = await axios.get(act_req);
+    const requestTwo = await axios.get(logs);
+
     await axios
-      .get(act_req)
-      .then((response) => {
-        let newDataRequest = response.data.data.request_facility;
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
 
-        newDataRequest = newDataRequest.map((item) => ({
-          id: item.id,
-          facility_req_code: item.facility_req_code,
-          req_created: item.createdAt,
-          user_id: item.user_id,
-        }));
+          let newDataRequest = responseOne.data.data.request_facility;
+          let newDataLog = responseTwo.data.data.fr_log;
+          newDataRequest = newDataRequest.map((item) => ({
+            id: item.id,
+            facility_req_code: item.facility_req_code,
+            req_created: item.createdAt,
+            user_id: item.user_id,
+          }));
 
-        newDataRequest = newDataRequest.filter(
-          (item) => item.facility_req_code === parseObject.action_req_code
-        );
-        setDataRequest(newDataRequest);
+          newDataRequest = newDataRequest.filter(
+            (item) => item.facility_req_code === parseObject.action_req_code
+          );
 
-        let jsonList = JSON.parse(parseObject.request_list);
-        setPurchaseList(jsonList);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
+          newDataLog = newDataLog.filter(
+            (item) => item.request_number === parseObject.action_req_code
+          );
+          setDataRequest(newDataRequest);
+          setDataRequestLog(newDataLog);
+
+          let jsonList = JSON.parse(parseObject.request_list);
+          setPurchaseList(jsonList);
+
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
       });
   };
 
@@ -889,7 +935,6 @@ const RequestApprove = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Request Date</p>
-                {console.log(parseObject)}
                 <p className="wrap-paraf">{calbill(parseObject.createdAt)}</p>
               </div>
               <div className="col-3">

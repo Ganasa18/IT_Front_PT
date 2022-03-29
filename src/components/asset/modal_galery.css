@@ -40,6 +40,7 @@
 }
 
 .modal-body {
+  width: 85%;
   padding: 10px;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;

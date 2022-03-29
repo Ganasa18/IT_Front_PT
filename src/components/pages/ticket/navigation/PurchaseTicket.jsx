@@ -177,8 +177,12 @@ const useStyles2 = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(4, 12, 4),
     [theme.breakpoints.down("lg")]: {
-      transform: "translate(-50%,-50%)",
+      // transform: "translate(-50%,-50%)",
+      // width: 1000,
+      top: "0%",
+      left: "15%",
       width: 1000,
+      transform: "scale(0.95)",
     },
 
     [theme.breakpoints.between("xlm", "xl")]: {
@@ -529,6 +533,8 @@ const PurchaseTicket = () => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
+
+      {console.log(ticketData)}
 
       {dataPR[0].img_po !== null ? (
         <>

@@ -161,7 +161,7 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableUser = () => {
+const TableUser = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -182,6 +182,8 @@ const TableUser = () => {
   const [resultJoinUser, setResultJoinUser] = useState([]);
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
 
+  const { searchValue } = props;
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -200,12 +202,38 @@ const TableUser = () => {
   };
 
   //   GET DATA
+  console.log(searchValue);
 
   useEffect(() => {
     getDataUser();
     getAreaList();
     getRoleList();
-  }, []);
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [searchValue]);
+
+  const searchHandle = (searchValue) => {
+    setIsLoading(true);
+    if (searchValue !== null) {
+      if (searchValue.length === 1) {
+        setTimeout(() => {
+          getDataUser();
+        }, 2000);
+        return;
+      }
+      setTimeout(() => {
+        let searchJoinUser = resultJoinUser.filter((item) =>
+          item.username.toLowerCase().match(searchValue)
+        );
+        setResultJoinUser(searchJoinUser);
+        setIsLoading(false);
+      }, 2000);
+    }
+  };
 
   const getDataUser = async () => {
     let user = `${authEndPoint[0].url}${

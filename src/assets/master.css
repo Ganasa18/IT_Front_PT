@@ -435,6 +435,10 @@ a {
   margin-top: 40px;
 }
 
+.margin-top-3 {
+  margin-top: 30px;
+}
+
 #filesImg {
   display: none;
 }
@@ -980,6 +984,74 @@ input[type="radio"] {
 
 .btn-submit:hover {
   background-color: #1652a6c4;
+}
+
+/* Button Filter */
+.btn-filter {
+  margin: 0 5px 0 5px;
+  color: #ec9108;
+  width: 130px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-filter.disabled {
+  cursor: not-allowed;
+}
+
+.btn-filter:hover {
+  background-color: #ec9108c4;
+  color: #fff;
+}
+
+.btn-reset-filter {
+  margin: 0 5px 0 5px;
+  color: #333333;
+  width: 130px;
+  height: 40px;
+  font-size: 0.7rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #333333;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+}
+
+.close-btn {
+  font-size: 40px;
+  font-weight: bold;
+  color: #000;
+  position: absolute;
+  right: 30px;
+}
+
+.close-btn:hover {
+  color: #eb5757;
+  cursor: pointer;
+}
+
+.btn-reset-filter:hover {
+  background-color: #333333c4;
+  color: white;
 }
 
 .position-profile-btn {
@@ -1889,6 +1961,26 @@ input[type="radio"] {
   cursor: not-allowed;
 }
 
+.wrapper-purchase {
+  position: relative;
+  height: 500px;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.wrapper-purchase::-webkit-scrollbar {
+  width: 0.4em;
+}
+
+.wrapper-purchase::-webkit-scrollbar-track {
+  box-shadow: inset rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
+
+.wrapper-purchase::-webkit-scrollbar-thumb {
+  background-color: rgb(134, 130, 130);
+}
+
 /* Purchase Approve*/
 
 .resend {
@@ -2166,6 +2258,14 @@ input[type="radio"] {
     height: 24px;
     font-size: 11px;
   }
+
+  .btn-create-po {
+    width: 90%;
+  }
+
+  .btn-create-po .name-btn {
+    left: 40px;
+  }
 }
 
 /* Facility Acc */
@@ -2292,7 +2392,7 @@ input[type="radio"] {
 }
 
 .iconFailedFac {
-  color: #EB5757;
+  color: #eb5757;
   font-size: 25px;
   position: relative;
   right: 10px;

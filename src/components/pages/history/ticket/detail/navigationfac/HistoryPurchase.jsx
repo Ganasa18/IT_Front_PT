@@ -231,7 +231,7 @@ const HistoryPurchase = (props) => {
     // document.getElementById("overlay").style.display = "block";
     const logs = `${logsEndPoint[0].url}${
       logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
-    }/api/v1/logs-login/history-ar`;
+    }/api/v1/logs-login/history-fr`;
 
     const status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -245,7 +245,7 @@ const HistoryPurchase = (props) => {
         axios.spread((...responses) => {
           const responseOne = responses[0];
           const responseTwo = responses[1];
-          let newDataLog = responseOne.data.data.log_ar;
+          let newDataLog = responseOne.data.data.log_fr;
           let newStatus = responseTwo.data.data.statuss;
           newDataLog = newDataLog.filter(
             (item) => item.request_number === req_no
@@ -356,13 +356,6 @@ const HistoryPurchase = (props) => {
       <Grid item xs={12} className={classes.cardPadding}>
         <TablePurchaseList listData={listReq} />
       </Grid>
-
-      {ticketData[0].gr_item !== null ? (
-        <Grid item xs={12} className={classes.cardPadding}>
-          <HistoryPurchaseOrder poDataLog={ticketData} />
-        </Grid>
-      ) : null}
-
       <div id="overlay">
         <Loader
           className="loading-data"

@@ -111,11 +111,11 @@ export const menuData = [
         to: "/history/ticket",
         icon: "fluent:ticket-diagonal-16-filled",
       },
-      {
-        name: "Inventory",
-        to: "/history/inventory",
-        icon: "fluent:clipboard-bullet-list-rtl-20-filled",
-      },
+      // {
+      //   name: "Inventory",
+      //   to: "/history/inventory",
+      //   icon: "fluent:clipboard-bullet-list-rtl-20-filled",
+      // },
     ],
   },
 ];
@@ -295,48 +295,48 @@ export const menuDataUser5 = [
 
 export const pathEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "5000",
   },
 ];
 
 export const authEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "1200",
   },
 ];
 
 export const invEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "1400",
   },
 ];
 
 export const prEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "2888",
   },
 ];
 
 export const logsEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "7800",
   },
 ];
 
 export const FacEndPoint = [
   {
-    // url: "http://192.168.101.48",
-    url: "http://localhost",
+    url: "http://192.168.101.48",
+    // url: "http://localhost",
     port: "1234",
   },
 ];

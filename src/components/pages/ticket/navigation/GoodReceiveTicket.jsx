@@ -196,7 +196,7 @@ const GoodReceiveTicket = () => {
     getLogsData();
     setInterval(() => {
       getInvLatestId();
-    }, 2000);
+    }, 3000);
   }, []);
 
   const getLogsData = async () => {
@@ -217,7 +217,7 @@ const GoodReceiveTicket = () => {
             newDataLog = newDataLog.filter(
               (item) => item.request_number === req_no
             );
-            console.log(newDataLog);
+
             setDataRequestLog(newDataLog);
           })
         )
@@ -227,6 +227,30 @@ const GoodReceiveTicket = () => {
         });
       return;
     }
+
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-fr-history`;
+
+    const requestOne = await axios.get(logs);
+
+    await axios
+      .all([requestOne])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          let newDataLog = responseOne.data.data.fr_log;
+          newDataLog = newDataLog.filter(
+            (item) => item.request_number === req_no
+          );
+          console.log(newDataLog);
+          setDataRequestLog(newDataLog);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
   };
 
   const getDataPO = async () => {
@@ -383,6 +407,20 @@ const GoodReceiveTicket = () => {
     // );
   };
 
+  function checkNumber(text, number) {
+    var numb = text.match(/\d/g);
+    numb = numb.join("");
+    numb = parseInt(numb) + number;
+    var str = "" + numb;
+    var pad = "000";
+    var ans = pad.substring(0, pad.length - str.length) + str;
+    return ans;
+  }
+
+  // function delay(t) {
+  //   return new Promise((resolve) => setTimeout(resolve, t));
+  // }
+
   const checkValue = async () => {
     var result = Object.keys(selected).map((key) => [
       Number(key),
@@ -418,43 +456,7 @@ const GoodReceiveTicket = () => {
         return;
       }
 
-      const numberItem = arr2[0].childNodes[2].innerHTML + `-${lastNumber}`;
-
-      let inventory = `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/inventory`;
-
-      setTimeout(() => {
-        var j = 0;
-        const postData = {
-          asset_name: newInvent[j].asset_name,
-          asset_number: numberItem,
-          asset_fisik_or_none: newInvent[j].asset_fisik_or_none,
-          category_asset: parseInt(newInvent[j].id_category),
-          subcategory_asset:
-            newInvent[j].id_subcategory === null
-              ? null
-              : parseInt(newInvent[j].id_subcategory),
-          initial_asset_name: newInvent[j].initial_asset_name,
-          asset_part_or_unit: newInvent[j].asset_part_or_unit,
-          area: parseInt(newInvent[j].area),
-          type_asset: newInvent[j].type_asset,
-          asset_po_number: newInvent[j].asset_po_number,
-          asset_pr_number: lastNumberPR,
-          asset_detail: newInvent[j].desc_po,
-          asset_new_or_old: "new",
-          asset_quantity: parseInt(
-            arr2[0].childNodes[7].childNodes[1].innerHTML
-          ),
-          status_asset: true,
-          departement: newInvent[j].departement,
-          used_by: !newInvent[j].used_by ? null : newInvent[j].used_by,
-        };
-
-        axios.post(inventory, postData);
-
-        j = j + 1;
-      }, 1000);
+      // const numberItem = arr2[0].childNodes[2].innerHTML + `-${lastNumber}`;
 
       const newData = {
         id: newInvent[x].id,
@@ -462,7 +464,6 @@ const GoodReceiveTicket = () => {
         new_qty: arr2[0].childNodes[7].childNodes[1].innerHTML,
       };
       dataNew.push(newData);
-
       x = x + 1;
     });
 
@@ -476,15 +477,63 @@ const GoodReceiveTicket = () => {
       arrayEmpty[objIndex].qty = parseInt(
         dataNew[index].old_qty - dataNew[index].new_qty
       );
-      console.log("After update: ", arrayEmpty[objIndex]);
     });
-
-    console.log(dataGR);
 
     var updateTemp = newInvent.map((item) => ({
       ticket_number: item.id_gr,
       gr_list: dataGR,
     }));
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    var interval = 4000;
+    var promise = Promise.resolve();
+    let dataLoop = 1;
+    dataGR.forEach((item, index) => {
+      promise = promise.then(function () {
+        if (parseInt(item.real_qty - item.qty) !== 0) {
+          let numberData = lastNumber;
+          numberData = checkNumber(numberData, dataLoop);
+          const postData = {
+            asset_name: item.asset_name,
+            asset_number: `${item.asset_number}-${numberData}`,
+            asset_fisik_or_none: item.asset_fisik_or_none,
+            category_asset: parseInt(item.id_category),
+            subcategory_asset:
+              item.id_subcategory === null
+                ? null
+                : parseInt(item.id_subcategory),
+            initial_asset_name: item.initial_asset_name,
+            asset_part_or_unit: item.asset_part_or_unit,
+            area: parseInt(item.area),
+            type_asset: item.type_asset,
+            asset_po_number: item.asset_po_number,
+            asset_pr_number: lastNumberPR,
+            asset_detail: item.desc_po,
+            asset_new_or_old: "new",
+            asset_quantity: parseInt(item.real_qty - item.qty),
+            status_asset: true,
+            departement: item.departement,
+            used_by: !item.used_by ? null : item.used_by,
+          };
+
+          (async () => {
+            await axios
+              .post(inventory, postData)
+              .then(() => {
+                console.log("post data");
+              })
+              .catch((err) => console.error(err));
+          })();
+          dataLoop = dataLoop + 1;
+        }
+        return new Promise(function (resolve) {
+          setTimeout(resolve, interval);
+        });
+      });
+    });
 
     let type_req = req_no.replace(/[0-9]/g, "");
     if (type_req === "MKDAR") {
@@ -511,8 +560,67 @@ const GoodReceiveTicket = () => {
         gr_item: JSON.stringify(dataGR),
       };
 
-      axios.post(Logs, log_data);
+      // axios.post(Logs, log_data);
+
+      let gr_updated = `${prEndPoint[0].url}${
+        prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
+      }/api/v1/purchase-order/updated-gr`;
+
+      updateTemp.forEach((element, index) => {
+        const data = {
+          ticket_number: element.ticket_number,
+          gr_list: element.gr_list,
+        };
+        (async () => {
+          await axios
+            .patch(gr_updated, data)
+            .then((resp) => {
+              document.getElementById("overlay").style.display = "block";
+              console.log(resp);
+              setTimeout(() => {
+                document.getElementById("overlay").style.display = "none";
+                window.location.reload();
+              }, 10000);
+            })
+            .catch((err) => console.error(err));
+        })();
+      });
+
+      return;
     }
+    const Logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/history-fr`;
+
+    const log_data = {
+      request_number: dataRequestLog[0].request_number,
+      user_name: dataRequestLog[0].user_name,
+      user_email: dataRequestLog[0].user_email,
+      user_area: dataRequestLog[0].user_area,
+      status_ar: parseInt(dataRequestLog[0].status_ar),
+      request_by: dataRequestLog[0].request_by,
+      status_user: dataRequestLog[0].status_user,
+      departement_user: dataRequestLog[0].departement_user,
+      subdepartement_user: dataRequestLog[0].subdepartement_user,
+      leader_name: dataRequestLog[0].leader_name
+        ? dataRequestLog[0].leader_name
+        : null,
+      leader_comment: dataRequestLog[0].leader_comment
+        ? dataRequestLog[0].leader_comment
+        : null,
+      user_create: dataRequestLog[0].user_create,
+      general_request: dataRequestLog[0].general_request,
+      aplication_req: dataRequestLog[0].aplication_req,
+      ticketCreated: new Date(dataRequestLog[0].ticketCreated),
+      pr_number: dataRequestLog[0].pr_number,
+      status_pr: parseInt(dataRequestLog[0].status_pr),
+      pr_item: dataRequestLog[0].pr_item,
+      sub_total_po: dataRequestLog[0].sub_total_po,
+      gr_item: JSON.stringify(dataGR),
+    };
+
+    // console.log(log_data);
+    axios.post(Logs, log_data);
 
     let gr_updated = `${prEndPoint[0].url}${
       prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""
@@ -523,20 +631,20 @@ const GoodReceiveTicket = () => {
         ticket_number: element.ticket_number,
         gr_list: element.gr_list,
       };
-
-      axios
-        .patch(gr_updated, data)
-        .then((resp) => {
-          document.getElementById("overlay").style.display = "block";
-          console.log(resp);
-        })
-        .catch((err) => console.error(err));
+      (async () => {
+        await axios
+          .patch(gr_updated, data)
+          .then((resp) => {
+            document.getElementById("overlay").style.display = "block";
+            console.log(resp);
+            setTimeout(() => {
+              document.getElementById("overlay").style.display = "none";
+              window.location.reload();
+            }, 10000);
+          })
+          .catch((err) => console.error(err));
+      })();
     });
-
-    setTimeout(() => {
-      document.getElementById("overlay").style.display = "none";
-      // window.location.reload();
-    }, 1800);
   };
 
   const getInvLatestId = async () => {
@@ -560,7 +668,7 @@ const GoodReceiveTicket = () => {
         text = text.split("-")[1].trim();
         numb = text.match(/\d/g);
         numb = numb.join("");
-        numb = parseInt(numb) + 1;
+        numb = parseInt(numb);
         str = "" + numb;
         pad = "000";
         ans = pad.substring(0, pad.length - str.length) + str;
