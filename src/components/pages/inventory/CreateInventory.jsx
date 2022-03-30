@@ -374,6 +374,11 @@ const CreateInventory = () => {
     // Create For User
 
     if (inventory_type.value === "user") {
+      if (userId === null) {
+        alert("user must select 1");
+        return;
+      }
+
       await axios
         .post(inventory, {
           asset_name: assetName,

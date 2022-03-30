@@ -181,8 +181,7 @@ const TableUser = (props) => {
   const [valueUserId, setValueUserId] = useState("");
   const [resultJoinUser, setResultJoinUser] = useState([]);
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
-
-  const { searchValue } = props;
+  const { searchValue, filterValue } = props;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -202,7 +201,6 @@ const TableUser = (props) => {
   };
 
   //   GET DATA
-  console.log(searchValue);
 
   useEffect(() => {
     getDataUser();
@@ -214,24 +212,153 @@ const TableUser = (props) => {
         searchHandle(searchValue);
       }, 1000);
     }
-  }, [searchValue]);
+
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
 
   const searchHandle = (searchValue) => {
-    setIsLoading(true);
+    // setIsLoading(true);
+
+    if (searchValue.length === 1) {
+      setTimeout(() => {
+        getDataUser();
+      }, 1500);
+      return;
+    }
+
     if (searchValue !== null) {
-      if (searchValue.length === 1) {
+      (async function () {
+        const results = await filter(resultJoinUser, async (item) => {
+          await doAsyncStuff();
+          return item.username.toLowerCase().match(searchValue);
+        });
+        setPage(0);
+        setResultJoinUser(results);
         setTimeout(() => {
-          getDataUser();
+          setIsLoading(false);
+        }, 1500);
+      })();
+      return;
+    }
+  };
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+    console.log(searchValue.length);
+    if (checkData && searchValue.length === 0) {
+      setTimeout(() => {
+        getDataUser();
+      }, 2000);
+
+      return;
+    }
+    if (!checkData) {
+      setIsLoading(true);
+
+      if (
+        filterValue[0] !== "" &&
+        filterValue[1] !== "" &&
+        filterValue[2] !== ""
+      ) {
+        (async function () {
+          const results = await filter(resultJoinUser, async (item) => {
+            await doAsyncStuff();
+            return (
+              item.role === filterValue[0] &&
+              item.area === filterValue[1] &&
+              item.departement === filterValue[2]
+            );
+          });
+          setPage(0);
+          setResultJoinUser(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+
+      if (filterValue[0] !== "" && filterValue[1] !== "") {
+        setTimeout(() => {
+          let searchJoinUser = resultJoinUser.filter(
+            (item) =>
+              item.role === filterValue[0] && item.area === filterValue[1]
+          );
+          setResultJoinUser(searchJoinUser);
+          setIsLoading(false);
+        }, 2000);
+
+        return;
+      }
+
+      if (filterValue[0] !== "") {
+        if (filterValue[2] !== "") {
+          (async function () {
+            const results = await filter(resultJoinUser, async (item) => {
+              await doAsyncStuff();
+              return (
+                item.role === filterValue[0] &&
+                item.departement === filterValue[2]
+              );
+            });
+            setPage(0);
+            setResultJoinUser(results);
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 1500);
+          })();
+          return;
+        }
+        setTimeout(() => {
+          let searchJoinUser = resultJoinUser.filter(
+            (item) => item.role === filterValue[0]
+          );
+          setResultJoinUser(searchJoinUser);
+          setIsLoading(false);
+        }, 2000);
+      }
+
+      if (filterValue[1] !== "") {
+        setTimeout(() => {
+          let searchJoinUser = resultJoinUser.filter(
+            (item) => item.area === filterValue[1]
+          );
+          setResultJoinUser(searchJoinUser);
+          setIsLoading(false);
         }, 2000);
         return;
       }
-      setTimeout(() => {
-        let searchJoinUser = resultJoinUser.filter((item) =>
-          item.username.toLowerCase().match(searchValue)
-        );
-        setResultJoinUser(searchJoinUser);
-        setIsLoading(false);
-      }, 2000);
+
+      if (filterValue[2] !== "") {
+        setTimeout(() => {
+          let searchJoinUser = resultJoinUser.filter(
+            (item) => item.departement === filterValue[2]
+          );
+          setResultJoinUser(searchJoinUser);
+          setIsLoading(false);
+        }, 2000);
+        return;
+      }
     }
   };
 

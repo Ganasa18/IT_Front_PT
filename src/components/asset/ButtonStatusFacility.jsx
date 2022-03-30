@@ -127,10 +127,13 @@ const ButtonStatusFacility = (styleProps) => {
 
   const statusChange = async (props, data) => {
     setIdStatus(props);
-    setIdRequest(data.id);
     setModalOpenDefault(true);
     setLogsData(data);
-    console.log(data);
+    if (data.action_req_code !== undefined) {
+      setIdRequest(data.request_id.id);
+      return;
+    }
+    setIdRequest(data.id);
   };
 
   const submitStatus = async () => {

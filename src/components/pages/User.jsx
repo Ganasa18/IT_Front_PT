@@ -10,11 +10,6 @@ import {
   Backdrop,
   Fade,
   Modal,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
 } from "@material-ui/core";
 
 import "../../assets/master.css";
@@ -95,6 +90,7 @@ const User = () => {
   const classes = useStyles();
   const [dataRole, setDataRole] = useState([]);
   const [dataArea, setDataArea] = useState([]);
+  const [listDataDepartement, setListDataDepartement] = useState([]);
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -107,11 +103,13 @@ const User = () => {
   const [valueEmail, setValueEmail] = useState("");
   const [valueNoHP, setValueNoHP] = useState("");
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
-  const [searchValue, SetSearchValue] = useState(null);
+  const [searchValue, SetSearchValue] = useState("");
+  const [searchValueFilter, setSearchValueFilter] = useState(null);
 
   useEffect(() => {
     getRoleList();
     getAreaList();
+    getDepartementList();
   }, []);
 
   const modalPop = () => {
@@ -163,6 +161,27 @@ const User = () => {
           name: row.area_name,
         }));
         setDataArea(newArr);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getDepartementList = async () => {
+    await axios
+      .get(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/departement`
+      )
+      .then((response) => {
+        const DepartementList = response.data.data.departements;
+        const arr = [...DepartementList];
+        const newArr = arr.map((row) => ({
+          value: row.id,
+          name: row.departement_name,
+        }));
+        setListDataDepartement(newArr);
       })
       .catch((error) => {
         console.log(error);
@@ -284,13 +303,20 @@ const User = () => {
 
   const handleFilter = (e) => {
     e.preventDefault();
-
     var arr = [];
-
-    arr.push(valueArea);
     arr.push(valueRole);
+    arr.push(valueArea);
+    arr.push(valueDepartement);
+    setSearchValueFilter(arr);
+    setTimeout(() => {
+      setModalOpenFilter(false);
+    }, 2000);
+  };
 
-    console.log(arr);
+  const handleResetFilter = () => {
+    setSearchValueFilter(["reset"]);
+    setValueRole("");
+    setValueArea("");
   };
 
   const bodyModal = (
@@ -470,10 +496,30 @@ const User = () => {
                 />
               </div>
             </div>
+            <div className="row margin-top-3">
+              <div className="col-12">
+                <label htmlFor="roleName">Departement</label>
+                <SelectSearch
+                  options={listDataDepartement}
+                  value={listDataDepartement}
+                  onChange={(e) => {
+                    setValueDepartement(e);
+                  }}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Departement"
+                />
+              </div>
+            </div>
             <br />
             <br />
             <div className="footer-modal">
-              <button className={"btn-reset-filter"}>Reset</button>
+              <button
+                type="button"
+                className={"btn-reset-filter"}
+                onClick={handleResetFilter}>
+                Reset
+              </button>
               <button className={"btn-filter"} type={"submit"}>
                 Filter
               </button>
@@ -532,7 +578,10 @@ const User = () => {
         </Grid>
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableUser searchValue={searchValue} />
+            <TableUser
+              searchValue={searchValue}
+              filterValue={searchValueFilter}
+            />
           </div>
         </Grid>
       </Grid>

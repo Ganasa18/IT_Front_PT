@@ -187,6 +187,8 @@ const TableDisposal = () => {
   const [dataDisposal, setDataDisposal] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log(dataDisposal);
+
   useEffect(() => {
     setTimeout(() => {
       getDisposalGroup();
@@ -274,6 +276,7 @@ const TableDisposal = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>Disposal No</StyledTableCell>
+                <StyledTableCell>Disposal Name</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
@@ -298,6 +301,7 @@ const TableDisposal = () => {
                         {row.disposal_code}
                       </Link>
                     </TableCell>
+                    <TableCell>{row.disposal_name}</TableCell>
                     <TableCell>{calbill(row.createdAt)}</TableCell>
                     <TableCell align="center">
                       <span

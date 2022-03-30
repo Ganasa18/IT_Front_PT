@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { invEndPoint, authEndPoint, pathEndPoint } from "../../../assets/menu";
+import { invEndPoint, logsEndPoint, pathEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { makeStyles, Grid, Breadcrumbs, Typography } from "@material-ui/core";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
@@ -76,6 +76,8 @@ const GoodReceiptDetail = () => {
   const [statusBtn, setStatusBtn] = useState([]);
   var gr_check = JSON.parse(grdata);
 
+  console.log(gr_check);
+
   useEffect(() => {
     getData();
   }, []);
@@ -85,14 +87,22 @@ const GoodReceiptDetail = () => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/status`;
 
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-fr-history`;
+
     const requestOne = await axios.get(status);
+    const requestTwo = await axios.get(logs);
 
     axios
-      .all([requestOne])
+      .all([requestOne, requestTwo])
       .then(
         axios.spread((...responses) => {
           const responseOne = responses[0];
+          const responseTwo = responses[1];
           let newStatus = responseOne.data.data.statuss;
+          let newDataLog = responseTwo.data.data.fr_log;
+
           setStatusBtn(newStatus);
           var datagr = JSON.parse(grdata);
 
@@ -104,11 +114,9 @@ const GoodReceiptDetail = () => {
           datagr.forEach(function (request_id) {
             request_id.status_id = statusmap[request_id.request_id.status_id];
           });
-          // console.log(datagr);
-
-          // console.log(gr_check);
 
           setDataInfo(datagr);
+
           setIsLoading(false);
         })
       )
@@ -272,7 +280,6 @@ const GoodReceiptDetail = () => {
                       {gr_check.action_req_code.replace(/[0-9]/g, "") ===
                       "MKDFR" ? (
                         <>
-                          {console.log(dataInfo)}
                           <ButtonStatusFacility
                             idStatus={row.id}
                             status={`${
@@ -284,12 +291,11 @@ const GoodReceiptDetail = () => {
                             nameBtn={row.status_name}
                             colorName={row.color_status}
                             backgroundColor={row.color_status}
-                            data={dataInfo[0].request_id}
+                            data={dataInfo[0]}
                           />
                         </>
                       ) : (
                         <>
-                          {console.log(dataInfo)}
                           <StatusButton
                             idStatus={row.id}
                             status={`${

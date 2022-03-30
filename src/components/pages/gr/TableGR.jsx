@@ -4,6 +4,7 @@ import {
   prEndPoint,
   invEndPoint,
   authEndPoint,
+  logsEndPoint,
 } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import PropTypes from "prop-types";
@@ -228,6 +229,10 @@ const TableGR = () => {
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
     }/api/v1/role`;
 
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-ar-history`;
+
     const requestOne = await axios.get(pr_req);
     const requestTwo = await axios.get(act_req);
     const requestThree = await axios.get(user, {
@@ -239,6 +244,7 @@ const TableGR = () => {
     const requestSeven = await axios.get(role, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    const requestEight = await axios.get(logs);
 
     axios
       .all([
@@ -249,6 +255,7 @@ const TableGR = () => {
         requestFive,
         requestSix,
         requestSeven,
+        requestEight,
       ])
       .then(
         axios.spread((...responses) => {
@@ -259,6 +266,7 @@ const TableGR = () => {
           const responseFive = responses[4];
           const responseSix = responses[5];
           const responseSeven = responses[6];
+          const responseEight = responses[7];
           let newDataRequest = responseOne.data.data.request_purchase;
           let newDataTicket = responseTwo.data.data.request_tiket;
           let newDataUser = responseThree.data.data.users;
@@ -266,6 +274,7 @@ const TableGR = () => {
           let newDataSubDepartement = responseFive.data.data.subdepartements;
           let newDataArea = responseSix.data.data.areas;
           let newDataRole = responseSeven.data.data.roles;
+          let newDataLog = responseEight.data.data.ar_log;
 
           const getUser = newDataUser.map((item) => ({
             id: item.id,
@@ -333,6 +342,16 @@ const TableGR = () => {
           });
           newDataRequest.forEach(function (request_id) {
             request_id.id_role_user = prmap[request_id.id_user.role];
+          });
+
+          var logsmap = {};
+
+          newDataLog.forEach(function (logs_id) {
+            logsmap[logs_id.request_number] = logs_id;
+          });
+
+          newDataRequest.forEach(function (request_id) {
+            request_id.logs_id = logsmap[request_id.action_req_code];
           });
 
           let newDataFilter = newDataRequest.filter(
