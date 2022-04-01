@@ -192,8 +192,10 @@ const useStyles2 = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(4, 10, 4),
     [theme.breakpoints.down("lg")]: {
-      transform: "translate(-50%,-45%)",
+      top: "-4%",
+      left: "15%",
       width: 1000,
+      transform: "scale(0.9)",
     },
   },
   buttonAdd: {

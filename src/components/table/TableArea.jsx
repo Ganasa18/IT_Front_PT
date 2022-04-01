@@ -22,6 +22,7 @@ import {
   Modal,
   Backdrop,
   Snackbar,
+  Divider,
 } from "@material-ui/core";
 import "../../assets/master.css";
 
@@ -166,6 +167,8 @@ const TableArea = (props) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [areaDelete, setAreaDelete] = useState([]);
   const [dataArea, setDataArea] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [areaId, setAreaId] = useState("");
@@ -254,12 +257,21 @@ const TableArea = (props) => {
   }
 
   const handleDelete = async (row) => {
-    await axios.delete(
-      `${pathEndPoint[0].url}${
-        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-      }/api/v1/area/${row.id}`
-    );
-    setToast(true);
+    await axios
+      .delete(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/area/${row.id}`
+      )
+      .then((res) => {
+        setToast(true);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      })
+      .catch((err) => {
+        alert(`area has been used on item`);
+      });
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -267,8 +279,14 @@ const TableArea = (props) => {
     setPage(0);
   };
 
+  const handleConfirmDelete = (row) => {
+    setDeleteModal(true);
+    setAreaDelete(row);
+  };
+
   const modalClose = () => {
     setEditModal(false);
+    setDeleteModal(false);
   };
 
   const handleClose = (event, reason) => {
@@ -328,6 +346,29 @@ const TableArea = (props) => {
     </>
   );
 
+  const bodyModalDelete = (
+    <>
+      <Fade in={deleteModal}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to delete this {areaDelete.area_name}</h3>
+          <Divider />
+          <br />
+
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalClose}>
+              Cancel
+            </button>
+            <button
+              className="btn-submit"
+              onClick={() => handleDelete(areaDelete)}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -376,12 +417,20 @@ const TableArea = (props) => {
                       </button>
                       <button
                         className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
+                        onClick={() => handleConfirmDelete(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
+                      {/* <button
+                        className="btn-delete"
+                        onClick={(e) => handleDelete(row)}>
+                        <span
+                          class="iconify icon-btn"
+                          data-icon="ant-design:delete-filled"></span>
+                        <span className="name-btn">Delete</span>
+                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -422,6 +471,16 @@ const TableArea = (props) => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+
+      <Modal
+        open={deleteModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalDelete}
       </Modal>
 
       <Snackbar

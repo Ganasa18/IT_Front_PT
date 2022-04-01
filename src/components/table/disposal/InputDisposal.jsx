@@ -178,7 +178,7 @@ const useStyles2 = makeStyles((theme) => ({
 const InputDisposal = ({ dataDisposal, userProp }) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(1);
   const [selectDisposal, setSelectDisposal] = useState(dataDisposal);
   const [nameDisposal, setNameDisposal] = useState("");
   const [descriptionDisposal, setDescriptionDisposal] = useState("");

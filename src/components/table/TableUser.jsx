@@ -23,6 +23,7 @@ import {
   Fade,
   Modal,
   Backdrop,
+  Divider,
 } from "@material-ui/core";
 import "../../assets/master.css";
 
@@ -182,6 +183,8 @@ const TableUser = (props) => {
   const [resultJoinUser, setResultJoinUser] = useState([]);
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
   const { searchValue, filterValue } = props;
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteModalUser, setDeleteModalUser] = useState([]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -194,6 +197,7 @@ const TableUser = (props) => {
 
   const modalClose = () => {
     setEditModal(false);
+    setDeleteModal(false);
   };
 
   const handleChangeEmply = (event) => {
@@ -412,6 +416,8 @@ const TableUser = (props) => {
           let newDataDepartement = responesFour.data.data.departements;
           let newDataSubDepartement = responesFive.data.data.subdepartements;
 
+          newDataUser = newDataUser.filter((data) => data.is_active === true);
+
           const arr_user = [...newDataUser];
           const arr_area = [...newDataArea];
           const arr_role = [...newDataRole];
@@ -490,6 +496,11 @@ const TableUser = (props) => {
     setTimeout(() => {
       window.location.reload();
     }, 1500);
+  };
+
+  const handleConfirmDelete = (row) => {
+    setDeleteModal(true);
+    setDeleteModalUser(row);
   };
 
   const handleEditUser = async (row) => {
@@ -796,6 +807,29 @@ const TableUser = (props) => {
     </>
   );
 
+  const bodyModalDelete = (
+    <>
+      <Fade in={deleteModal}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to delete this "{deleteModalUser.username}"</h3>
+          <Divider />
+          <br />
+
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalClose}>
+              Cancel
+            </button>
+            <button
+              className="btn-submit"
+              onClick={() => handleUserDelete(deleteModalUser)}>
+              Submit
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -881,17 +915,38 @@ const TableUser = (props) => {
                       </button>
                       <button
                         disabled={`${
-                          row.role_id.role_name === "admin" ? "disabled" : ""
+                          row.role_id.role_name === "Administrator"
+                            ? "disabled"
+                            : ""
                         }`}
                         className={`btn-delete ${
-                          row.role_id.role_name === "admin" ? "disabled" : ""
+                          row.role_id.role_name === "Administrator"
+                            ? "disabled"
+                            : ""
+                        } `}
+                        onClick={() => handleConfirmDelete(row)}>
+                        <span
+                          class="iconify icon-btn"
+                          data-icon="ant-design:delete-filled"></span>
+                        <span className="name-btn">Delete</span>
+                      </button>
+                      {/* <button
+                        disabled={`${
+                          row.role_id.role_name === "Administrator"
+                            ? "disabled"
+                            : ""
+                        }`}
+                        className={`btn-delete ${
+                          row.role_id.role_name === "Administrator"
+                            ? "disabled"
+                            : ""
                         } `}
                         onClick={(e) => handleUserDelete(row)}>
                         <span
                           class="iconify icon-btn"
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
-                      </button>
+                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -932,6 +987,15 @@ const TableUser = (props) => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={deleteModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalDelete}
       </Modal>
     </>
   );

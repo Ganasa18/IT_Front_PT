@@ -110,6 +110,9 @@ const Area = () => {
 
     setToast(true);
     setModalOpen(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const handleSearch = (e) => {

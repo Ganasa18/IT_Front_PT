@@ -239,13 +239,13 @@ const ActionTicketTable = (props) => {
 
   const filterHandle = (filterValue) => {
     let checkData = filterValue.every((element) => element === "reset");
-    console.log(filterValue);
-    if (checkData && searchValue.length === 0) {
-      setTimeout(() => {
-        getStatusList();
-      }, 2000);
-      return;
-    }
+
+    // if (checkData && searchValue.length === 0) {
+    //   setTimeout(() => {
+    //     getStatusList();
+    //   }, 2000);
+    //   return;
+    // }
 
     if (!checkData) {
       setIsLoading(true);
@@ -376,6 +376,10 @@ const ActionTicketTable = (props) => {
           JoinInvent.forEach(function (request_id) {
             request_id.user_data = usermap[request_id.user_id];
           });
+
+          JoinInvent = JoinInvent.filter(
+            (data) => data.user_data.is_active === true
+          );
 
           setDataRequest(JoinInvent);
           setIsLoading(false);

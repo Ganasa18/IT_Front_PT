@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { pathEndPoint, logsEndPoint } from "../../../../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
-import Loading from "../asset/Loading";
+import Loading from "../../../../asset/Loading";
+import "../../../../asset/chips.css";
 import { Link } from "react-router-dom";
+import "../../../../../assets/master.css";
+import IconButton from "@material-ui/core/IconButton";
+import FirstPageIcon from "@material-ui/icons/FirstPage";
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
+import LastPageIcon from "@material-ui/icons/LastPage";
 import {
   useTheme,
   makeStyles,
@@ -18,13 +25,6 @@ import {
   Paper,
   withStyles,
 } from "@material-ui/core";
-import "../../assets/master.css";
-
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -138,18 +138,8 @@ const useStyles2 = makeStyles((theme) => ({
       borderRadius: "0 0.5em 0 0",
     },
   },
-  paper: {
-    position: "fixed",
-    transform: "translate(-50%,-50%)",
-    top: "30%",
-    left: "50%",
-    width: 550,
-    display: "block",
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[2],
-    padding: theme.spacing(2, 4, 3),
-  },
 }));
+
 function calbill(date) {
   const monthNames = [
     "Jan",
@@ -180,77 +170,16 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TableDisposal = () => {
+const HistoryInventoryTable = () => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [dataDisposal, setDataDisposal] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      getDisposalGroup();
-    }, 2000);
-  }, []);
-
-  const getDisposalGroup = async () => {
-    let disposal = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/disposal/group/`;
-
-    let status = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/status`;
-
-    const requestOne = await axios.get(disposal);
-    const requestTwo = await axios.get(status);
-
-    axios
-      .all([requestOne, requestTwo])
-      .then(
-        axios.spread((...responses) => {
-          const responseOne = responses[0];
-          const responseTwo = responses[1];
-
-          let newDataDisposal = responseOne.data.data.disposal_group;
-          let newDataStatus = responseTwo.data.data.statuss;
-
-          const arr_disposal = [...newDataDisposal];
-          const arr_status = [...newDataStatus];
-
-          var statusmap = {};
-
-          arr_status.forEach(function (status_id) {
-            statusmap[status_id.id] = status_id;
-          });
-
-          arr_disposal.forEach(function (disposal) {
-            disposal.status_id = statusmap[disposal.status_approval];
-          });
-
-          arr_status.forEach(function (status_condition) {
-            statusmap[status_condition.id] = status_condition;
-          });
-
-          arr_disposal.forEach(function (disposal) {
-            disposal.status_condition = statusmap[disposal.status_disposal];
-          });
-
-          let JoinRole = arr_disposal;
-
-          setDataDisposal(JoinRole);
-          setIsLoading(false);
-        })
-      )
-      .catch((errors) => {
-        // react on errors.
-        console.error(errors);
-      });
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [dataHistoryInvent, setDataHistoryInvent] = useState([]);
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, dataDisposal.length - page * rowsPerPage);
+    Math.min(rowsPerPage, dataHistoryInvent.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -261,11 +190,6 @@ const TableDisposal = () => {
     setPage(0);
   };
 
-  const storeData = (row) => {
-    localStorage.setItem("dispos_no", row.disposal_code);
-    localStorage.setItem("disposalData", JSON.stringify(row));
-  };
-
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -273,10 +197,16 @@ const TableDisposal = () => {
           <Table className={classes.table} aria-label="custom pagination table">
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
-                <StyledTableCell>Disposal No</StyledTableCell>
-                <StyledTableCell>Disposal Name</StyledTableCell>
-                <StyledTableCell>Date Create</StyledTableCell>
+                <StyledTableCell>Asset No</StyledTableCell>
+                <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>Unit/Part</StyledTableCell>
+                <StyledTableCell>Fisik/Non</StyledTableCell>
+                <StyledTableCell>User/Dept.</StyledTableCell>
+                <StyledTableCell>QTY</StyledTableCell>
+                <StyledTableCell>Used By</StyledTableCell>
+                <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
+                <StyledTableCell align="center">Date</StyledTableCell>
               </TableRow>
             </TableHead>
 
@@ -285,37 +215,63 @@ const TableDisposal = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataDisposal.slice(
+                  ? dataHistoryInvent.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataDisposal
+                  : dataHistoryInvent
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link
-                        onClick={() => storeData(row)}
-                        to="/disposal-assets/detail">
-                        {row.disposal_code}
+                      <Link to="/history/ticket/action-req/detail/information">
+                        {row.asset_number}
                       </Link>
                     </TableCell>
-                    <TableCell>{row.disposal_name}</TableCell>
-                    <TableCell>{calbill(row.createdAt)}</TableCell>
-                    <TableCell align="center">
-                      <span
-                        class="chip"
-                        style={{
-                          background: `${row.status_id.color_status}4C`,
-                          color: `${row.status_id.color_status}FF`,
-                        }}>
-                        {capitalizeFirstLetter(row.status_id.status_name)}
-                      </span>
+                    <TableCell component="th" scope="row">
+                      {row.asset_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row" align="center">
+                      {row.asset_part_or_unit === ""
+                        ? " - "
+                        : row.asset_part_or_unit}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.asset_fisik_or_none}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.type_asset}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.qty}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.qty}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.used_by}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.area}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <div className="chip-container">
+                        {row.status_asset === true ? (
+                          <span className="chip-inventory-used">Used</span>
+                        ) : (
+                          <span className="chip-inventory-available">
+                            Available
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.createdAt}
                     </TableCell>
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (
                   <TableRow style={{ height: 20 * emptyRows }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={10} />
                   </TableRow>
                 )}
               </TableBody>
@@ -326,7 +282,7 @@ const TableDisposal = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataDisposal.length}
+                  count={dataHistoryInvent.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
@@ -346,4 +302,4 @@ const TableDisposal = () => {
   );
 };
 
-export default TableDisposal;
+export default HistoryInventoryTable;

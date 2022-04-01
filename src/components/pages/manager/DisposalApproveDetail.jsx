@@ -282,6 +282,7 @@ const DisposalApproveDetail = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     document.getElementById("overlay").style.display = "block";
+    let numberOTP = localStorage.getItem("otp");
 
     let updatedsp = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -292,6 +293,7 @@ const DisposalApproveDetail = () => {
       pic_name: dataUser[0].username,
       pic_comment: areaInput,
       status_approval: 7,
+      number_otp: numberOTP,
     };
 
     await axios
@@ -643,6 +645,10 @@ const DisposalApproveDetail = () => {
               <div className="col-3">
                 <p className="label-asset">Disposal Name</p>
                 <p>{parseObject.disposal_name}</p>
+              </div>
+              <div className="col-3">
+                <p className="label-asset">Condition</p>
+                <p>{parseObject.status_id_disposal.status_name}</p>
               </div>
               <div className="col-3">
                 <p className="label-asset">Status</p>

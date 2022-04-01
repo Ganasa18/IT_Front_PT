@@ -181,16 +181,101 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TableDisposal = () => {
+const TableDisposal = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataDS, setDataDS] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { searchValue, filterValue } = props;
 
   useEffect(() => {
     getDisposallist();
-  }, []);
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+
+      if (
+        filterValue[0] !== "" &&
+        new Date(filterValue[1]).toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0]
+      ) {
+        (async function () {
+          const results = await filter(dataDS, async (item) => {
+            await doAsyncStuff();
+            return item.status_id.id === filterValue[0];
+          });
+
+          setDataDS(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+      var ed = new Date(filterValue[1]).toISOString().split("T")[0];
+      var sd = new Date(filterValue[2]).toISOString().split("T")[0];
+
+      (async function () {
+        const results = await filter(dataDS, async (item) => {
+          await doAsyncStuff();
+          return (
+            new Date(item.createdAt).toISOString().split("T")[0] >= ed &&
+            new Date(item.createdAt).toISOString().split("T")[0] <= sd
+          );
+        });
+        setDataDS(results);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      })();
+    }
+  };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataDS, searchValue);
+      setDataDS(searchRequest);
+    }
+  };
 
   const getDisposallist = async () => {
     let disposal = `${pathEndPoint[0].url}${
@@ -223,6 +308,14 @@ const TableDisposal = () => {
           });
           arr_request.forEach(function (request_id) {
             request_id.status_id = statusmap[request_id.status_approval];
+          });
+
+          arr_status.forEach(function (status_id_disposal) {
+            statusmap[status_id_disposal.id] = status_id_disposal;
+          });
+          arr_request.forEach(function (request_id) {
+            request_id.status_id_disposal =
+              statusmap[request_id.status_disposal];
           });
 
           setDataDS(newDataDisposal);
@@ -260,8 +353,8 @@ const TableDisposal = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>Disposal No</StyledTableCell>
+                <StyledTableCell>Disposal Name</StyledTableCell>
                 <StyledTableCell>Date Create</StyledTableCell>
-
                 <StyledTableCell align="center">Status</StyledTableCell>
               </TableRow>
             </TableHead>
@@ -289,6 +382,9 @@ const TableDisposal = () => {
                         to="/disposal-asset-approval/request/approve">
                         {row.disposal_code}
                       </Link>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.disposal_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {calbill(row.createdAt)}

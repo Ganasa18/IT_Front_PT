@@ -21,7 +21,7 @@ import {
   Backdrop,
   Collapse,
   Box,
-  Typography,
+  Divider,
   Button,
 } from "@material-ui/core";
 import "../../assets/master.css";
@@ -175,6 +175,7 @@ const TableCategory = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [dataCategory, setDataCategory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState([]);
@@ -227,6 +228,11 @@ const TableCategory = () => {
       .catch((err) => {
         console.error(err);
       });
+  };
+
+  const handleConfirmDelete = (row) => {
+    setDeleteModal(true);
+    setCategoryEdit(row);
   };
 
   const handleDelete = async (row) => {
@@ -285,6 +291,7 @@ const TableCategory = () => {
 
   const modalOut = () => {
     setEditModal(false);
+    setDeleteModal(false);
   };
 
   const emptyRows =
@@ -311,6 +318,29 @@ const TableCategory = () => {
             variant="outlined">
             Cancel
           </Button>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyModalDelete = (
+    <>
+      <Fade in={deleteModal}>
+        <div className={classes.paper}>
+          <h3>Are you sure want to delete this {categoryEdit.category_name}</h3>
+          <Divider />
+          <br />
+
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalOut}>
+              Cancel
+            </button>
+            <button
+              className="btn-submit"
+              onClick={() => handleDelete(categoryEdit)}>
+              Submit
+            </button>
+          </div>
         </div>
       </Fade>
     </>
@@ -381,12 +411,25 @@ const TableCategory = () => {
                             className={`btn-delete ${
                               lastCategoryId === row.id ? "disabled" : ""
                             }`}
-                            onClick={() => handleDelete(row)}>
+                            onClick={() => handleConfirmDelete(row)}>
                             <span
                               class="iconify icon-btn"
                               data-icon="ant-design:delete-filled"></span>
                             <span className="name-btn">Delete</span>
                           </button>
+                          {/* <button
+                            disabled={`${
+                              lastCategoryId === row.id ? "disabled" : ""
+                            }`}
+                            className={`btn-delete ${
+                              lastCategoryId === row.id ? "disabled" : ""
+                            }`}
+                            onClick={() => handleDelete(row)}>
+                            <span
+                              class="iconify icon-btn"
+                              data-icon="ant-design:delete-filled"></span>
+                            <span className="name-btn">Delete</span>
+                          </button> */}
                         </TableCell>
                       </TableRow>
 
@@ -462,6 +505,15 @@ const TableCategory = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={deleteModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalDelete}
       </Modal>
     </>
   );
