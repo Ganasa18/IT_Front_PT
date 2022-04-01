@@ -699,6 +699,14 @@ const DisposalApproveDetail = () => {
                 </div>
               ) : null}
             </div>
+            {parseObject.number_otp && (
+              <div className="row">
+                <div className="col-3">
+                  <p className="label-asset">OTP Number</p>
+                  <p>{parseObject.number_otp}</p>
+                </div>
+              </div>
+            )}
           </div>
         </Grid>
         <Grid item xs={12} className={classes.cardPadding}>

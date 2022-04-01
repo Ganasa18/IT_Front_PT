@@ -558,6 +558,14 @@ const DisposalDetail = () => {
                 </div>
               ) : null}
             </div>
+            {dataDisposal.number_otp && (
+              <div className="row">
+                <div className="col-3">
+                  <p className="label-asset">OTP Number</p>
+                  <p>{dataDisposal.number_otp}</p>
+                </div>
+              </div>
+            )}
           </div>
         </Grid>
       </Grid>
