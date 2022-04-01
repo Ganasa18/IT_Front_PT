@@ -175,7 +175,7 @@ const Roles = () => {
           <div className="card">
             <div className="row">
               <div className="col-4">
-                <div className="input-container">
+                {/* <div className="input-container">
                   <span
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
@@ -184,7 +184,7 @@ const Roles = () => {
                     type="text"
                     placeholder="Search..."
                   />
-                </div>
+                </div> */}
               </div>
               <div className="col-4"></div>
               <div className="col-4">

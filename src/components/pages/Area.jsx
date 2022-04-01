@@ -77,6 +77,7 @@ const Area = () => {
   const [areaName, setAreaName] = useState("");
   const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
+  const [searchValue, SetSearchValue] = useState("");
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -110,6 +111,20 @@ const Area = () => {
     setToast(true);
     setModalOpen(false);
   };
+
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
+
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
 
   const bodyModal = (
     <>
@@ -178,6 +193,7 @@ const Area = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
@@ -200,7 +216,7 @@ const Area = () => {
         </Grid>
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableArea />
+            <TableArea searchValue={searchValue} />
           </div>
         </Grid>
       </Grid>

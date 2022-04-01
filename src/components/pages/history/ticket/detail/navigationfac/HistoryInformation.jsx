@@ -160,16 +160,14 @@ const HistoryInformation = (props) => {
               <p style={{ marginRight: "5px" }}>
                 <span
                   className="iconify iconFailedFac"
-                  data-icon="ps:forbidden"
-                ></span>
+                  data-icon="ps:forbidden"></span>
                 Not Create Account
               </p>
             ) : (
               <p style={{ marginRight: "5px" }}>
                 <span
                   className="iconify iconSuccessFac"
-                  data-icon="clarity:success-standard-solid"
-                ></span>
+                  data-icon="clarity:success-standard-solid"></span>
                 Success Create Account
               </p>
             )}
@@ -195,8 +193,7 @@ const HistoryInformation = (props) => {
                 style={{
                   background: `${ticketData[0].status_id.color_status}4C`,
                   color: `${ticketData[0].status_id.color_status}FF`,
-                }}
-              >
+                }}>
                 {ticketData[0].status_id.status_name}
               </span>
             </div>
@@ -247,8 +244,7 @@ const HistoryInformation = (props) => {
                 Computer
                 <span
                   class="iconify check-class"
-                  data-icon="clarity:success-line"
-                ></span>
+                  data-icon="clarity:success-line"></span>
               </p>
               <p className="wrap-paraf">{generalRequest.comp_detail}</p>
             </div>
@@ -258,8 +254,7 @@ const HistoryInformation = (props) => {
                 {generalRequest.telephone === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -274,8 +269,7 @@ const HistoryInformation = (props) => {
                 {generalRequest.internetacc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -299,8 +293,7 @@ const HistoryInformation = (props) => {
                 {generalRequest.emailid === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -315,8 +308,7 @@ const HistoryInformation = (props) => {
                 {generalRequest.printeracc === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -331,8 +323,7 @@ const HistoryInformation = (props) => {
                 {generalRequest.wifiaccess === "yes" ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
               <p className="wrap-paraf">
@@ -354,8 +345,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.openERP === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -365,8 +355,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.clickBca === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -376,8 +365,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.odoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -391,8 +379,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.eskom === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -402,8 +389,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.randevoo === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -423,8 +409,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.accurate === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>
@@ -434,8 +419,7 @@ const HistoryInformation = (props) => {
                 {applicationRequest.solution === true ? (
                   <span
                     class="iconify check-class"
-                    data-icon="clarity:success-line"
-                  ></span>
+                    data-icon="clarity:success-line"></span>
                 ) : null}
               </p>
             </div>

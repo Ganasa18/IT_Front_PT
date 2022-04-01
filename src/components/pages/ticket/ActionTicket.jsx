@@ -18,7 +18,6 @@ import axios from "axios";
 import ActionTicketTable from "../../table/ticket/ActionTicketTable";
 import DateFnsUtils from "@date-io/date-fns";
 import {
-  DatePicker,
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from "@material-ui/pickers";

@@ -196,7 +196,6 @@ const ActionTicketTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState(false);
 
   const { searchValue, filterValue } = props;
 

@@ -71,7 +71,7 @@ const FacilityApproved = () => {
                 </div>
               </div>
               <div className="col-4">
-                <button className="filter-btn">Filter</button>
+                {/* <button className="filter-btn">Filter</button> */}
               </div>
               <div className="col-4"></div>
             </div>

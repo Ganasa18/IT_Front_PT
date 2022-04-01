@@ -263,7 +263,7 @@ const TableUser = (props) => {
 
   const filterHandle = (filterValue) => {
     let checkData = filterValue.every((element) => element === "reset");
-    console.log(searchValue.length);
+
     if (checkData && searchValue.length === 0) {
       setTimeout(() => {
         getDataUser();

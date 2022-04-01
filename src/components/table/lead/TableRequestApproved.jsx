@@ -197,17 +197,38 @@ const storeData = (row) => {
   localStorage.setItem("ticketData", JSON.stringify(row));
 };
 
-const TableRequestApproved = () => {
+const TableRequestApproved = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { searchValue } = props;
+
   useEffect(() => {
     getStatusList();
-  }, []);
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [searchValue]);
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataRequest, searchValue);
+      setDataRequest(searchRequest);
+    }
+  };
 
   const getStatusList = async () => {
     let user = `${authEndPoint[0].url}${

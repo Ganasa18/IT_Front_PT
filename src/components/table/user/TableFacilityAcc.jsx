@@ -195,16 +195,102 @@ const storeData = (row) => {
   localStorage.setItem("ticketData", JSON.stringify(row));
 };
 
-const TableFacilityAcc = () => {
+const TableFacilityAcc = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { searchValue, filterValue } = props;
+
   useEffect(() => {
     getStatusList();
-  }, []);
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataRequest, searchValue);
+      setDataRequest(searchRequest);
+    }
+  };
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+
+      if (
+        filterValue[0] !== "" &&
+        new Date(filterValue[1]).toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0]
+      ) {
+        (async function () {
+          const results = await filter(dataRequest, async (item) => {
+            await doAsyncStuff();
+            return item.status_id.id === filterValue[0];
+          });
+
+          setDataRequest(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+      var ed = new Date(filterValue[1]).toISOString().split("T")[0];
+      var sd = new Date(filterValue[2]).toISOString().split("T")[0];
+
+      (async function () {
+        const results = await filter(dataRequest, async (item) => {
+          await doAsyncStuff();
+          return (
+            new Date(item.createdAt).toISOString().split("T")[0] >= ed &&
+            new Date(item.createdAt).toISOString().split("T")[0] <= sd
+          );
+        });
+        setDataRequest(results);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      })();
+    }
+  };
 
   const getStatusList = async () => {
     let act_req = `${FacEndPoint[0].url}${

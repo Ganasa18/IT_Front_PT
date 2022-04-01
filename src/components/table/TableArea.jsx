@@ -161,7 +161,7 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableArea = () => {
+const TableArea = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -172,12 +172,34 @@ const TableArea = () => {
   const [areaName, setAreaName] = useState("");
   const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
+  const { searchValue } = props;
 
   useEffect(() => {
-    setTimeout(() => {
-      getAreaList();
-    }, 3000);
-  }, [dataArea]);
+    getAreaList();
+    // setTimeout(() => {
+
+    // }, 3000);
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [searchValue]);
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataArea, searchValue);
+      setDataArea(searchRequest);
+    }
+  };
 
   const getAreaList = async () => {
     await axios
@@ -212,6 +234,9 @@ const TableArea = () => {
     setAreaName("");
     setAliasName("");
     setEditModal(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
 
   const emptyRows =

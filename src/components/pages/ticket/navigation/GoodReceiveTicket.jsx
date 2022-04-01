@@ -560,7 +560,7 @@ const GoodReceiveTicket = () => {
         gr_item: JSON.stringify(dataGR),
       };
 
-      // axios.post(Logs, log_data);
+      axios.post(Logs, log_data);
 
       let gr_updated = `${prEndPoint[0].url}${
         prEndPoint[0].port !== "" ? ":" + prEndPoint[0].port : ""

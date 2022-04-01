@@ -198,7 +198,7 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableInventory = () => {
+const TableInventory = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -211,10 +211,196 @@ const TableInventory = () => {
   const [lastNumber, setLastNumber] = useState("");
   const [selectedDisposal, setSelectedDisposal] = useState([]);
   const [modalDisposal, setModalDisposal] = useState(false);
+  const { searchValue, filterValue } = props;
 
   useEffect(() => {
     getInventory();
-  }, []);
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+      if (filterValue[0] !== "" && filterValue[1] !== "") {
+        (async function () {
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return (
+              item.status_asset === Boolean(parseInt(filterValue[0])) &&
+              item.type_asset === filterValue[1]
+            );
+          });
+
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+        return;
+      }
+
+      if (filterValue[0] !== "") {
+        (async function () {
+          if (filterValue[0] !== "" && filterValue[2] !== "") {
+            const results = await filter(dataInventory, async (item) => {
+              await doAsyncStuff();
+              return (
+                item.status_asset === Boolean(parseInt(filterValue[0])) &&
+                item.area === filterValue[2]
+              );
+            });
+            console.log("status & area");
+            setPage(0);
+            setDataInventory(results);
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 1500);
+            return;
+          }
+
+          if (filterValue[0] !== "" && filterValue[3] !== "") {
+            const results = await filter(dataInventory, async (item) => {
+              await doAsyncStuff();
+              return (
+                item.status_asset === Boolean(parseInt(filterValue[0])) &&
+                item.asset_fisik_or_none === filterValue[3]
+              );
+            });
+            console.log("status & fisik non");
+            setPage(0);
+            setDataInventory(results);
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 1500);
+            return;
+          }
+
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return item.status_asset === Boolean(parseInt(filterValue[0]));
+          });
+          console.log("status");
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+      if (filterValue[1] !== "") {
+        (async function () {
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return item.type_asset === filterValue[1];
+          });
+          console.log("usr/dpt");
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+
+      if (filterValue[2] !== "") {
+        (async function () {
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return item.area === filterValue[2];
+          });
+
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+
+      if (filterValue[3] !== "") {
+        (async function () {
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return item.asset_fisik_or_none === filterValue[3];
+          });
+
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+      if (filterValue[4] !== "") {
+        (async function () {
+          const results = await filter(dataInventory, async (item) => {
+            await doAsyncStuff();
+            return item.asset_part_or_unit === filterValue[4];
+          });
+
+          setPage(0);
+          setDataInventory(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+    }
+  };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataInventory, searchValue);
+      setDataInventory(searchRequest);
+      console.log(searchRequest);
+    }
+  };
 
   const getInventory = async () => {
     let user = `${authEndPoint[0].url}${

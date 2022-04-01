@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import Loader from "react-loader-spinner";
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 import {
   makeStyles,
   Grid,
@@ -13,7 +18,7 @@ import {
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
-import SelectSearch from "react-select-search";
+import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../../assets/select-search.css";
 import axios from "axios";
 import TableActionReq from "../../table/user/TableActionReq";
@@ -81,14 +86,18 @@ const useStyles = makeStyles((theme) => ({
       height: "82%",
     },
   },
+  paperFilter: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "30%",
+    left: "50%",
+    width: 540,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 10, 3),
+  },
 }));
-
-// const readImg = (file) => {
-//   if (file.files && file.files[0]) {
-//     var reader = new FileReader();
-//     console.log(reader);
-//   }
-// };
 
 const handleImage = () => {
   const labelImg = document.getElementById("labelImg");
@@ -107,6 +116,13 @@ const ActionReq = () => {
   const [assetId, setAssetId] = useState(null);
   const [lastNumber, setLastNumber] = useState("");
   const [leadEmail, setLeadEmail] = useState(null);
+  const [searchValue, SetSearchValue] = useState("");
+  const [valueStatus, setValueStatus] = useState("");
+  const [searchValueFilter, setSearchValueFilter] = useState(null);
+  const [modalOpenFilter, setModalOpenFilter] = useState(false);
+  const [dataStatus, setDataStatus] = useState([]);
+  const [selectedDate, handleDateChange] = useState(new Date());
+  const [selectedDate2, handleDateChange2] = useState(new Date());
 
   const handleChange = (...args) => {
     setAssetId(args[1].value);
@@ -132,7 +148,35 @@ const ActionReq = () => {
 
   useEffect(() => {
     getUserList();
+    getStatusList();
   }, []);
+
+  const getStatusList = async () => {
+    await axios
+      .get(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/status`
+      )
+      .then((response) => {
+        console.log(response.data.data.statuss);
+        const DataStatus = response.data.data.statuss;
+
+        const arr = [...DataStatus];
+        let newArr = arr.map((row) => ({
+          value: row.id,
+          name: row.status_name,
+        }));
+        newArr = newArr.filter((row) =>
+          [4, 8, 9, 10, 12, 13, 14, 15, 19].includes(row.value)
+        );
+
+        setDataStatus(newArr);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const getUserList = async () => {
     let user = `${authEndPoint[0].url}${
@@ -270,7 +314,7 @@ const ActionReq = () => {
 
     if (getData.length > 0) {
       setLeadEmail(getData[0].email);
-      if (userData[0].role === 3) {
+      if (userData[0].role === 3 || userData[0].role === 6) {
         var arr = [];
         getDataAdmin.forEach((x) => arr.push(x.email));
         setLeadEmail(arr);
@@ -362,8 +406,13 @@ const ActionReq = () => {
       });
   };
 
+  const modalPopFilter = () => {
+    setModalOpenFilter(true);
+  };
+
   const modalClose = () => {
     setModalOpen(false);
+    setModalOpenFilter(false);
   };
 
   function handleChangeImg(e) {
@@ -418,7 +467,10 @@ const ActionReq = () => {
     imageFormData.append("username", userData[0].name);
     imageFormData.append("email", userData[0].email);
     imageFormData.append("departement_id", parseInt(userData[0].departement));
-    imageFormData.append("status_id", userData[0].role === 3 ? 12 : 10);
+    imageFormData.append(
+      "status_id",
+      userData[0].role === 3 ? 12 : userData[0].role === 6 ? 12 : 10
+    );
     imageFormData.append("lead", leadEmail);
     imageFormData.append("url", urlHost);
 
@@ -430,7 +482,7 @@ const ActionReq = () => {
       })
       .then((response) => {
         alert(response.data.status);
-        if (userData[0].role === 3) {
+        if (userData[0].role === 3 || userData[0].role === 6) {
           const log_data = {
             request_number: `MKDAR${lastNumber}`,
             asset_number: localStorage.getItem("asset_number"),
@@ -465,10 +517,38 @@ const ActionReq = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
 
-    // console.log(checkFile.files);
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
 
-    // console.log(files);
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
+
+  const handleFilterData = (e) => {
+    e.preventDefault();
+    var arr = [];
+    arr.push(valueStatus);
+    arr.push(selectedDate);
+    arr.push(selectedDate2);
+    setSearchValueFilter(arr);
+    setTimeout(() => {
+      setModalOpenFilter(false);
+    }, 2000);
+  };
+
+  const handleResetFilter = () => {
+    setSearchValueFilter(["reset"]);
+    SetSearchValue("");
+    setValueStatus("");
   };
 
   const bodyModal = (
@@ -551,6 +631,100 @@ const ActionReq = () => {
     </>
   );
 
+  const bodyModalFilter = (
+    <>
+      <Fade in={modalOpenFilter}>
+        <div className={classes.paperFilter}>
+          <div className="row">
+            <div className="col-8">
+              <h2>Filter</h2>
+            </div>
+            <div className="col-4">
+              <a class="close-btn" role="button" onClick={modalClose}>
+                &times;
+              </a>
+            </div>
+          </div>
+          <form onSubmit={handleFilterData}>
+            <div className="row">
+              <div className="col-12">
+                <label htmlFor="">Status</label>
+                <SelectSearch
+                  options={dataStatus}
+                  value={dataStatus}
+                  onChange={(e) => {
+                    setValueStatus(e);
+                  }}
+                  filterOptions={fuzzySearch}
+                  search
+                  placeholder="Search Status"
+                />
+              </div>
+            </div>
+            <div className="row margin-top-2">
+              <div className="col-5">
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <KeyboardDatePicker
+                    autoOk
+                    variant="inline"
+                    inputVariant="outlined"
+                    label="Date"
+                    format="dd/MM/yyyy"
+                    value={selectedDate}
+                    InputAdornmentProps={{ position: "start" }}
+                    onChange={(date) => handleDateChange(date)}
+                  />
+                </MuiPickersUtilsProvider>
+              </div>
+              <div className="col-2">
+                <label
+                  htmlFor=""
+                  style={{
+                    position: "absolute",
+                    right: "48%",
+                    bottom: "35%",
+                    fontSize: "18px",
+                    color: "#8b8787",
+                  }}>
+                  To
+                </label>
+              </div>
+              <div className="col-5">
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                  <KeyboardDatePicker
+                    autoOk
+                    variant="inline"
+                    inputVariant="outlined"
+                    label="Date"
+                    format="dd/MM/yyyy"
+                    value={selectedDate2}
+                    InputAdornmentProps={{ position: "start" }}
+                    onChange={(date) => handleDateChange2(date)}
+                  />
+                </MuiPickersUtilsProvider>
+              </div>
+            </div>
+
+            <br />
+            <br />
+            <div className="footer-modal">
+              <button
+                type="button"
+                className={"btn-reset-filter"}
+                onClick={handleResetFilter}>
+                Reset
+              </button>
+              <button className={"btn-filter"} type={"submit"}>
+                Filter
+              </button>
+            </div>
+          </form>
+          <br />
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -569,6 +743,7 @@ const ActionReq = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
@@ -576,7 +751,9 @@ const ActionReq = () => {
                 </div>
               </div>
               <div className="col-4">
-                <button className="filter-btn">Filter</button>
+                <button className="filter-btn" onClick={modalPopFilter}>
+                  Filter
+                </button>
               </div>
               <div className="col-4">
                 <Button
@@ -594,7 +771,10 @@ const ActionReq = () => {
 
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableActionReq />
+            <TableActionReq
+              searchValue={searchValue}
+              filterValue={searchValueFilter}
+            />
           </div>
         </Grid>
       </Grid>
@@ -606,6 +786,15 @@ const ActionReq = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenFilter}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalFilter}
       </Modal>
     </>
   );

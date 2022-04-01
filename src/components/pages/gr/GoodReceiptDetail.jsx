@@ -10,6 +10,7 @@ import StatusButton from "../../asset/StatusButton";
 import axios from "axios";
 import GoodReceiveTicket from "../ticket/navigation/GoodReceiveTicket";
 import ButtonStatusFacility from "../../asset/ButtonStatusFacility";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -76,12 +77,13 @@ const GoodReceiptDetail = () => {
   const [statusBtn, setStatusBtn] = useState([]);
   var gr_check = JSON.parse(grdata);
 
-  console.log(gr_check);
-
   useEffect(() => {
     getData();
   }, []);
 
+  const saveStorage = (row) => {
+    localStorage.setItem("req_no", row);
+  };
   const getData = async () => {
     let status = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
@@ -200,7 +202,20 @@ const GoodReceiptDetail = () => {
               </div>
               <div className="col-3">
                 <p className="label-asset">Request No</p>
-                <p>{dataInfo[0].action_req_code}</p>
+
+                {gr_check.action_req_code.replace(/[0-9]/g, "") === "MKDFR" ? (
+                  <Link
+                    onClick={() => saveStorage(dataInfo[0].action_req_code)}
+                    to="/ticket-admin/facility-request/detail/information">
+                    {dataInfo[0].action_req_code}
+                  </Link>
+                ) : (
+                  <Link
+                    onClick={() => saveStorage(dataInfo[0].action_req_code)}
+                    to="/ticket-admin/action-request/detail/information">
+                    {dataInfo[0].action_req_code}
+                  </Link>
+                )}
               </div>
             </div>
           </div>
