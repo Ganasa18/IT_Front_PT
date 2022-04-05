@@ -177,19 +177,114 @@ function calbill(date) {
   return newdate;
 }
 
-const TableIncomingPR = () => {
+const TableIncomingPR = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
   const [dataPR, setDataPR] = useState([]);
+  const { searchValue, filterValue } = props;
 
   useEffect(() => {
     getPRList();
-    return () => {
-      setDataPR([]); // This worked for me
-    };
-  }, []);
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+      if (
+        filterValue[0] !== "" &&
+        new Date(filterValue[1]).toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0]
+      ) {
+        (async function () {
+          if (filterValue[0] === "null") {
+            const results = await filter(dataPR, async (item) => {
+              await doAsyncStuff();
+              return item.purchase_order_code_1 === null;
+            });
+
+            setPage(0);
+            setDataPR(results);
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 1500);
+          } else {
+            const results = await filter(dataPR, async (item) => {
+              await doAsyncStuff();
+              return item.purchase_order_code_1 !== null;
+            });
+            console.log(results);
+
+            setPage(0);
+            // setDataPR(results);
+            setTimeout(() => {
+              setIsLoading(false);
+            }, 1500);
+          }
+        })();
+        return;
+      }
+      var ed = new Date(filterValue[1]).toISOString().split("T")[0];
+      var sd = new Date(filterValue[2]).toISOString().split("T")[0];
+
+      (async function () {
+        const results = await filter(dataPR, async (item) => {
+          await doAsyncStuff();
+          return (
+            new Date(item.createdAt).toISOString().split("T")[0] >= ed &&
+            new Date(item.createdAt).toISOString().split("T")[0] <= sd
+          );
+        });
+        setDataPR(results);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      })();
+    }
+  };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataPR, searchValue);
+      setDataPR(searchRequest);
+    }
+  };
 
   const getPRList = async () => {
     let pr = `${prEndPoint[0].url}${

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   makeStyles,
   Grid,
@@ -33,6 +33,22 @@ const useStyles = makeStyles((theme) => ({
 
 const PurchaseDone = () => {
   const classes = useStyles();
+  const [searchValue, SetSearchValue] = useState("");
+
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
+
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -51,6 +67,7 @@ const PurchaseDone = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
@@ -64,7 +81,7 @@ const PurchaseDone = () => {
         </Grid>
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TablePurchaseDone />
+            <TablePurchaseDone searchValue={searchValue} />
           </div>
         </Grid>
       </Grid>

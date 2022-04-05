@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { pathEndPoint } from "../../assets/menu";
@@ -180,18 +180,105 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-const TableDisposal = () => {
+const TableDisposal = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataDisposal, setDataDisposal] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { searchValue, filterValue } = props;
 
   useEffect(() => {
-    setTimeout(() => {
-      getDisposalGroup();
-    }, 2000);
-  }, []);
+    getDisposalGroup();
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+
+      if (
+        filterValue[0] !== "" &&
+        new Date(filterValue[1]).toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0]
+      ) {
+        (async function () {
+          const results = await filter(dataDisposal, async (item) => {
+            await doAsyncStuff();
+            return item.status_id.id === filterValue[0];
+          });
+
+          setDataDisposal(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+
+        return;
+      }
+      var ed = new Date(filterValue[1]).toISOString().split("T")[0];
+      var sd = new Date(filterValue[2]).toISOString().split("T")[0];
+
+      (async function () {
+        const results = await filter(dataDisposal, async (item) => {
+          await doAsyncStuff();
+          return (
+            new Date(item.createdAt).toISOString().split("T")[0] >= ed &&
+            new Date(item.createdAt).toISOString().split("T")[0] <= sd
+          );
+        });
+        setDataDisposal(results);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      })();
+    }
+  };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = useCallback(
+    (searchValue) => {
+      if (searchValue !== null) {
+        let searchRequest = filterByValue(dataDisposal, searchValue);
+        setDataDisposal(searchRequest);
+      }
+    },
+    [dataDisposal]
+  );
 
   const getDisposalGroup = async () => {
     let disposal = `${pathEndPoint[0].url}${

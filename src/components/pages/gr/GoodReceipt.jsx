@@ -50,7 +50,7 @@ const GoodReceipt = () => {
           <div className="card">
             <div className="row">
               <div className="col-4">
-                <div className="input-container">
+                {/* <div className="input-container">
                   <span
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
@@ -59,7 +59,7 @@ const GoodReceipt = () => {
                     type="text"
                     placeholder="Search..."
                   />
-                </div>
+                </div> */}
               </div>
               <div className="col-4"></div>
               <div className="col-4"></div>

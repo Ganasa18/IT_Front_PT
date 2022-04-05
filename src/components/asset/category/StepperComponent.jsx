@@ -37,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  instructions2: {
+    marginTop: theme.spacing(20),
+    marginBottom: theme.spacing(20),
+  },
   step_label_root: {
     fontSize: "14px",
   },
@@ -172,7 +176,7 @@ const StepperComponent = () => {
         <div>
           {activeStep === steps.length ? (
             <div>
-              <Typography className={classes.instructions}>
+              <Typography className={classes.instructions2}>
                 All steps completed
               </Typography>
             </div>

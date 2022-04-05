@@ -215,13 +215,6 @@ const ActionTicketTable = (props) => {
     }
   }, [searchValue, filterValue]);
 
-  function filterByValue(array, value) {
-    return array.filter(
-      (data) =>
-        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
-    );
-  }
-
   // Arbitrary asynchronous function
   function doAsyncStuff() {
     return Promise.resolve();
@@ -287,6 +280,13 @@ const ActionTicketTable = (props) => {
       })();
     }
   };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
 
   const searchHandle = (searchValue) => {
     if (searchValue !== null) {

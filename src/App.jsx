@@ -1,4 +1,5 @@
 import { ThemeProvider, createTheme, makeStyles } from "@material-ui/core";
+import createBreakpoints from "@material-ui/core/styles/createBreakpoints";
 import React, { useEffect } from "react";
 import PersistentDrawer from "./components/layout/PersistentDrawer";
 import Auth from "./components/pages/Auth";
@@ -7,7 +8,7 @@ import { authEndPoint } from "./assets/menu";
 import axios from "axios";
 
 const cookies = new Cookies();
-
+const breakpoints = createBreakpoints({});
 const authToken = cookies.get("token");
 const roleUser = cookies.get("role");
 const ID = cookies.get("id");
@@ -79,6 +80,13 @@ const App = () => {
     marginAppbar: "10px",
     theadColor: "#1653A6",
     overrides: {
+      MuiTableCell: {
+        root: {
+          [breakpoints.down("lg")]: {
+            fontSize: "12px",
+          },
+        },
+      },
       MuiListItem: {
         root: {
           width: "280px",

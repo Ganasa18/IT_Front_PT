@@ -176,19 +176,36 @@ function calbill(date) {
   return newdate;
 }
 
-const TablePurchaseDone = () => {
+const TablePurchaseDone = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(true);
   const [dataPR, setDataPR] = useState([]);
+  const { searchValue } = props;
 
   useEffect(() => {
     getPRList();
-    return () => {
-      setDataPR([]); // This worked for me
-    };
-  }, []);
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [searchValue]);
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataPR, searchValue);
+      setDataPR(searchRequest);
+    }
+  };
 
   const getPRList = async () => {
     let po = `${prEndPoint[0].url}${

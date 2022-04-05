@@ -27,10 +27,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("lg")]: {
       width: "130px",
       height: "40px",
-      transform: "translate(270%, 140%)",
+      transform: "translate(260%, 140%)",
     },
     [theme.breakpoints.between("xlm", "xl")]: {
-      transform: "translate(200%, 140%)",
+      transform: "translate(190%, 140%)",
       width: "130px",
       height: "35px",
     },

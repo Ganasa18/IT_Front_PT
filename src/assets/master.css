@@ -2217,11 +2217,12 @@ input[type="radio"] {
 .position-total-po {
   position: relative;
   top: 80px;
-  left: 75%;
+  left: 65%;
 }
 
 .position-total-po p {
   font-size: 18px;
+  
 }
 
 .position-total-po span {

@@ -258,6 +258,25 @@ const StatusButton = (styleProps) => {
   };
 
   const submitStatus = async () => {
+    if (modalOpen2) {
+      if (troubleTitle.length === 0) {
+        alert("please fill field title");
+        return;
+      }
+
+      if (remark.length === 0) {
+        alert("please fill field remark");
+        return;
+      }
+    }
+
+    if (modalOpen) {
+      if (remark.length === 0) {
+        alert("please fill field remark");
+        return;
+      }
+    }
+
     let ticket = `${invEndPoint[0].url}${
       invEndPoint[0].port !== "" ? ":" + invEndPoint[0].port : ""
     }/api/v1/action-req/updated-ticket-status/${idRequest}`;

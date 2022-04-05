@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { pathEndPoint, logsEndPoint } from "../../../../../assets/menu";
+import { logsEndPoint, authEndPoint } from "../../../../../assets/menu";
 import PropTypes from "prop-types";
 import axios from "axios";
 import Loading from "../../../../asset/Loading";
@@ -25,6 +25,10 @@ import {
   Paper,
   withStyles,
 } from "@material-ui/core";
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
+const token = cookies.get("token");
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -166,16 +170,151 @@ function calbill(date) {
   return newdate;
 }
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-const HistoryInventoryTable = () => {
+const HistoryInventoryTable = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [dataHistoryInvent, setDataHistoryInvent] = useState([]);
+  const { searchValue, filterValue } = props;
+
+  useEffect(() => {
+    getDataHistory();
+
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+    if (filterValue) {
+      setTimeout(() => {
+        filterHandle(filterValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue]);
+
+  // Arbitrary asynchronous function
+  function doAsyncStuff() {
+    return Promise.resolve();
+  }
+
+  // The helper function
+  async function filter(arr, callback) {
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  }
+
+  const filterHandle = (filterValue) => {
+    let checkData = filterValue.every((element) => element === "reset");
+
+    if (!checkData) {
+      setIsLoading(true);
+      if (
+        filterValue[0] !== "" &&
+        new Date(filterValue[1]).toISOString().split("T")[0] ===
+          new Date().toISOString().split("T")[0]
+      ) {
+        (async function () {
+          const results = await filter(dataHistoryInvent, async (item) => {
+            await doAsyncStuff();
+            return item.status_asset === Boolean(parseInt(filterValue[0]));
+          });
+
+          setPage(0);
+          setDataHistoryInvent(results);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
+        })();
+        return;
+      }
+      var ed = new Date(filterValue[1]).toISOString().split("T")[0];
+      var sd = new Date(filterValue[2]).toISOString().split("T")[0];
+
+      (async function () {
+        const results = await filter(dataHistoryInvent, async (item) => {
+          await doAsyncStuff();
+          return (
+            new Date(item.createdAt).toISOString().split("T")[0] >= ed &&
+            new Date(item.createdAt).toISOString().split("T")[0] <= sd
+          );
+        });
+        setDataHistoryInvent(results);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      })();
+    }
+  };
+
+  function filterByValue(array, value) {
+    return array.filter(
+      (data) =>
+        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+  }
+
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(dataHistoryInvent, searchValue);
+      setDataHistoryInvent(searchRequest);
+    }
+  };
+
+  const getDataHistory = async () => {
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/get-latest-invent-history`;
+
+    let user = `${authEndPoint[0].url}${
+      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+    }/api/v1/auth/`;
+
+    const requestOne = await axios.get(logs);
+    const requestTwo = await axios.get(user, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    await axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          const responseTwo = responses[1];
+          let newDataLog = responseOne.data.data.invent_log;
+          let newDataUser = responseTwo.data.data.users;
+          let getUser = newDataUser.map((item) => ({
+            id: item.id,
+            name: item.username,
+            role: item.role,
+            departement: item.departement,
+            subdepartement: item.subdepartement,
+            area: item.area,
+            email: item.email,
+            employe: item.employe_status,
+          }));
+
+          var usermap = {};
+          getUser.forEach(function (user_id) {
+            usermap[user_id.id] = user_id;
+          });
+
+          newDataLog.forEach(function (request_id) {
+            request_id.user_id = usermap[request_id.used_by];
+          });
+          console.log(newDataLog);
+          setDataHistoryInvent(newDataLog);
+          setIsLoading(false);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  };
 
   const emptyRows =
     rowsPerPage -
@@ -190,6 +329,10 @@ const HistoryInventoryTable = () => {
     setPage(0);
   };
 
+  const saveStorage = (row) => {
+    localStorage.setItem("inv_no", row.asset_number);
+  };
+
   return (
     <>
       <TableContainer className={classes.tableWidth}>
@@ -199,9 +342,9 @@ const HistoryInventoryTable = () => {
               <TableRow>
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
-                <StyledTableCell>Unit/Part</StyledTableCell>
-                <StyledTableCell>Fisik/Non</StyledTableCell>
-                <StyledTableCell>User/Dept.</StyledTableCell>
+                <StyledTableCell align="center">Unit/Part</StyledTableCell>
+                <StyledTableCell align="center">Fisik/Non</StyledTableCell>
+                <StyledTableCell align="center">User/Dept.</StyledTableCell>
                 <StyledTableCell>QTY</StyledTableCell>
                 <StyledTableCell>Used By</StyledTableCell>
                 <StyledTableCell>Area</StyledTableCell>
@@ -223,7 +366,9 @@ const HistoryInventoryTable = () => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link to="/history/ticket/action-req/detail/information">
+                      <Link
+                        to="/history/inventory/detail"
+                        onClick={() => saveStorage(row)}>
                         {row.asset_number}
                       </Link>
                     </TableCell>
@@ -235,20 +380,19 @@ const HistoryInventoryTable = () => {
                         ? " - "
                         : row.asset_part_or_unit}
                     </TableCell>
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" align="center">
                       {row.asset_fisik_or_none}
                     </TableCell>
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" align="center">
                       {row.type_asset}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.qty}
+                      {row.asset_quantity}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.qty}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.used_by}
+                      {row.user_id === undefined
+                        ? "departement"
+                        : row.user_id.name}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.area}
@@ -264,8 +408,8 @@ const HistoryInventoryTable = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.createdAt}
+                    <TableCell component="th" scope="row" align="center">
+                      {calbill(row.createdAt)}
                     </TableCell>
                   </TableRow>
                 ))}

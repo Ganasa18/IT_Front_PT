@@ -128,6 +128,7 @@ const useStyles2 = makeStyles((theme) => ({
     minWidth: 400,
     width: "100%",
     overflowX: "auto",
+    fontSize: "20px",
   },
 
   posPagination: {
@@ -400,7 +401,6 @@ const TableInventory = (props) => {
     if (searchValue !== null) {
       let searchRequest = filterByValue(dataInventory, searchValue);
       setDataInventory(searchRequest);
-      console.log(searchRequest);
     }
   };
 

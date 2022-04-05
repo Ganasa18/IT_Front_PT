@@ -46,6 +46,7 @@ import GoodReceiptFacility from "../pages/gr/GoodReceiptFacility";
 import TableAssetUserMore from "../table/user/TableAssetUserMore";
 import HistoryFacilityReq from "../pages/history/ticket/detail/HistoryFacilityReq";
 import HistoryInventory from "../pages/history/inventory/HistoryInventory";
+import HistoryInventoryDetail from "../pages/history/inventory/HistoryInventoryDetail";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
@@ -334,6 +335,7 @@ const Routes = () => {
           )
         }
       />
+
       <Route
         path="/history/ticket/action-req/detail/"
         component={(props) =>
@@ -374,6 +376,17 @@ const Routes = () => {
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <HistoryInventory {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        path="/history/inventory/detail/"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <HistoryInventoryDetail {...props} />
           ) : (
             <Redirect to="/" />
           )

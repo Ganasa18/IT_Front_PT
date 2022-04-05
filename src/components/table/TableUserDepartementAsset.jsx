@@ -248,6 +248,7 @@ const TableUserDepartementAsset = (props) => {
   const [modalDisposal, setModalDisposal] = useState(false);
   const [modalRemove, setModalRemove] = useState(false);
   const [removeItem, setRemoveItem] = useState([]);
+  const [handleDataLog, setHandleDataLog] = useState([]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -345,6 +346,18 @@ const TableUserDepartementAsset = (props) => {
           value: row.id,
           code: row.asset_number,
           category: row.category_name,
+          asset_quantity: row.asset_quantity,
+          asset_detail: row.asset_detail,
+          asset_part_or_unit: row.asset_part_or_unit,
+          asset_fisik_or_none: row.asset_fisik_or_none,
+          type_asset: row.type_asset,
+          area_name: row.area_name,
+          alias_name: row.alias_name,
+          asset_new_or_old: row.asset_new_or_old,
+          initial_asset_name: row.initial_asset_name,
+          category_asset: row.category_name,
+          subcategory_name: row.subcategory_name,
+          createdAsset: row.createdAt,
         }));
 
         setDataAssetInv(dataAssetSelect);
@@ -360,6 +373,7 @@ const TableUserDepartementAsset = (props) => {
     setAssetNumber(e[1].code);
     setAssetName(e[1].name);
     setAssetCategory(e[1].category);
+    setHandleDataLog(e[1]);
   };
 
   const toggleAllSelected = (e) => {
@@ -417,6 +431,29 @@ const TableUserDepartementAsset = (props) => {
       status_asset: true,
     };
 
+    const log_data = {
+      asset_name: handleDataLog.name,
+      asset_number: handleDataLog.code,
+      asset_detail: handleDataLog.asset_detail,
+      asset_quantity: handleDataLog.asset_quantity,
+      asset_part_or_unit: handleDataLog.asset_part_or_unit,
+      asset_fisik_or_none: handleDataLog.asset_fisik_or_none,
+      type_asset: "departement",
+      area: handleDataLog.area_name + "-" + handleDataLog.alias_name,
+      status_asset: true,
+      asset_new_or_old: handleDataLog.asset_new_or_old,
+      initial_asset_name: handleDataLog.initial_asset_name,
+      category_asset: handleDataLog.category_name,
+      subcategory_asset: handleDataLog.subcategory_name,
+      createdAsset: new Date(handleDataLog.createdAsset),
+      used_by: null,
+      departement: parseInt(dataAsset[0].departement),
+    };
+
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/create-logs-invent`;
+
     if (dataUser.logs_id !== undefined) {
       const dataLogs = {
         request_number: dataUser.logs_id.request_number,
@@ -442,6 +479,7 @@ const TableUserDepartementAsset = (props) => {
       .patch(inventory, data)
       .then((response) => {
         alert(response.data.status);
+        axios.post(logs, log_data);
         setTimeout(() => {
           setAssetNumber("");
           setAssetName("");
@@ -459,6 +497,29 @@ const TableUserDepartementAsset = (props) => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory/updatedInvent`;
 
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/create-logs-invent`;
+
+    const log_data = {
+      asset_name: removeItem.asset_name,
+      asset_number: removeItem.asset_number,
+      asset_detail: removeItem.asset_detail,
+      asset_quantity: removeItem.asset_quantity,
+      asset_part_or_unit: removeItem.asset_part_or_unit,
+      asset_fisik_or_none: removeItem.asset_fisik_or_none,
+      type_asset: removeItem.type_asset,
+      area: removeItem.area_name + "-" + removeItem.alias_name,
+      status_asset: false,
+      asset_new_or_old: removeItem.asset_new_or_old,
+      initial_asset_name: removeItem.initial_asset_name,
+      category_asset: removeItem.category_name,
+      subcategory_asset: removeItem.subcategory_name,
+      createdAsset: new Date(removeItem.createdAt),
+      used_by: null,
+      departement: removeItem.departement,
+    };
+
     await axios
       .patch(inventory, {
         id: removeItem.id,
@@ -467,6 +528,9 @@ const TableUserDepartementAsset = (props) => {
       })
       .then((response) => {
         setTimeout(() => {
+          axios.post(logs, log_data);
+          setModalRemove(false);
+          alert("success");
           if (dataUser.logs_id !== undefined) {
             const dataLogs = {
               request_number: dataUser.logs_id.request_number,
@@ -480,12 +544,8 @@ const TableUserDepartementAsset = (props) => {
             const Logs = `${logsEndPoint[0].url}${
               logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
             }/api/v1/logs-login/update-departement-inv-logs`;
-
             axios.patch(Logs, dataLogs);
           }
-
-          setModalRemove(false);
-          alert("success");
         }, 1500);
       })
       .catch((error) => {

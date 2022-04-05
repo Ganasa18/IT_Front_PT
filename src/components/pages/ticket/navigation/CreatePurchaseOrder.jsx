@@ -186,6 +186,7 @@ const useStyles = makeStyles((theme) => ({
   posPagination: {
     position: "absolute",
     right: "50px",
+    transform: "translate(0%, 60%)",
   },
 
   tableWidth: {

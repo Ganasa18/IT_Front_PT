@@ -204,7 +204,7 @@ const HistoryFaciltyAccess = () => {
                   }}
                   filterOptions={fuzzySearch}
                   search
-                  placeholder="Search Status"
+                  placeholder="Status"
                 />
               </div>
             </div>

@@ -5,7 +5,7 @@ import "../../../assets/select-search.css";
 import Loading from "../../asset/Loading";
 import "../../../assets/master.css";
 import "../../../assets/asset_user.css";
-import { authEndPoint, pathEndPoint } from "../../../assets/menu";
+import { authEndPoint, pathEndPoint, logsEndPoint } from "../../../assets/menu";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
@@ -185,6 +185,33 @@ const EditInventory = (props) => {
 
     if (dataInventory.type_asset !== "") {
       if (dataInventory.type_asset === "user") {
+        if (!userId) {
+          alert("please select one user");
+          return;
+        }
+
+        const logs = `${logsEndPoint[0].url}${
+          logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+        }/api/v1/logs-login/create-logs-invent`;
+
+        const log_data = {
+          asset_name: dataInventory.asset_name,
+          asset_number: dataInventory.asset_number,
+          asset_detail: dataInventory.asset_detail,
+          asset_quantity: dataInventory.asset_quantity,
+          asset_part_or_unit: dataInventory.asset_part_or_unit,
+          asset_fisik_or_none: dataInventory.asset_fisik_or_none,
+          type_asset: dataInventory.type_asset,
+          area: dataInventory.area_name + "-" + dataInventory.alias_name,
+          status_asset: true,
+          asset_new_or_old: dataInventory.asset_new_or_old,
+          initial_asset_name: dataInventory.initial_asset_name,
+          category_asset: dataInventory.category_name,
+          subcategory_asset: dataInventory.subcategory_name,
+          createdAsset: new Date(dataInventory.createdAt),
+          used_by: parseInt(userId[0].value),
+        };
+
         await axios
           .patch(inventory, {
             id: dataInventory.id,
@@ -199,6 +226,7 @@ const EditInventory = (props) => {
           })
           .then((response) => {
             alert(response.data.status);
+            axios.post(logs, log_data);
             setTimeout(() => {
               window.location.reload();
             }, 1500);
@@ -207,6 +235,29 @@ const EditInventory = (props) => {
             console.log(error);
           });
       } else {
+        const logs = `${logsEndPoint[0].url}${
+          logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+        }/api/v1/logs-login/create-logs-invent`;
+
+        const log_data = {
+          asset_name: dataInventory.asset_name,
+          asset_number: dataInventory.asset_number,
+          asset_detail: dataInventory.asset_detail,
+          asset_quantity: dataInventory.asset_quantity,
+          asset_part_or_unit: dataInventory.asset_part_or_unit,
+          asset_fisik_or_none: dataInventory.asset_fisik_or_none,
+          type_asset: dataInventory.type_asset,
+          area: dataInventory.area_name + "-" + dataInventory.alias_name,
+          status_asset: true,
+          asset_new_or_old: dataInventory.asset_new_or_old,
+          initial_asset_name: dataInventory.initial_asset_name,
+          category_asset: dataInventory.category_name,
+          subcategory_asset: dataInventory.subcategory_name,
+          createdAsset: new Date(dataInventory.createdAt),
+          used_by: null,
+          departement: parseInt(departementId),
+        };
+
         await axios
           .patch(inventory, {
             id: dataInventory.id,
@@ -218,6 +269,7 @@ const EditInventory = (props) => {
           })
           .then((response) => {
             alert(response.data.status);
+            axios.post(logs, log_data);
             setTimeout(() => {
               window.location.reload();
             }, 1500);
@@ -297,6 +349,29 @@ const EditInventory = (props) => {
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory/updatedInvent`;
 
+    const log_data = {
+      asset_name: dataInventory.asset_name,
+      asset_number: dataInventory.asset_number,
+      asset_detail: dataInventory.asset_detail,
+      asset_quantity: dataInventory.asset_quantity,
+      asset_part_or_unit: dataInventory.asset_part_or_unit,
+      asset_fisik_or_none: dataInventory.asset_fisik_or_none,
+      type_asset: dataInventory.type_asset,
+      area: dataInventory.area_name + "-" + dataInventory.alias_name,
+      status_asset: false,
+      asset_new_or_old: dataInventory.asset_new_or_old,
+      initial_asset_name: dataInventory.initial_asset_name,
+      category_asset: dataInventory.category_name,
+      subcategory_asset: dataInventory.subcategory_name,
+      createdAsset: new Date(dataInventory.createdAt),
+      used_by: dataInventory.used_by,
+      departement: dataInventory.departement,
+    };
+
+    const logs = `${logsEndPoint[0].url}${
+      logsEndPoint[0].port !== "" ? ":" + logsEndPoint[0].port : ""
+    }/api/v1/logs-login/create-logs-invent`;
+
     await axios
       .patch(inventory, {
         id: dataInventory.id,
@@ -305,6 +380,8 @@ const EditInventory = (props) => {
       })
       .then((response) => {
         alert(response.data.status);
+        axios.post(logs, log_data);
+
         setTimeout(() => {
           window.location.reload();
         }, 1500);

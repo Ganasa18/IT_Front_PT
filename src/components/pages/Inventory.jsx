@@ -104,6 +104,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 10, 3),
+    [theme.breakpoints.down("lg")]: {
+      top: "-4%",
+      left: "34%",
+      width: 540,
+      transform: "scale(0.85)",
+    },
   },
 }));
 

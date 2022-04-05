@@ -111,11 +111,11 @@ export const menuData = [
         to: "/history/ticket",
         icon: "fluent:ticket-diagonal-16-filled",
       },
-      // {
-      //   name: "Inventory",
-      //   to: "/history/inventory",
-      //   icon: "fluent:clipboard-bullet-list-rtl-20-filled",
-      // },
+      {
+        name: "Inventory",
+        to: "/history/inventory",
+        icon: "fluent:clipboard-bullet-list-rtl-20-filled",
+      },
     ],
   },
 ];

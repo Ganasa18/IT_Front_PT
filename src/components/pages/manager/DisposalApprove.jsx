@@ -169,7 +169,7 @@ const DisposalApprove = () => {
                   }}
                   filterOptions={fuzzySearch}
                   search
-                  placeholder="Search Status"
+                  placeholder="Status"
                 />
               </div>
             </div>

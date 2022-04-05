@@ -5,12 +5,9 @@ import {
   makeStyles,
   Grid,
   Typography,
-  Button,
   Backdrop,
   Fade,
   Modal,
-  Snackbar,
-  Divider,
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
@@ -106,7 +103,6 @@ const ActionTicket = () => {
         }/api/v1/status`
       )
       .then((response) => {
-        console.log(response.data.data.statuss);
         const DataStatus = response.data.data.statuss;
 
         const arr = [...DataStatus];
@@ -161,6 +157,8 @@ const ActionTicket = () => {
 
   const handleResetFilter = () => {
     setSearchValueFilter(["reset"]);
+    handleDateChange(new Date());
+    handleDateChange2(new Date());
     SetSearchValue("");
     setValueStatus("");
   };
