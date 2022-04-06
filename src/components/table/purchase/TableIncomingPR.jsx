@@ -357,7 +357,7 @@ const TableIncomingPR = (props) => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>PR No</StyledTableCell>
-                <StyledTableCell>PO No</StyledTableCell>
+                {/* <StyledTableCell>PO No</StyledTableCell> */}
                 <StyledTableCell>Create by</StyledTableCell>
                 <StyledTableCell>Request For</StyledTableCell>
                 <StyledTableCell>PR Date</StyledTableCell>
@@ -384,11 +384,23 @@ const TableIncomingPR = (props) => {
                         {row.purchase_req_code}
                       </Link>
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.purchase_order_code
-                        ? row.purchase_order_code
-                        : " - "}
-                    </TableCell>
+                    {/* <TableCell component="th" scope="row">
+                      {row.purchase_order_code_1 !== null ||
+                      row.purchase_order_code_2 !== null ||
+                      row.purchase_order_code_3 !== null ||
+                      row.purchase_order_code_4 !== null ||
+                      row.purchase_order_code_5 !== null ? (
+                        <>
+                          {row.purchase_order_code_1}
+                          {row.purchase_order_code_2}
+                          {row.purchase_order_code_3}
+                          {row.purchase_order_code_4}
+                          {row.purchase_order_code_5}
+                        </>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell> */}
                     <TableCell component="th" scope="row">
                       {row.created_by}
                     </TableCell>
