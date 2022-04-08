@@ -230,9 +230,29 @@ const TableCategory = () => {
       });
   };
 
-  const handleConfirmDelete = (row) => {
-    setDeleteModal(true);
-    setCategoryEdit(row);
+  const handleConfirmDelete = async (row) => {
+    const invent = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory/check/${row.id}`;
+
+    await axios
+      .post(invent)
+      .then((res) => {
+        const check = res.data.data.status_data;
+
+        if (check === "used") {
+          alert("used with some data");
+          const origin = window.location.origin;
+          window.location.href = `${origin}/inventory/used`;
+          return;
+        }
+
+        setDeleteModal(true);
+        setCategoryEdit(row);
+      })
+      .catch((err) => {
+        alert("somethin wrong");
+      });
   };
 
   const handleDelete = async (row) => {
@@ -404,19 +424,24 @@ const TableCategory = () => {
                             <span className="name-btn">Edit</span>
                           </button>
 
-                          <button
-                            disabled={`${
-                              lastCategoryId === row.id ? "disabled" : ""
-                            }`}
-                            className={`btn-delete ${
-                              lastCategoryId === row.id ? "disabled" : ""
-                            }`}
-                            onClick={() => handleConfirmDelete(row)}>
-                            <span
-                              class="iconify icon-btn"
-                              data-icon="ant-design:delete-filled"></span>
-                            <span className="name-btn">Delete</span>
-                          </button>
+                          {!row.is_default ? (
+                            <>
+                              <button
+                                disabled={`${
+                                  lastCategoryId === row.id ? "disabled" : ""
+                                }`}
+                                className={`btn-delete ${
+                                  lastCategoryId === row.id ? "disabled" : ""
+                                }`}
+                                onClick={() => handleConfirmDelete(row)}>
+                                <span
+                                  class="iconify icon-btn"
+                                  data-icon="ant-design:delete-filled"></span>
+                                <span className="name-btn">Delete</span>
+                              </button>
+                            </>
+                          ) : null}
+
                           {/* <button
                             disabled={`${
                               lastCategoryId === row.id ? "disabled" : ""

@@ -56,6 +56,8 @@ const EditInventory = (props) => {
   const classes = useStyles();
   const [dataInventory] = useState(rowData);
   const [dataUser, setDataUser] = useState([]);
+  const [dataCategory, setDataCategory] = useState([]);
+  const [dataSubCategory, setDataSubCategory] = useState([]);
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSelectUser, setDataSelectUser] = useState([]);
   const [dataSelectDepartement, setDataSelectDepartement] = useState([]);
@@ -64,6 +66,8 @@ const EditInventory = (props) => {
   const [dataTypeAsset, setDataTypeAsset] = useState([]);
   const [userId, setUserId] = useState(null);
   const checkUserDeptRef = React.useRef(null);
+  const [categoryId, setCategoryId] = useState(null);
+  const [subCategoryId, setSubCategoryId] = useState(null);
   const [departementId, setDepartementId] = useState(null);
 
   useEffect(() => {
@@ -71,9 +75,58 @@ const EditInventory = (props) => {
       getSelectList();
     }
     setTimeout(() => {
+      getCategoryList();
       checkSelect(rowData);
-    }, 10000);
+    }, 15000);
   });
+
+  const getCategoryList = async () => {
+    await axios
+      .get(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/category`
+      )
+      .then((response) => {
+        const DataCategory = response.data.data.category;
+        const newArrCategory = DataCategory.map((row) => ({
+          value: row.id,
+          name: row.category_name,
+        }));
+
+        setDataCategory(newArrCategory);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleCategory = async (e) => {
+    setCategoryId(e);
+    await axios
+      .get(
+        `${pathEndPoint[0].url}${
+          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+        }/api/v1/subcategory`
+      )
+      .then((response) => {
+        const SubCategoryList = response.data.data.subcategory;
+        const subcat = [...SubCategoryList];
+        const idSubCatgory = subcat.filter((item) => item.id_category === e);
+        if (idSubCatgory === undefined || idSubCatgory.length === 0) {
+          setDataSubCategory([]);
+        } else {
+          const newArr = idSubCatgory.map((sub) => ({
+            value: sub.id,
+            name: sub.subcategory_name,
+          }));
+          setDataSubCategory(newArr);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const getSelectList = async () => {
     let user = `${authEndPoint[0].url}${
@@ -218,6 +271,12 @@ const EditInventory = (props) => {
             type_asset: dataInventory.type_asset,
             status_asset: true,
             used_by: parseInt(userId[0].value),
+            category_asset:
+              categoryId === null ? dataInventory.category_asset : categoryId,
+            subcategory_asset:
+              subCategoryId === null
+                ? dataInventory.subcategory_asset
+                : subCategoryId,
             departement: parseInt(userId[0].departement),
             subdepartement:
               userId[0].subdepartement !== null
@@ -264,6 +323,12 @@ const EditInventory = (props) => {
             type_asset: dataInventory.type_asset,
             status_asset: true,
             used_by: null,
+            category_asset:
+              categoryId === null ? dataInventory.category_asset : categoryId,
+            subcategory_asset:
+              subCategoryId === null
+                ? dataInventory.subcategory_asset
+                : subCategoryId,
             departement: parseInt(departementId),
             subdepartement: null,
           })
@@ -304,6 +369,12 @@ const EditInventory = (props) => {
             status_asset: true,
             used_by: parseInt(userId[0].value),
             departement: parseInt(userId[0].departement),
+            category_asset:
+              categoryId === null ? dataInventory.category_asset : categoryId,
+            subcategory_asset:
+              subCategoryId === null
+                ? dataInventory.subcategory_asset
+                : subCategoryId,
             subdepartement:
               userId[0].subdepartement !== null
                 ? userId[0].subdepartement
@@ -325,6 +396,12 @@ const EditInventory = (props) => {
             type_asset: typeAsset,
             status_asset: true,
             used_by: null,
+            category_asset:
+              categoryId === null ? dataInventory.category_asset : categoryId,
+            subcategory_asset:
+              subCategoryId === null
+                ? dataInventory.subcategory_asset
+                : subCategoryId,
             departement: parseInt(departementId),
             subdepartement: null,
           })
@@ -341,7 +418,7 @@ const EditInventory = (props) => {
       return;
     }
 
-    console.log("cannot submit");
+    alert("something wrong or not select user or departement");
   };
 
   const handleReset = async () => {
@@ -681,11 +758,21 @@ const EditInventory = (props) => {
           <div className="row margin-top">
             <div className="col-6">
               <label htmlFor="">Category</label>
-              <input
+              {/* <input
                 value={dataInventory.category_name}
                 type="text"
                 className="form-input-inv"
                 disabled
+              /> */}
+
+              <SelectSearch
+                id="idCategory"
+                options={dataCategory}
+                value={dataCategory}
+                filterOptions={fuzzySearch}
+                onChange={handleCategory}
+                search
+                placeholder={`${dataInventory.category_name}`}
               />
             </div>
             <div className="col-6">
@@ -701,12 +788,20 @@ const EditInventory = (props) => {
           <div className="row margin-top-2">
             <div className="col-6">
               <label htmlFor="">SubCategory</label>
-              <input
+              <SelectSearch
+                options={dataSubCategory}
+                value={dataSubCategory}
+                filterOptions={fuzzySearch}
+                onChange={(e) => setSubCategoryId(e)}
+                search
+                placeholder="Search Sub Category"
+              />
+              {/* <input
                 value={dataInventory.subcategory_name}
                 type="text"
                 className="form-input-inv"
                 disabled
-              />
+              /> */}
             </div>
             <div className="col-6">
               {dataInventory.type_asset !== "" ? (

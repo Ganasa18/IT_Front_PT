@@ -18,6 +18,7 @@ import ActionApproveDetail from "../pages/lead/ActionApproveDetail";
 import ActionTicket from "../pages/ticket/ActionTicket";
 import ActionReqTicketDetail from "../pages/ticket/ActionReqTicketDetail";
 import Inventory from "../pages/Inventory";
+import UsedInventory from "../pages/inventory/UsedInventory";
 
 import Cookies from "universal-cookie";
 import Disposal from "../pages/Disposal";
@@ -135,10 +136,23 @@ const Routes = () => {
       />
 
       <Route
+        exact
         path="/inventory"
         component={(props) =>
           parseInt(roleUser) === 1 ? (
             <Inventory {...props} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/inventory/used"
+        component={(props) =>
+          parseInt(roleUser) === 1 ? (
+            <UsedInventory {...props} />
           ) : (
             <Redirect to="/" />
           )

@@ -18,10 +18,6 @@ import {
   TableRow,
   Paper,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Snackbar,
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import "../../asset/chips.css";

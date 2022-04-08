@@ -625,6 +625,8 @@ const TableInventory = (props) => {
     setEditModal(true);
   };
 
+  console.log(dataInventory);
+
   return (
     <>
       <div className="col-12">
@@ -670,6 +672,7 @@ const TableInventory = (props) => {
                 </StyledTableCell>
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
+                <StyledTableCell>Category</StyledTableCell>
                 <StyledTableCell>User/Dept.</StyledTableCell>
                 <StyledTableCell>Area</StyledTableCell>
                 <StyledTableCell>Fisik/Non</StyledTableCell>
@@ -706,6 +709,9 @@ const TableInventory = (props) => {
                       {row.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
+                      {row.category_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
                       {row.type_asset}
                     </TableCell>
                     <TableCell component="th" scope="row">
@@ -723,7 +729,6 @@ const TableInventory = (props) => {
                       {row.asset_part_or_unit === ""
                         ? " - "
                         : row.asset_part_or_unit}
-                      {/* {calbill(row.createdAt)} */}
                     </TableCell>
 
                     <TableCell component="th" scope="row">
