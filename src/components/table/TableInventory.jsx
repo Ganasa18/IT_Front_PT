@@ -262,6 +262,8 @@ const TableInventory = (props) => {
             );
           });
 
+          console.log(results.sort((a, b) => (a.id > b.id ? 1 : -1)));
+
           setPage(0);
           setDataInventory(results);
           setTimeout(() => {
@@ -624,8 +626,6 @@ const TableInventory = (props) => {
 
     setEditModal(true);
   };
-
-  console.log(dataInventory);
 
   return (
     <>

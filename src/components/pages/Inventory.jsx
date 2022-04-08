@@ -191,7 +191,6 @@ const Inventory = () => {
     arr.push(valueUnitPart);
 
     setSearchValueFilter(arr);
-    console.log(arr);
     setTimeout(() => {
       setModalOpenFilter(false);
     }, 2000);
