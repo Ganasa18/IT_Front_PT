@@ -25,6 +25,8 @@ import {
   Button,
 } from "@material-ui/core";
 import "../../assets/master.css";
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../assets/select-search.css";
 
 import IconButton from "@material-ui/core/IconButton";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
@@ -34,6 +36,10 @@ import LastPageIcon from "@material-ui/icons/LastPage";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import StepperEdit from "../asset/category/StepperEdit";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -168,6 +174,38 @@ const useStyles2 = makeStyles((theme) => ({
     left: "0",
     transform: "translate(35%, -40%)",
   },
+
+  paperInfo: {
+    position: "fixed",
+    transform: "translate(-50%,-50%)",
+    top: "30%",
+    left: "50%",
+    width: 600,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 4, 3),
+  },
+
+  wrapperInfo: {
+    padding: "25px",
+    alignItems: "center",
+  },
+  boldText: {
+    fontWeight: "bold",
+  },
+
+  paperTransfer: {
+    position: "fixed",
+    transform: "translate(-50%,-40%)",
+    top: "35%",
+    left: "50%",
+    width: 850,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 4, 3),
+  },
 }));
 
 const TableCategory = () => {
@@ -176,12 +214,21 @@ const TableCategory = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [transferModal, setTransferModal] = useState(false);
+  const [confirmChangeItemModal, setConfirmChangeItemModal] = useState(false);
   const [dataCategory, setDataCategory] = useState([]);
+  const [optionCategory, setOptionCategory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState([]);
   const [dataSubCategory, setDataSubCategory] = useState([]);
   const [lastCategoryId, setLastCategoryId] = useState(null);
   const [categoryEdit, setCategoryEdit] = useState([]);
+  const [totalUsed, setTotalUsed] = useState(null);
+  const [isCheckAll, setIsCheckAll] = useState(false);
+  const [isCheck, setIsCheck] = useState([]);
+  const [list, setList] = useState([]);
+  const [optionCategoryId, setOptionCategoryId] = useState(null);
+  const [toast, setToast] = useState(false);
 
   const modalPop = (row) => {
     setCategoryEdit(row);
@@ -191,7 +238,7 @@ const TableCategory = () => {
   useEffect(() => {
     getCategoryList();
     getLatestId();
-  }, []);
+  }, [list]);
 
   const getCategoryList = async () => {
     await axios
@@ -201,7 +248,16 @@ const TableCategory = () => {
         }/api/v1/category`
       )
       .then((response) => {
-        setDataCategory(response.data.data.category);
+        const DataCategory = response.data.data.category;
+        setDataCategory(DataCategory);
+
+        const newArrCategory = DataCategory.map((row) => ({
+          value: row.id,
+          name: row.category_name,
+        }));
+
+        setOptionCategory(newArrCategory);
+
         setIsLoading(false);
 
         setExpanded(
@@ -231,6 +287,7 @@ const TableCategory = () => {
   };
 
   const handleConfirmDelete = async (row) => {
+    setCategoryEdit(row);
     const invent = `${pathEndPoint[0].url}${
       pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
     }/api/v1/inventory/check/${row.id}`;
@@ -239,16 +296,14 @@ const TableCategory = () => {
       .post(invent)
       .then((res) => {
         const check = res.data.data.status_data;
-
         if (check === "used") {
-          alert("used with some data");
-          const origin = window.location.origin;
-          window.location.href = `${origin}/inventory/used`;
+          setTransferModal(true);
+          setTotalUsed(res.data.data.total_used);
+
           return;
         }
 
         setDeleteModal(true);
-        setCategoryEdit(row);
       })
       .catch((err) => {
         alert("somethin wrong");
@@ -312,6 +367,8 @@ const TableCategory = () => {
   const modalOut = () => {
     setEditModal(false);
     setDeleteModal(false);
+    setTransferModal(false);
+    setConfirmChangeItemModal(false);
   };
 
   const emptyRows =
@@ -326,6 +383,95 @@ const TableCategory = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const confirmChangeItem = async () => {
+    setTransferModal(false);
+
+    let inventory = `${pathEndPoint[0].url}${
+      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+    }/api/v1/inventory`;
+
+    setTimeout(() => {
+      (async function () {
+        await axios
+          .get(inventory)
+          .then((response) => {
+            setConfirmChangeItemModal(true);
+            let dataInvent = response.data.data.inventorys;
+            dataInvent = dataInvent.filter(
+              (row) => row.category_asset === categoryEdit.id
+            );
+
+            setList(dataInvent);
+          })
+          .catch((err) => {
+            alert("something wrong");
+          });
+      })();
+    }, 1000);
+  };
+
+  const handleSelectAll = (e) => {
+    setIsCheckAll(!isCheckAll);
+    setIsCheck(list.map((li) => li.id));
+    if (isCheckAll) {
+      setIsCheck([]);
+    }
+  };
+
+  const handleClickCheckbox = (e) => {
+    const { id, checked } = e.target;
+
+    setIsCheck([...isCheck, parseInt(id)]);
+    if (!checked) {
+      setIsCheck(isCheck.filter((item) => item !== parseInt(id)));
+    }
+  };
+
+  const handleSubmitChange = async () => {
+    if (!optionCategoryId) {
+      alert("must select 1 category");
+      return;
+    }
+
+    if (isCheck.length === 0) {
+      alert("must select 1 item");
+      return;
+    }
+
+    isCheck.forEach((item) => {
+      (async function () {
+        await axios
+          .patch(
+            `${pathEndPoint[0].url}${
+              pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+            }/api/v1/inventory/transfer-category/${item}`,
+            {
+              category_asset: parseInt(optionCategoryId),
+            }
+          )
+          .then(() => {
+            const removeItem = list.filter((row) => !isCheck.includes(row.id));
+            setList(removeItem);
+            const invent = `${pathEndPoint[0].url}${
+              pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+            }/api/v1/inventory/check/${categoryEdit.id}`;
+            (async function () {
+              await axios
+                .post(invent)
+                .then((res) => {
+                  setTotalUsed(res.data.data.total_used);
+                })
+                .catch((err) => {
+                  alert("somethin wrong");
+                });
+            })();
+          });
+      })();
+    });
+  };
+
+  const selectedCount = Object.values(isCheck).filter(Boolean).length;
 
   const bodyModal = (
     <>
@@ -361,6 +507,134 @@ const TableCategory = () => {
               Submit
             </button>
           </div>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const bodyModalTransfer = (
+    <>
+      <Fade in={transferModal}>
+        <div className={classes.paperInfo}>
+          <div className={classes.wrapperInfo}>
+            <h3>Delete Category</h3>
+            <p className={classes.info}>
+              Are you sure want to delete{" "}
+              <span className={classes.boldText}>
+                {categoryEdit.category_name}
+              </span>{" "}
+              category? You must move
+              <span className={classes.boldText}> {totalUsed} </span> item to{" "}
+              <br />
+              another category before you delete this category
+            </p>
+          </div>
+          <Divider />
+          <br />
+          <div className="footer-modal">
+            <button className="btn-cancel" onClick={modalOut}>
+              Cancel
+            </button>
+            <button className="btn-submit" onClick={confirmChangeItem}>
+              Change Item
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
+  const Checkbox = ({ id, type, name, handleClick, isChecked }) => {
+    return (
+      <div className="checkBoxWrap">
+        <input
+          id={id}
+          type="checkbox"
+          class="checkbox-transfer c1"
+          onChange={handleClick}
+          checked={isChecked}
+        />
+        <label htmlFor={name}>{name}</label>
+      </div>
+    );
+  };
+
+  const confirmModalTransfer = (
+    <>
+      <Fade in={confirmChangeItemModal}>
+        <div className={classes.paperTransfer}>
+          <h3>List Item in category {categoryEdit.category_name}</h3>
+          <Divider />
+          <br />
+          <div className="wrapper-transfer-container">
+            <div>
+              <Checkbox
+                type="checkbox"
+                name="All"
+                id="selectAll"
+                handleClick={handleSelectAll}
+                isChecked={isCheckAll}
+              />
+            </div>
+            <div></div>
+            <div>
+              <span style={{ color: "#2370D8" }}>
+                {selectedCount} / {totalUsed}{" "}
+              </span>
+              item
+            </div>
+          </div>
+          <div className="wrapper-transfer-height">
+            <div className="wrapper-checkbox-transfer">
+              {list.map((row) => (
+                <Checkbox
+                  type="checkbox"
+                  name={row.asset_name}
+                  id={row.id}
+                  handleClick={handleClickCheckbox}
+                  isChecked={isCheck.includes(row.id)}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-5">
+              <label htmlFor="roleName">Category</label>
+              <SelectSearch
+                id="idCategory"
+                options={optionCategory}
+                value={optionCategory}
+                filterOptions={fuzzySearch}
+                onChange={(e) => setOptionCategoryId(e)}
+                search
+                placeholder="Category"
+              />
+            </div>
+          </div>
+          <br />
+          <br />
+          <div className="footer-modal">
+            <div className="footer-modal-transfer">
+              <button className="btn-cancel" onClick={modalOut}>
+                Cancel
+              </button>
+              <button className="btn-submit" onClick={handleSubmitChange}>
+                Change Category
+              </button>
+            </div>
+            {totalUsed === 0 ? (
+              <button
+                className="btn-delete-transfer"
+                onClick={() => handleDelete(categoryEdit)}>
+                Delete
+              </button>
+            ) : (
+              <button disabled className="btn-delete-transfer-disabled">
+                Delete
+              </button>
+            )}
+          </div>
+          <br />
         </div>
       </Fade>
     </>
@@ -539,6 +813,25 @@ const TableCategory = () => {
           timeout: 500,
         }}>
         {bodyModalDelete}
+      </Modal>
+      <Modal
+        open={transferModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalTransfer}
+      </Modal>
+
+      <Modal
+        open={confirmChangeItemModal}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {confirmModalTransfer}
       </Modal>
     </>
   );
