@@ -16,6 +16,7 @@ import {
   TableFooter,
   TablePagination,
   TableRow,
+  TableSortLabel,
   Paper,
   withStyles,
   Fade,
@@ -32,6 +33,7 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import ImportExportIcon from "@material-ui/icons/ImportExport";
 import Cookies from "universal-cookie";
 import EditInventory from "../pages/inventory/EditInventory";
 import InputDisposal from "./disposal/InputDisposal";
@@ -199,6 +201,17 @@ const useStyles2 = makeStyles((theme) => ({
       fontSize: "11px",
     },
   },
+  visuallyHidden: {
+    border: 0,
+    clip: "rect(0 0 0 0)",
+    height: 1,
+    margin: -1,
+    overflow: "hidden",
+    padding: 0,
+    position: "absolute",
+    top: 20,
+    width: 1,
+  },
 }));
 
 const TableInventory = (props) => {
@@ -214,6 +227,9 @@ const TableInventory = (props) => {
   const [lastNumber, setLastNumber] = useState("");
   const [selectedDisposal, setSelectedDisposal] = useState([]);
   const [modalDisposal, setModalDisposal] = useState(false);
+  const [orderBy, setOrderBy] = useState("asset_number");
+  const [order, setOrder] = useState("asc");
+
   const { searchValue, filterValue } = props;
 
   useEffect(() => {
@@ -262,7 +278,7 @@ const TableInventory = (props) => {
             );
           });
 
-          console.log(results.sort((a, b) => (a.id > b.id ? 1 : -1)));
+          // console.log(results.sort((a, b) => (a.id > b.id ? 1 : -1)));
 
           setPage(0);
           setDataInventory(results);
@@ -406,6 +422,28 @@ const TableInventory = (props) => {
     }
   };
 
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
   const getInventory = async () => {
     let user = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
@@ -509,31 +547,31 @@ const TableInventory = (props) => {
   //   return cleaned;
   // }
 
-  function calbill(date) {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+  // function calbill(date) {
+  //   const monthNames = [
+  //     "Jan",
+  //     "Feb",
+  //     "Mar",
+  //     "Apr",
+  //     "May",
+  //     "Jun",
+  //     "Jul",
+  //     "Aug",
+  //     "Sep",
+  //     "Oct",
+  //     "Nov",
+  //     "Dec",
+  //   ];
 
-    var myDate = new Date(date);
-    var d = myDate.getDate();
-    var m = myDate.getMonth();
-    m += 1;
-    var y = myDate.getFullYear();
+  //   var myDate = new Date(date);
+  //   var d = myDate.getDate();
+  //   var m = myDate.getMonth();
+  //   m += 1;
+  //   var y = myDate.getFullYear();
 
-    var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
-    return newdate;
-  }
+  //   var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+  //   return newdate;
+  // }
 
   const selectedCount = Object.values(selected).filter(Boolean).length;
 
@@ -552,9 +590,7 @@ const TableInventory = (props) => {
       Number(key),
       selected[key],
     ]);
-    // const newArrDisposal = Object.keys(selected)
-    //   .map((key) => Number(key))
-    //
+
     result = result.filter((key) => key[1] !== false);
     result = result.map((key) => ({
       id: key[0],

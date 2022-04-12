@@ -267,9 +267,20 @@ const FacilityTicket = () => {
                   />
                 </div>
               </div>
-              <div className="col-4">
+              <div className="col-2">
                 <button className="filter-btn" onClick={modalPopFilter}>
-                  Filter
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="cil:list-filter"></span>
+                  <span className="name-btn">Filter</span>
+                </button>
+              </div>
+              <div className="col-2">
+                <button className="sort-btn">
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="bx:sort-alt-2"></span>
+                  <span className="name-btn">Sort</span>
                 </button>
               </div>
               <div className="col-4"></div>

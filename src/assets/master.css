@@ -1087,8 +1087,8 @@ input[type="radio"] {
 .filter-btn {
   margin: 18px 5px 0 -10px;
   color: #ec9108;
-  width: 130px;
-  height: 40px;
+  width: 82px;
+  height: 30px;
   font-size: 0.8rem;
   min-width: 64px;
   outline: none;
@@ -1102,11 +1102,117 @@ input[type="radio"] {
   text-transform: capitalize;
   cursor: pointer;
   position: relative;
+  top: 5px;
+  right: 30px;
 }
 
 .filter-btn:hover {
   background-color: #ec91084b;
 }
+
+.filter-btn .icon-btn {
+  left: 10px;
+  bottom: 5px;
+  position: absolute;
+  font-size: 18px;
+}
+.filter-btn .name-btn {
+  right: 14px;
+  bottom: 6px;
+  position: absolute;
+  font-size: 14px;
+  line-height: 16.8px;
+}
+
+
+.sort-btn {
+  margin: 18px 5px 0 -10px;
+  color: #ec9108;
+  width: 82px;
+  height: 30px;
+  font-size: 0.8rem;
+  min-width: 64px;
+  outline: none;
+  border: 1px solid #ec9108;
+  background-color: transparent;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 500;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: capitalize;
+  cursor: pointer;
+  position: relative;
+  top: 5px;
+  
+}
+
+.sort-btn:hover {
+  background-color: #ec91084b;
+}
+
+.sort-btn .icon-btn {
+  left: 10px;
+  bottom: 6px;
+  position: absolute;
+  font-size: 18px;
+}
+.sort-btn .name-btn {
+  right: 20px;
+  bottom: 6px;
+  position: absolute;
+  font-size: 14px;
+  line-height: 16.8px;
+}
+
+.position-pill {
+  position: relative;
+  transform: translate(8%, -10%);
+}
+
+.pill-sort {
+  display: block;
+  width: 123px;
+  height: 42px;
+  border-radius: 41px;
+  color: #000;
+  background: transparent;
+  border: 1px solid #000;
+  text-align: center;
+  cursor: pointer;
+}
+
+.pill-sort:hover {
+  color: #000;
+  background-color: rgba(236, 145, 8, 0.3);
+  border: 1px solid rgba(236, 145, 8, 1);
+}
+
+.pill-sort.active {
+  color: #000;
+  background-color: rgba(236, 145, 8, 0.3);
+  border: 1px solid rgba(236, 145, 8, 1);
+}
+
+.container-pill{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 30px;
+  grid-column-gap: 60px;
+}
+
+@media only screen and (min-width: 1600px) and (max-width: 1980px) {
+  .sort-btn {
+    right: 195px;
+  }
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1368px) {
+  .sort-btn {
+    right: 100px;
+  }
+}
+
 
 .btn-response {
   margin: 0 5px 0 5px;

@@ -111,6 +111,18 @@ const useStyles = makeStyles((theme) => ({
       transform: "scale(0.85)",
     },
   },
+
+  paperSort: {
+    position: "fixed",
+    transform: "translate(-50%,-46%)",
+    top: "45%",
+    left: "50%",
+    width: 400,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 10, 3),
+  },
 }));
 
 const Inventory = () => {
@@ -126,6 +138,8 @@ const Inventory = () => {
   const [dataArea, setDataArea] = useState([]);
   const [searchValueFilter, setSearchValueFilter] = useState(null);
   const [modalOpenFilter, setModalOpenFilter] = useState(false);
+  const [modalOpenSort, setModalOpenSort] = useState(false);
+  const [sortActive, setSortActive] = useState("");
 
   useEffect(() => {
     getInvLatestId();
@@ -161,10 +175,15 @@ const Inventory = () => {
   const modalClose = () => {
     setModalOpen(false);
     setModalOpenFilter(false);
+    setModalOpenSort(false);
   };
 
   const modalPopFilter = () => {
     setModalOpenFilter(true);
+  };
+
+  const modalPopSort = () => {
+    setModalOpenSort(true);
   };
 
   const handleSearch = (e) => {
@@ -204,6 +223,7 @@ const Inventory = () => {
     setValueUserDpt("");
     setValueFisikNon("");
     setValueUnitPart("");
+    setSortActive("");
   };
 
   const getInvLatestId = async () => {
@@ -236,6 +256,10 @@ const Inventory = () => {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  const handleActiveSort = (e) => {
+    setSortActive(e.target.innerHTML);
   };
 
   const bodyModal = (
@@ -367,6 +391,84 @@ const Inventory = () => {
     </>
   );
 
+  const bodyModalSort = (
+    <>
+      <Fade in={modalOpenSort}>
+        <div className={classes.paperSort}>
+          <div className="row">
+            <div className="col-8">
+              <h2>Sort</h2>
+            </div>
+            <div className="col-4">
+              <a class="close-btn" role="button" onClick={modalClose}>
+                &times;
+              </a>
+            </div>
+          </div>
+          <form>
+            <div className="row margin-top-3 ">
+              <div className="container-pill position-pill">
+                <button
+                  type="button"
+                  onClick={handleActiveSort}
+                  className={`pill-sort ${
+                    sortActive === "All" ? "active" : ""
+                  }`}>
+                  All
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "A - Z" ? "active" : ""
+                  }`}>
+                  A - Z
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort  ${
+                    sortActive === "Highest Number" ? "active" : ""
+                  }`}>
+                  Highest Number
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "Z - A" ? "active" : ""
+                  }`}>
+                  Z - A
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "Lowest Number" ? "active" : ""
+                  }`}>
+                  Lowest Number
+                </button>
+              </div>
+            </div>
+
+            <br />
+            <div className="row">
+              <div className="col-12">
+                <button
+                  style={{ width: "100%" }}
+                  className={"btn-filter"}
+                  type={"submit"}>
+                  Sort
+                </button>
+              </div>
+            </div>
+          </form>
+          <br />
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -392,9 +494,20 @@ const Inventory = () => {
                   />
                 </div>
               </div>
-              <div className="col-4">
+              <div className="col-2">
                 <button className="filter-btn" onClick={modalPopFilter}>
-                  Filter
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="cil:list-filter"></span>
+                  <span className="name-btn">Filter</span>
+                </button>
+              </div>
+              <div className="col-2">
+                <button className="sort-btn" onClick={modalPopSort}>
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="bx:sort-alt-2"></span>
+                  <span className="name-btn">Sort</span>
                 </button>
               </div>
               <div className="col-4">
@@ -436,6 +549,15 @@ const Inventory = () => {
           timeout: 500,
         }}>
         {bodyModalFilter}
+      </Modal>
+      <Modal
+        open={modalOpenSort}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalSort}
       </Modal>
     </>
   );

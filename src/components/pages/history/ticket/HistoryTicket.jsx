@@ -318,7 +318,10 @@ const HistoryTicket = () => {
               </div>
               <div className="col-4">
                 <button className="filter-btn" onClick={modalPopFilter}>
-                  Filter
+                  <span
+                    class="iconify icon-btn"
+                    data-icon="cil:list-filter"></span>
+                  <span className="name-btn">Filter</span>
                 </button>
               </div>
               <div className="col-4"></div>
