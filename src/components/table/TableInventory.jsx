@@ -227,10 +227,8 @@ const TableInventory = (props) => {
   const [lastNumber, setLastNumber] = useState("");
   const [selectedDisposal, setSelectedDisposal] = useState([]);
   const [modalDisposal, setModalDisposal] = useState(false);
-  const [orderBy, setOrderBy] = useState("asset_number");
-  const [order, setOrder] = useState("asc");
 
-  const { searchValue, filterValue } = props;
+  const { searchValue, filterValue, sortValue } = props;
 
   useEffect(() => {
     getInventory();
@@ -246,7 +244,13 @@ const TableInventory = (props) => {
         filterHandle(filterValue);
       }, 1000);
     }
-  }, [searchValue, filterValue]);
+
+    if (sortValue) {
+      setTimeout(() => {
+        handleSort(sortValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue, sortValue]);
 
   // Arbitrary asynchronous function
   function doAsyncStuff() {
@@ -422,26 +426,42 @@ const TableInventory = (props) => {
     }
   };
 
-  function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-      return -1;
+  const handleSort = (sortValue) => {
+    let sortData = [...dataInventory];
+    switch (sortValue) {
+      case "asc":
+        sortData.sort((a, b) => (a.id > b.id ? 1 : -1));
+        setDataInventory(sortData);
+        return;
+      case "desc":
+        sortData.sort((a, b) => (a.id > b.id ? -1 : 1));
+        setDataInventory(sortData);
+        return;
+      case "alpha":
+        sortData.sort((a, b) =>
+          a.asset_name !== b.asset_name
+            ? a.asset_name < b.asset_name
+              ? 1
+              : -1
+            : 0
+        );
+        setDataInventory(sortData);
+        return;
+      case "revalpha":
+        sortData.sort((a, b) =>
+          a.asset_name !== b.asset_name
+            ? a.asset_name < b.asset_name
+              ? -1
+              : 1
+            : 0
+        );
+        setDataInventory(sortData);
+        return;
+      case "all":
+        return window.location.reload();
+      default:
+        return null;
     }
-    if (b[orderBy] > a[orderBy]) {
-      return 1;
-    }
-    return 0;
-  }
-
-  function getComparator(order, orderBy) {
-    return order === "desc"
-      ? (a, b) => descendingComparator(a, b, orderBy)
-      : (a, b) => -descendingComparator(a, b, orderBy);
-  }
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
   };
 
   const getInventory = async () => {

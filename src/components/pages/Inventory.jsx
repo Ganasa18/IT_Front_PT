@@ -140,6 +140,7 @@ const Inventory = () => {
   const [modalOpenFilter, setModalOpenFilter] = useState(false);
   const [modalOpenSort, setModalOpenSort] = useState(false);
   const [sortActive, setSortActive] = useState("");
+  const [sortValue, setSortValue] = useState("");
 
   useEffect(() => {
     getInvLatestId();
@@ -224,6 +225,7 @@ const Inventory = () => {
     setValueFisikNon("");
     setValueUnitPart("");
     setSortActive("");
+    setSortValue("");
   };
 
   const getInvLatestId = async () => {
@@ -260,6 +262,46 @@ const Inventory = () => {
 
   const handleActiveSort = (e) => {
     setSortActive(e.target.innerHTML);
+  };
+
+  const handleSort = (e) => {
+    e.preventDefault();
+
+    switch (sortActive) {
+      case "All":
+        setSortValue("all");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+
+        return;
+      case "Z - A":
+        setSortValue("alpha");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "Highest Number":
+        setSortValue("desc");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "A - Z":
+        setSortValue("revalpha");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "Lowest Number":
+        setSortValue("asc");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      default:
+        return console.log("empty");
+    }
   };
 
   const bodyModal = (
@@ -405,7 +447,7 @@ const Inventory = () => {
               </a>
             </div>
           </div>
-          <form>
+          <form onSubmit={handleSort}>
             <div className="row margin-top-3 ">
               <div className="container-pill position-pill">
                 <button
@@ -528,6 +570,7 @@ const Inventory = () => {
             <TableInventory
               searchValue={searchValue}
               filterValue={searchValueFilter}
+              sortValue={sortValue}
             />
           </div>
         </Grid>
