@@ -197,7 +197,7 @@ const ActionTicketTable = (props) => {
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { searchValue, filterValue } = props;
+  const { searchValue, filterValue, sortValue } = props;
 
   useEffect(() => {
     getStatusList();
@@ -213,7 +213,13 @@ const ActionTicketTable = (props) => {
         filterHandle(filterValue);
       }, 1000);
     }
-  }, [searchValue, filterValue]);
+
+    if (sortValue) {
+      setTimeout(() => {
+        handleSort(sortValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue, sortValue]);
 
   // Arbitrary asynchronous function
   function doAsyncStuff() {
@@ -292,6 +298,44 @@ const ActionTicketTable = (props) => {
     if (searchValue !== null) {
       let searchRequest = filterByValue(dataRequest, searchValue);
       setDataRequest(searchRequest);
+    }
+  };
+
+  const handleSort = (sortValue) => {
+    let sortData = [...dataRequest];
+    switch (sortValue) {
+      case "asc":
+        sortData.sort((a, b) => (a.id > b.id ? 1 : -1));
+        setDataRequest(sortData);
+        return;
+      case "desc":
+        sortData.sort((a, b) => (a.id > b.id ? -1 : 1));
+        setDataRequest(sortData);
+        return;
+      case "alpha":
+        sortData.sort((a, b) =>
+          a.asset_name !== b.asset_name
+            ? a.asset_name < b.asset_name
+              ? 1
+              : -1
+            : 0
+        );
+        setDataRequest(sortData);
+        return;
+      case "revalpha":
+        sortData.sort((a, b) =>
+          a.asset_name !== b.asset_name
+            ? a.asset_name < b.asset_name
+              ? -1
+              : 1
+            : 0
+        );
+        setDataRequest(sortData);
+        return;
+      case "all":
+        return window.location.reload();
+      default:
+        return null;
     }
   };
 

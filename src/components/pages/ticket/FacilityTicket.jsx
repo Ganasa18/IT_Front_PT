@@ -65,17 +65,31 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 10, 3),
   },
+  paperSort: {
+    position: "fixed",
+    transform: "translate(-50%,-46%)",
+    top: "45%",
+    left: "50%",
+    width: 400,
+    display: "block",
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: theme.shadows[2],
+    padding: theme.spacing(2, 10, 3),
+  },
 }));
 
 const FacilityTicket = () => {
   const classes = useStyles();
   const [searchValue, SetSearchValue] = useState("");
   const [valueStatus, setValueStatus] = useState("");
+  const [dataStatus, setDataStatus] = useState([]);
   const [searchValueFilter, setSearchValueFilter] = useState(null);
   const [modalOpenFilter, setModalOpenFilter] = useState(false);
-  const [dataStatus, setDataStatus] = useState([]);
+  const [modalOpenSort, setModalOpenSort] = useState(false);
   const [selectedDate, handleDateChange] = useState(new Date());
   const [selectedDate2, handleDateChange2] = useState(new Date());
+  const [sortActive, setSortActive] = useState("");
+  const [sortValue, setSortValue] = useState("");
 
   useEffect(() => {
     getStatusList();
@@ -112,8 +126,13 @@ const FacilityTicket = () => {
     setModalOpenFilter(true);
   };
 
+  const modalPopSort = () => {
+    setModalOpenSort(true);
+  };
+
   const modalClose = () => {
     setModalOpenFilter(false);
+    setModalOpenSort(false);
   };
 
   const handleSearch = (e) => {
@@ -146,6 +165,52 @@ const FacilityTicket = () => {
     setSearchValueFilter(["reset"]);
     SetSearchValue("");
     setValueStatus("");
+    setSortActive("");
+    setSortValue("");
+  };
+
+  const handleActiveSort = (e) => {
+    setSortActive(e.target.innerHTML);
+  };
+
+  const handleSort = (e) => {
+    e.preventDefault();
+
+    switch (sortActive) {
+      case "All":
+        setSortValue("all");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+
+        return;
+      case "Z - A":
+        setSortValue("alpha");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "Highest Number":
+        setSortValue("desc");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "A - Z":
+        setSortValue("revalpha");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      case "Lowest Number":
+        setSortValue("asc");
+        setTimeout(() => {
+          setModalOpenSort(false);
+        }, 2000);
+        return;
+      default:
+        return console.log("empty");
+    }
   };
 
   const bodyModalFilter = (
@@ -242,6 +307,84 @@ const FacilityTicket = () => {
     </>
   );
 
+  const bodyModalSort = (
+    <>
+      <Fade in={modalOpenSort}>
+        <div className={classes.paperSort}>
+          <div className="row">
+            <div className="col-8">
+              <h2>Sort</h2>
+            </div>
+            <div className="col-4">
+              <a class="close-btn" role="button" onClick={modalClose}>
+                &times;
+              </a>
+            </div>
+          </div>
+          <form onSubmit={handleSort}>
+            <div className="row margin-top-3 ">
+              <div className="container-pill position-pill">
+                <button
+                  type="button"
+                  onClick={handleActiveSort}
+                  className={`pill-sort ${
+                    sortActive === "All" ? "active" : ""
+                  }`}>
+                  All
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "A - Z" ? "active" : ""
+                  }`}>
+                  A - Z
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort  ${
+                    sortActive === "Highest Number" ? "active" : ""
+                  }`}>
+                  Highest Number
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "Z - A" ? "active" : ""
+                  }`}>
+                  Z - A
+                </button>
+                <button
+                  onClick={handleActiveSort}
+                  type="button"
+                  className={`pill-sort ${
+                    sortActive === "Lowest Number" ? "active" : ""
+                  }`}>
+                  Lowest Number
+                </button>
+              </div>
+            </div>
+
+            <br />
+            <div className="row">
+              <div className="col-12">
+                <button
+                  style={{ width: "100%" }}
+                  className={"btn-filter"}
+                  type={"submit"}>
+                  Sort
+                </button>
+              </div>
+            </div>
+          </form>
+          <br />
+        </div>
+      </Fade>
+    </>
+  );
+
   return (
     <>
       <div className={classes.toolbar} />
@@ -276,7 +419,7 @@ const FacilityTicket = () => {
                 </button>
               </div>
               <div className="col-2">
-                <button className="sort-btn">
+                <button className="sort-btn" onClick={modalPopSort}>
                   <span
                     class="iconify icon-btn"
                     data-icon="bx:sort-alt-2"></span>
@@ -292,6 +435,7 @@ const FacilityTicket = () => {
             <FacilityTicketTable
               searchValue={searchValue}
               filterValue={searchValueFilter}
+              sortValue={sortValue}
             />
           </div>
         </Grid>
@@ -304,6 +448,15 @@ const FacilityTicket = () => {
           timeout: 500,
         }}>
         {bodyModalFilter}
+      </Modal>
+      <Modal
+        open={modalOpenSort}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalSort}
       </Modal>
     </>
   );
