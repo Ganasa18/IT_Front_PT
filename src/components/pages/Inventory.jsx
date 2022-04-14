@@ -111,7 +111,6 @@ const useStyles = makeStyles((theme) => ({
       transform: "scale(0.85)",
     },
   },
-
   paperSort: {
     position: "fixed",
     transform: "translate(-50%,-46%)",

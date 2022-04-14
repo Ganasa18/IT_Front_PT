@@ -192,7 +192,7 @@ const FacilityTicketTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { searchValue, filterValue } = props;
+  const { searchValue, filterValue, sortValue } = props;
 
   useEffect(() => {
     getStatusList();
@@ -207,7 +207,13 @@ const FacilityTicketTable = (props) => {
         filterHandle(filterValue);
       }, 1000);
     }
-  }, [searchValue, filterValue]);
+
+    if (sortValue) {
+      setTimeout(() => {
+        handleSort(sortValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue, sortValue]);
 
   function filterByValue(array, value) {
     return array.filter(
@@ -279,6 +285,36 @@ const FacilityTicketTable = (props) => {
     if (searchValue !== null) {
       let searchRequest = filterByValue(dataRequest, searchValue);
       setDataRequest(searchRequest);
+    }
+  };
+
+  const handleSort = (sortValue) => {
+    let sortData = [...dataRequest];
+    switch (sortValue) {
+      case "asc":
+        sortData.sort((a, b) => (a.id > b.id ? 1 : -1));
+        setDataRequest(sortData);
+        return;
+      case "desc":
+        sortData.sort((a, b) => (a.id > b.id ? -1 : 1));
+        setDataRequest(sortData);
+        return;
+      case "alpha":
+        sortData.sort((a, b) =>
+          a.user_name !== b.user_name ? (a.user_name < b.user_name ? 1 : -1) : 0
+        );
+        setDataRequest(sortData);
+        return;
+      case "revalpha":
+        sortData.sort((a, b) =>
+          a.user_name !== b.user_name ? (a.user_name < b.user_name ? -1 : 1) : 0
+        );
+        setDataRequest(sortData);
+        return;
+      case "all":
+        return window.location.reload();
+      default:
+        return null;
     }
   };
 
