@@ -6,6 +6,8 @@ import Auth from "./components/pages/Auth";
 import Cookies from "universal-cookie";
 import { authEndPoint } from "./assets/menu";
 import axios from "axios";
+import { Provider } from "react-redux";
+import store from "./components/redux";
 
 const cookies = new Cookies();
 const breakpoints = createBreakpoints({});
@@ -116,25 +118,32 @@ const App = () => {
   });
 
   const classes = useStyles();
-
   useEffect(() => {
     checkUser();
   }, []);
 
+  const MainApp = () => {
+    return (
+      <ThemeProvider theme={theme}>
+        <div className={classes.root}>
+          {!authToken ? (
+            <Auth />
+          ) : (
+            <PersistentDrawer
+              userID={ID}
+              userRole={roleUser}
+              tokenUser={authToken}
+            />
+          )}
+        </div>
+      </ThemeProvider>
+    );
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <div className={classes.root}>
-        {!authToken ? (
-          <Auth />
-        ) : (
-          <PersistentDrawer
-            userID={ID}
-            userRole={roleUser}
-            tokenUser={authToken}
-          />
-        )}
-      </div>
-    </ThemeProvider>
+    <Provider store={store}>
+      <MainApp />
+    </Provider>
   );
 };
 

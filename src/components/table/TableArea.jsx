@@ -1,48 +1,35 @@
-import React, { useState, useEffect } from "react";
-
-import PropTypes from "prop-types";
-import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
-
-import Loading from "../asset/Loading";
 import {
-  useTheme,
+  Backdrop,
+  Divider,
+  Fade,
   makeStyles,
+  Modal,
+  Paper,
+  Snackbar,
   Table,
   TableBody,
-  TableHead,
   TableCell,
   TableContainer,
   TableFooter,
+  TableHead,
   TablePagination,
   TableRow,
-  Paper,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Snackbar,
-  Divider,
 } from "@material-ui/core";
-import "../../assets/master.css";
-
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
 import MuiAlert from "@material-ui/lab/Alert";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "../../assets/master.css";
+import { pathEndPoint } from "../../assets/menu";
+import Loading from "../asset/Loading";
+import TablePaginationActions from "../asset/pagination/TablePaginationActions";
+import { filterDataArea, getDataArea } from "../redux/action";
+import { filterByValue } from "../utils";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
-
-const useStyles1 = makeStyles((theme) => ({
-  root: {
-    flexShrink: 0,
-    marginLeft: theme.spacing(2.5),
-  },
-}));
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -53,72 +40,6 @@ const StyledTableCell = withStyles((theme) => ({
     fontSize: 14,
   },
 }))(TableCell);
-
-function TablePaginationActions(props) {
-  const classes = useStyles1();
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = (event) => {
-    onPageChange(event, 0);
-  };
-
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
-
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
-  return (
-    <div className={classes.root}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page">
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page">
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowRight />
-        ) : (
-          <KeyboardArrowLeft />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page">
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowLeft />
-        ) : (
-          <KeyboardArrowRight />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </div>
-  );
-}
-
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
 
 const useStyles2 = makeStyles((theme) => ({
   table: {
@@ -164,25 +85,22 @@ const useStyles2 = makeStyles((theme) => ({
 
 const TableArea = (props) => {
   const classes = useStyles2();
+  const { area } = useSelector((state) => state.areaReducer);
+  const { isLoading } = useSelector((state) => state.globalReducer);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [areaDelete, setAreaDelete] = useState([]);
-  const [dataArea, setDataArea] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [areaId, setAreaId] = useState("");
   const [areaName, setAreaName] = useState("");
   const [aliasName, setAliasName] = useState("");
   const [toast, setToast] = useState(false);
   const { searchValue } = props;
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getAreaList();
-    // setTimeout(() => {
-
-    // }, 3000);
-
+    dispatch(getDataArea());
     if (searchValue) {
       setTimeout(() => {
         searchHandle(searchValue);
@@ -190,35 +108,11 @@ const TableArea = (props) => {
     }
   }, [searchValue]);
 
-  function filterByValue(array, value) {
-    return array.filter(
-      (data) =>
-        JSON.stringify(data).toLowerCase().indexOf(value.toLowerCase()) !== -1
-    );
-  }
-
   const searchHandle = (searchValue) => {
     if (searchValue !== null) {
-      let searchRequest = filterByValue(dataArea, searchValue);
-      setDataArea(searchRequest);
+      let searchRequest = filterByValue(area, searchValue);
+      dispatch(filterDataArea(searchRequest));
     }
-  };
-
-  const getAreaList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
-      )
-      .then((response) => {
-        setDataArea(response.data.data.areas);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
   };
 
   const updateArea = async (e) => {
@@ -243,7 +137,7 @@ const TableArea = (props) => {
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, dataArea.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, area.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -387,11 +281,11 @@ const TableArea = (props) => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataArea.slice(
+                  ? area.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataArea
+                  : area
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell
@@ -423,14 +317,6 @@ const TableArea = (props) => {
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
-                      {/* <button
-                        className="btn-delete"
-                        onClick={(e) => handleDelete(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"></span>
-                        <span className="name-btn">Delete</span>
-                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -447,7 +333,7 @@ const TableArea = (props) => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataArea.length}
+                  count={area.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

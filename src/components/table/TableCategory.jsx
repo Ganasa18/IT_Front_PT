@@ -37,9 +37,16 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import StepperEdit from "../asset/category/StepperEdit";
 import MuiAlert from "@material-ui/lab/Alert";
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+import { useDispatch, useSelector } from "react-redux";
+import {
+  filterDataCategory,
+  getDataCategory,
+  getLatestId,
+} from "../redux/action";
+import { filterByValue } from "../utils";
+// function Alert(props) {
+//   return <MuiAlert elevation={6} variant="filled" {...props} />;
+// }
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -208,7 +215,7 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableCategory = () => {
+const TableCategory = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -216,19 +223,20 @@ const TableCategory = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [transferModal, setTransferModal] = useState(false);
   const [confirmChangeItemModal, setConfirmChangeItemModal] = useState(false);
-  const [dataCategory, setDataCategory] = useState([]);
-  const [optionCategory, setOptionCategory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState([]);
   const [dataSubCategory, setDataSubCategory] = useState([]);
-  const [lastCategoryId, setLastCategoryId] = useState(null);
   const [categoryEdit, setCategoryEdit] = useState([]);
   const [totalUsed, setTotalUsed] = useState(null);
   const [isCheckAll, setIsCheckAll] = useState(false);
   const [isCheck, setIsCheck] = useState([]);
   const [list, setList] = useState([]);
   const [optionCategoryId, setOptionCategoryId] = useState(null);
-  const [toast, setToast] = useState(false);
+  const { category, optCategory, lastCategoryId } = useSelector(
+    (state) => state.categoryReducer
+  );
+  const { isLoading } = useSelector((state) => state.globalReducer);
+  const { searchValue } = props;
+  const dispatch = useDispatch();
 
   const modalPop = (row) => {
     setCategoryEdit(row);
@@ -237,53 +245,27 @@ const TableCategory = () => {
 
   useEffect(() => {
     getCategoryList();
-    getLatestId();
-  }, [list]);
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [list, searchValue]);
 
-  const getCategoryList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/category`
-      )
-      .then((response) => {
-        const DataCategory = response.data.data.category;
-        setDataCategory(DataCategory);
-
-        const newArrCategory = DataCategory.map((row) => ({
-          value: row.id,
-          name: row.category_name,
-        }));
-
-        setOptionCategory(newArrCategory);
-
-        setIsLoading(false);
-
-        setExpanded(
-          [...Array(response.data.data.category.length)].map((val) => false)
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(category, searchValue);
+      dispatch(filterDataCategory(searchRequest));
+    }
   };
 
-  const getLatestId = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/category`
-      )
-      .then((response) => {
-        const dataCategory = response.data.data.category;
-        setLastCategoryId(dataCategory.shift().id);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  const getCategoryList = () => {
+    dispatch(getDataCategory());
+    dispatch(getLatestId());
+    if (!isLoading) {
+      const expandVal = [...Array(category.length)].map((val) => false);
+      setExpanded(expandVal);
+    }
   };
 
   const handleConfirmDelete = async (row) => {
@@ -299,10 +281,8 @@ const TableCategory = () => {
         if (check === "used") {
           setTransferModal(true);
           setTotalUsed(res.data.data.total_used);
-
           return;
         }
-
         setDeleteModal(true);
       })
       .catch((err) => {
@@ -372,8 +352,7 @@ const TableCategory = () => {
   };
 
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, dataCategory.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, category.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -602,8 +581,8 @@ const TableCategory = () => {
               <label htmlFor="roleName">Category</label>
               <SelectSearch
                 id="idCategory"
-                options={optionCategory}
-                value={optionCategory}
+                options={optCategory}
+                value={optCategory}
                 filterOptions={fuzzySearch}
                 onChange={(e) => setOptionCategoryId(e)}
                 search
@@ -658,11 +637,11 @@ const TableCategory = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataCategory.slice(
+                  ? category.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataCategory
+                  : category
                 )
                   .sort((a, b) => (a.id > b.id ? -1 : 1))
                   .map((row, index) => (
@@ -715,20 +694,6 @@ const TableCategory = () => {
                               </button>
                             </>
                           ) : null}
-
-                          {/* <button
-                            disabled={`${
-                              lastCategoryId === row.id ? "disabled" : ""
-                            }`}
-                            className={`btn-delete ${
-                              lastCategoryId === row.id ? "disabled" : ""
-                            }`}
-                            onClick={() => handleDelete(row)}>
-                            <span
-                              class="iconify icon-btn"
-                              data-icon="ant-design:delete-filled"></span>
-                            <span className="name-btn">Delete</span>
-                          </button> */}
                         </TableCell>
                       </TableRow>
 
@@ -780,7 +745,7 @@ const TableCategory = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataCategory.length}
+                  count={category.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

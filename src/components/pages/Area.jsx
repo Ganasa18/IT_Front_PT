@@ -97,7 +97,6 @@ const Area = () => {
 
   const saveHandler = async (event) => {
     event.preventDefault();
-
     await axios.post(
       `${pathEndPoint[0].url}${
         pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""

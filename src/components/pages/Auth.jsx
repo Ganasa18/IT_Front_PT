@@ -23,12 +23,10 @@ const Auth = () => {
   const getIPLogs = async () => {
     const res = await axios.get("https://geolocation-db.com/json/");
     setIP(res.data);
-    console.log(res.data);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(ip);
     const URL = `${authEndPoint[0].url}${
       authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
     }/api/v1/auth/login`;
@@ -76,8 +74,6 @@ const Auth = () => {
               log_country: ip.country_name,
             });
 
-            // console.log(error);
-            // console.log(error.response.status);
             if (error.response.status === 429) {
               return setError(error.response.data);
             }

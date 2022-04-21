@@ -1,40 +1,44 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import axios from "axios";
-import { pathEndPoint } from "../../assets/menu";
-import Loading from "../asset/Loading";
 import {
-  useTheme,
+  Backdrop,
+  Box,
+  Button,
+  Collapse,
+  Fade,
   makeStyles,
+  Modal,
+  Paper,
   Table,
   TableBody,
-  TableHead,
   TableCell,
   TableContainer,
   TableFooter,
+  TableHead,
   TablePagination,
   TableRow,
-  Paper,
+  useTheme,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Collapse,
-  Box,
-  Typography,
-  Button,
 } from "@material-ui/core";
-import "../../assets/master.css";
-
 import IconButton from "@material-ui/core/IconButton";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
 import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp";
-
+import axios from "axios";
+import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import "../../assets/master.css";
+import { pathEndPoint } from "../../assets/menu";
 import StepperEdit from "../asset/departement/StepperEdit";
+import Loading from "../asset/Loading";
+import {
+  filterDataDepartement,
+  getDataDepartment,
+  getLatestIdDepartement,
+} from "../redux/action";
+import { filterByValue } from "../utils";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -171,17 +175,20 @@ const useStyles2 = makeStyles((theme) => ({
   },
 }));
 
-const TableDepartement = () => {
+const TableDepartement = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [dataDepartement, setDataDepartement] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [expanded, setExpanded] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
-  const [lastDepartementId, setLastDepartementId] = useState(null);
   const [departementEdit, setDepartementEdit] = useState([]);
+  const { departement, lastDepartementId } = useSelector(
+    (state) => state.dapartementReducer
+  );
+  const { isLoading } = useSelector((state) => state.globalReducer);
+  const { searchValue } = props;
+  const dispatch = useDispatch();
 
   const modalPop = (row) => {
     setDepartementEdit(row);
@@ -194,48 +201,32 @@ const TableDepartement = () => {
 
   useEffect(() => {
     getDepartementList();
-    getLatestId();
-  }, []);
+    if (searchValue) {
+      setTimeout(() => {
+        searchHandle(searchValue);
+      }, 1000);
+    }
+  }, [searchValue]);
 
-  const getDepartementList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement`
-      )
-      .then((response) => {
-        setDataDepartement(response.data.data.departements);
-        setIsLoading(false);
-
-        setExpanded(
-          [...Array(response.data.data.departements.length)].map((val) => false)
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-      });
+  const searchHandle = (searchValue) => {
+    if (searchValue !== null) {
+      let searchRequest = filterByValue(departement, searchValue);
+      dispatch(filterDataDepartement(searchRequest));
+    }
   };
 
-  const getLatestId = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement/latestId`
-      )
-      .then((response) => {
-        setLastDepartementId(response.data.data.departement.id);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  const getDepartementList = () => {
+    dispatch(getDataDepartment());
+    dispatch(getLatestIdDepartement());
+    if (!isLoading) {
+      const expandVal = [...Array(departement.length)].map((val) => false);
+      setExpanded(expandVal);
+    }
   };
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, dataDepartement.length - page * rowsPerPage);
+    Math.min(rowsPerPage, departement.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -335,11 +326,11 @@ const TableDepartement = () => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? dataDepartement.slice(
+                  ? departement.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : dataDepartement
+                  : departement
                 )
                   .sort((a, b) => (a.id > b.id ? -1 : 1))
                   .map((row, index) => (
@@ -445,7 +436,7 @@ const TableDepartement = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={dataDepartement.length}
+                  count={departement.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{

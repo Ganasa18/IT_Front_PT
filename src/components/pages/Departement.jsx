@@ -77,6 +77,21 @@ const useStyles = makeStyles((theme) => ({
 const Departement = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchValue, SetSearchValue] = useState("");
+
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
+
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
 
   const modalPop = () => {
     setModalOpen((prevSelected) => !prevSelected);
@@ -116,6 +131,7 @@ const Departement = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
@@ -139,7 +155,7 @@ const Departement = () => {
 
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableDepartement />
+            <TableDepartement searchValue={searchValue} />
           </div>
         </Grid>
       </Grid>

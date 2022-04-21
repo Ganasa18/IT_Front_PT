@@ -76,10 +76,25 @@ const useStyles = makeStyles((theme) => ({
 const Category = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchValue, SetSearchValue] = useState("");
 
   const modalPop = () => {
     setModalOpen((prevSelected) => !prevSelected);
   };
+
+  const handleSearch = (e) => {
+    var typingTimer; //timer identifier
+    var doneTypingInterval = 10000;
+    clearTimeout(typingTimer);
+    var value = e.target.value;
+    if (value) {
+      typingTimer = setTimeout(doneTyping(value), doneTypingInterval);
+    }
+  };
+
+  function doneTyping(value) {
+    SetSearchValue(value);
+  }
 
   const bodyModal = (
     <>
@@ -115,6 +130,7 @@ const Category = () => {
                     className="iconify icon"
                     data-icon="bx:bx-search"></span>
                   <input
+                    onChange={handleSearch}
                     className="input-field"
                     type="text"
                     placeholder="Search..."
@@ -138,7 +154,7 @@ const Category = () => {
 
         <Grid item xs={12} sm={12}>
           <div className="row">
-            <TableCategory />
+            <TableCategory searchValue={searchValue} />
           </div>
         </Grid>
       </Grid>

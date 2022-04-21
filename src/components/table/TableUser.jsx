@@ -1,48 +1,35 @@
-import React, { useState, useEffect } from "react";
-import { authEndPoint, pathEndPoint } from "../../assets/menu";
-import PropTypes from "prop-types";
-import axios from "axios";
-import Loading from "../asset/Loading";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import { Link } from "react-router-dom";
-import "../../assets/select-search.css";
-
 import {
-  useTheme,
+  Backdrop,
+  Divider,
+  Fade,
   makeStyles,
+  Modal,
+  Paper,
   Table,
   TableBody,
-  TableHead,
   TableCell,
   TableContainer,
   TableFooter,
+  TableHead,
   TablePagination,
   TableRow,
-  Paper,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Divider,
 } from "@material-ui/core";
-import "../../assets/master.css";
-
-import IconButton from "@material-ui/core/IconButton";
-import FirstPageIcon from "@material-ui/icons/FirstPage";
-import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
-import LastPageIcon from "@material-ui/icons/LastPage";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import SelectSearch, { fuzzySearch } from "react-select-search";
 import Cookies from "universal-cookie";
+import "../../assets/master.css";
+import { authEndPoint, pathEndPoint } from "../../assets/menu";
+import "../../assets/select-search.css";
+import Loading from "../asset/Loading";
+import TablePaginationActions from "../asset/pagination/TablePaginationActions";
+import { useDispatch, useSelector } from "react-redux";
+import { getDataUser } from "../redux/action/user";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
-
-const useStyles1 = makeStyles((theme) => ({
-  root: {
-    flexShrink: 0,
-    marginLeft: theme.spacing(2.5),
-  },
-}));
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -53,72 +40,6 @@ const StyledTableCell = withStyles((theme) => ({
     fontSize: 14,
   },
 }))(TableCell);
-
-function TablePaginationActions(props) {
-  const classes = useStyles1();
-  const theme = useTheme();
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = (event) => {
-    onPageChange(event, 0);
-  };
-
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
-
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (event) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
-  return (
-    <div className={classes.root}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page">
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page">
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowRight />
-        ) : (
-          <KeyboardArrowLeft />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page">
-        {theme.direction === "rtl" ? (
-          <KeyboardArrowLeft />
-        ) : (
-          <KeyboardArrowRight />
-        )}
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page">
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </div>
-  );
-}
-
-TablePaginationActions.propTypes = {
-  count: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired,
-  page: PropTypes.number.isRequired,
-  rowsPerPage: PropTypes.number.isRequired,
-};
 
 const useStyles2 = makeStyles((theme) => ({
   table: {
@@ -164,10 +85,12 @@ const useStyles2 = makeStyles((theme) => ({
 
 const TableUser = (props) => {
   const classes = useStyles2();
+  const { users } = useSelector((state) => state.userReducer);
+  const { isLoading } = useSelector((state) => state.globalReducer);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [editModal, setEditModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [dataRole, setDataRole] = useState([]);
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
@@ -182,9 +105,10 @@ const TableUser = (props) => {
   const [valueUserId, setValueUserId] = useState("");
   const [resultJoinUser, setResultJoinUser] = useState([]);
   const [selectedValueEmply, setSelectedValueEmply] = useState("permanent");
-  const { searchValue, filterValue } = props;
+  const { searchValue, filterValue, sortValue } = props;
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteModalUser, setDeleteModalUser] = useState([]);
+  const dispatch = useDispatch();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -207,7 +131,7 @@ const TableUser = (props) => {
   //   GET DATA
 
   useEffect(() => {
-    getDataUser();
+    dispatch(getDataUser(token));
     getAreaList();
     getRoleList();
 
@@ -222,28 +146,35 @@ const TableUser = (props) => {
         filterHandle(filterValue);
       }, 1000);
     }
-  }, [searchValue, filterValue]);
+
+    if (sortValue) {
+      setTimeout(() => {
+        handleSort(sortValue);
+      }, 1000);
+    }
+  }, [searchValue, filterValue, sortValue]);
 
   const searchHandle = (searchValue) => {
-    // setIsLoading(true);
-
+    dispatch({ type: "SET_LOADING", value: true });
     if (searchValue.length === 1) {
       setTimeout(() => {
-        getDataUser();
+        dispatch(getDataUser(token));
+        dispatch({ type: "SET_LOADING", value: false });
       }, 1500);
       return;
     }
 
     if (searchValue !== null) {
+      dispatch({ type: "SET_LOADING", value: true });
       (async function () {
-        const results = await filter(resultJoinUser, async (item) => {
+        const results = await filter(users, async (item) => {
           await doAsyncStuff();
           return item.username.toLowerCase().match(searchValue);
         });
         setPage(0);
-        setResultJoinUser(results);
+        dispatch({ type: "SET_USER", value: results });
         setTimeout(() => {
-          setIsLoading(false);
+          dispatch({ type: "SET_LOADING", value: false });
         }, 1500);
       })();
       return;
@@ -270,13 +201,14 @@ const TableUser = (props) => {
 
     if (checkData && searchValue.length === 0) {
       setTimeout(() => {
-        getDataUser();
+        dispatch(getDataUser(token));
+        dispatch({ type: "SET_LOADING", value: false });
       }, 2000);
 
       return;
     }
     if (!checkData) {
-      setIsLoading(true);
+      dispatch({ type: "SET_LOADING", value: true });
 
       if (
         filterValue[0] !== "" &&
@@ -284,7 +216,7 @@ const TableUser = (props) => {
         filterValue[2] !== ""
       ) {
         (async function () {
-          const results = await filter(resultJoinUser, async (item) => {
+          const results = await filter(users, async (item) => {
             await doAsyncStuff();
             return (
               item.role === filterValue[0] &&
@@ -293,9 +225,9 @@ const TableUser = (props) => {
             );
           });
           setPage(0);
-          setResultJoinUser(results);
+          dispatch({ type: "SET_USER", value: results });
           setTimeout(() => {
-            setIsLoading(false);
+            dispatch({ type: "SET_LOADING", value: false });
           }, 1500);
         })();
 
@@ -303,22 +235,24 @@ const TableUser = (props) => {
       }
 
       if (filterValue[0] !== "" && filterValue[1] !== "") {
+        dispatch({ type: "SET_LOADING", value: true });
         setTimeout(() => {
-          let searchJoinUser = resultJoinUser.filter(
+          let searchJoinUser = users.filter(
             (item) =>
               item.role === filterValue[0] && item.area === filterValue[1]
           );
-          setResultJoinUser(searchJoinUser);
-          setIsLoading(false);
+          dispatch({ type: "SET_USER", value: searchJoinUser });
+          dispatch({ type: "SET_LOADING", value: false });
         }, 2000);
 
         return;
       }
 
       if (filterValue[0] !== "") {
+        dispatch({ type: "SET_LOADING", value: true });
         if (filterValue[2] !== "") {
           (async function () {
-            const results = await filter(resultJoinUser, async (item) => {
+            const results = await filter(users, async (item) => {
               await doAsyncStuff();
               return (
                 item.role === filterValue[0] &&
@@ -326,19 +260,19 @@ const TableUser = (props) => {
               );
             });
             setPage(0);
-            setResultJoinUser(results);
+            dispatch({ type: "SET_USER", value: results });
             setTimeout(() => {
-              setIsLoading(false);
+              dispatch({ type: "SET_LOADING", value: false });
             }, 1500);
           })();
           return;
         }
         setTimeout(() => {
-          let searchJoinUser = resultJoinUser.filter(
+          let searchJoinUser = users.filter(
             (item) => item.role === filterValue[0]
           );
-          setResultJoinUser(searchJoinUser);
-          setIsLoading(false);
+          dispatch({ type: "SET_USER", value: searchJoinUser });
+          dispatch({ type: "SET_LOADING", value: false });
         }, 2000);
       }
 
@@ -348,7 +282,7 @@ const TableUser = (props) => {
             (item) => item.area === filterValue[1]
           );
           setResultJoinUser(searchJoinUser);
-          setIsLoading(false);
+          dispatch({ type: "SET_LOADING", value: false });
         }, 2000);
         return;
       }
@@ -359,129 +293,42 @@ const TableUser = (props) => {
             (item) => item.departement === filterValue[2]
           );
           setResultJoinUser(searchJoinUser);
-          setIsLoading(false);
+          dispatch({ type: "SET_LOADING", value: false });
         }, 2000);
         return;
       }
     }
   };
 
-  const getDataUser = async () => {
-    let user = `${authEndPoint[0].url}${
-      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-    }/api/v1/auth/`;
+  const handleSort = (sortValue) => {
+    let sortData = [...users];
 
-    let area = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/area`;
-
-    let role = `${authEndPoint[0].url}${
-      authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-    }/api/v1/role`;
-
-    let departement = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/departement`;
-
-    let subdepartement = `${pathEndPoint[0].url}${
-      pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-    }/api/v1/subdepartement`;
-
-    const requestOne = await axios.get(user, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const requestTwo = await axios.get(area);
-    const requestThree = await axios.get(role, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const requestFour = await axios.get(departement);
-
-    const requestFive = await axios.get(subdepartement);
-
-    axios
-      .all([requestOne, requestTwo, requestThree, requestFour, requestFive])
-      .then(
-        axios.spread((...responses) => {
-          const responseOne = responses[0];
-          const responseTwo = responses[1];
-          const responesThree = responses[2];
-          const responesFour = responses[3];
-          const responesFive = responses[4];
-
-          let newDataUser = responseOne.data.data.users;
-          let newDataArea = responseTwo.data.data.areas;
-          let newDataRole = responesThree.data.data.roles;
-          let newDataDepartement = responesFour.data.data.departements;
-          let newDataSubDepartement = responesFive.data.data.subdepartements;
-
-          newDataUser = newDataUser.filter((data) => data.is_active === true);
-
-          const arr_user = [...newDataUser];
-          const arr_area = [...newDataArea];
-          const arr_role = [...newDataRole];
-          const arr_departement = [...newDataDepartement];
-          const arr_subdepartement = [...newDataSubDepartement];
-
-          const newArrDepart = arr_departement.map((row) => ({
-            value: row.id,
-            name: row.departement_name,
-          }));
-
-          const newArrSubDepart = arr_subdepartement.map((row) => ({
-            value: row.id,
-            name: row.subdepartement_name,
-          }));
-
-          var areamap = {};
-          arr_area.forEach(function (area_id) {
-            areamap[area_id.id] = area_id;
-          });
-          // now do the "join":
-          arr_user.forEach(function (user) {
-            user.area_id = areamap[user.area];
-          });
-          let JoinArea = arr_user;
-
-          var rolemap = {};
-          arr_role.forEach(function (role_id) {
-            rolemap[role_id.id] = role_id;
-          });
-
-          JoinArea.forEach(function (user) {
-            user.role_id = rolemap[user.role];
-          });
-          let JoinRole = JoinArea;
-
-          var departementmap = {};
-          newArrDepart.forEach(function (depart_id) {
-            departementmap[depart_id.value] = depart_id;
-          });
-
-          JoinRole.forEach(function (user) {
-            user.depart_id = departementmap[user.departement];
-          });
-
-          let JoinDepartement = JoinArea;
-          var subdepartementmap = {};
-          newArrSubDepart.forEach(function (subdepart_id) {
-            subdepartementmap[subdepart_id.value] = subdepart_id;
-          });
-          JoinDepartement.forEach(function (user) {
-            user.subdepart_id = subdepartementmap[user.subdepartement];
-          });
-
-          let JoinSubDepartement = JoinDepartement;
-
-          setResultJoinUser(JoinSubDepartement);
-          setIsLoading(false);
-        })
-      )
-      .catch((errors) => {
-        // react on errors.
-        console.error(errors);
-      });
+    switch (sortValue) {
+      case "asc":
+        sortData.sort((a, b) => (a.id > b.id ? 1 : -1));
+        dispatch({ type: "SET_USER", value: sortData });
+        return;
+      case "desc":
+        sortData.sort((a, b) => (a.id > b.id ? -1 : 1));
+        dispatch({ type: "SET_USER", value: sortData });
+        return;
+      case "alpha":
+        sortData.sort((a, b) =>
+          a.email !== b.email ? (a.email < b.email ? 1 : -1) : 0
+        );
+        dispatch({ type: "SET_USER", value: sortData });
+        return;
+      case "revalpha":
+        sortData.sort((a, b) =>
+          a.email !== b.email ? (a.email < b.email ? -1 : 1) : 0
+        );
+        dispatch({ type: "SET_USER", value: sortData });
+        return;
+      case "all":
+        return window.location.reload();
+      default:
+        return null;
+    }
   };
 
   const handleUserDelete = async (row) => {
@@ -677,8 +524,7 @@ const TableUser = (props) => {
   };
 
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, resultJoinUser.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, users.length - page * rowsPerPage);
 
   const bodyModal = (
     <>
@@ -853,11 +699,11 @@ const TableUser = (props) => {
             ) : (
               <TableBody>
                 {(rowsPerPage > 0
-                  ? resultJoinUser.slice(
+                  ? users.slice(
                       page * rowsPerPage,
                       page * rowsPerPage + rowsPerPage
                     )
-                  : resultJoinUser
+                  : users
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
@@ -930,23 +776,6 @@ const TableUser = (props) => {
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
-                      {/* <button
-                        disabled={`${
-                          row.role_id.role_name === "Administrator"
-                            ? "disabled"
-                            : ""
-                        }`}
-                        className={`btn-delete ${
-                          row.role_id.role_name === "Administrator"
-                            ? "disabled"
-                            : ""
-                        } `}
-                        onClick={(e) => handleUserDelete(row)}>
-                        <span
-                          class="iconify icon-btn"
-                          data-icon="ant-design:delete-filled"></span>
-                        <span className="name-btn">Delete</span>
-                      </button> */}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -963,7 +792,7 @@ const TableUser = (props) => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={resultJoinUser.length}
+                  count={users.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
