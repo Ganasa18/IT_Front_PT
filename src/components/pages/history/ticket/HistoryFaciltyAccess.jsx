@@ -1,25 +1,23 @@
-import React, { useState, useEffect } from "react";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import "../../../../assets/select-search.css";
-import {
-  makeStyles,
-  Grid,
-  Typography,
-  Backdrop,
-  Fade,
-  Modal,
-} from "@material-ui/core";
 import DateFnsUtils from "@date-io/date-fns";
 import {
-  MuiPickersUtilsProvider,
+  Backdrop,
+  Fade,
+  Grid,
+  makeStyles,
+  Modal,
+  Typography,
+} from "@material-ui/core";
+import {
   KeyboardDatePicker,
+  MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
-import "../../../../assets/master.css";
-import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../../../assets/master.css";
 import { pathEndPoint } from "../../../../assets/menu";
-import TicketManagementTable from "./table/TicketManagementTable";
+import "../../../../assets/select-search.css";
 import TicketManagementFacilityTable from "./table/TicketManagementFacilityTable";
 
 const useStyles = makeStyles((theme) => ({
@@ -108,7 +106,6 @@ const HistoryFaciltyAccess = () => {
         }/api/v1/status`
       )
       .then((response) => {
-        console.log(response.data.data.statuss);
         const DataStatus = response.data.data.statuss;
 
         const arr = [...DataStatus];

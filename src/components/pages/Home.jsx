@@ -11,8 +11,6 @@ import DashboardPurchase from "./dashboard/DashboardPurchase";
 const cookies = new Cookies();
 const roleUser = cookies.get("role");
 
-console.log(roleUser);
-
 const useStyles = makeStyles((theme) => ({
   toolbar: {
     display: "flex",

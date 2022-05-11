@@ -305,14 +305,14 @@ const HistoryInventoryTable = (props) => {
           newDataLog.forEach(function (request_id) {
             request_id.user_id = usermap[request_id.used_by];
           });
-          console.log(newDataLog);
+
           setDataHistoryInvent(newDataLog);
           setIsLoading(false);
         })
       )
       .catch((errors) => {
         // react on errors.
-        console.error(errors);
+        alert("something went wrong");
       });
   };
 

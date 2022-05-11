@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Loader from "react-loader-spinner";
-import { makeStyles, Grid } from "@material-ui/core";
+import { Grid, makeStyles } from "@material-ui/core";
 import axios from "axios";
-import "../../../../assets/master.css";
+import React, { useEffect, useState } from "react";
+import Loader from "react-loader-spinner";
+import Cookies from "universal-cookie";
 import "../../../../assets/asset_user.css";
-import "../../../asset/chips.css";
-
+import "../../../../assets/master.css";
 import {
-  logsEndPoint,
   authEndPoint,
+  logsEndPoint,
   pathEndPoint,
 } from "../../../../assets/menu";
-
-import Cookies from "universal-cookie";
+import "../../../asset/chips.css";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -159,8 +157,6 @@ const HistoryInformationInventory = (props) => {
                 subdepartementmap[request_id.user_id.subdepartement];
             }
           });
-
-          console.log(newDataLog);
 
           setInfoData(newDataLog);
           setIsLoading(false);

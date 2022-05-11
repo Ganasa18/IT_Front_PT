@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from "react";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import "../../../../assets/select-search.css";
-import {
-  makeStyles,
-  Grid,
-  Typography,
-  Backdrop,
-  Fade,
-  Modal,
-} from "@material-ui/core";
 import DateFnsUtils from "@date-io/date-fns";
 import {
-  MuiPickersUtilsProvider,
+  Backdrop,
+  Fade,
+  Grid,
+  makeStyles,
+  Modal,
+  Typography,
+} from "@material-ui/core";
+import {
   KeyboardDatePicker,
+  MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
-import "../../../../assets/master.css";
-import AddIcon from "@material-ui/icons/Add";
 import axios from "axios";
-import { pathEndPoint } from "../../../../assets/menu";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import SelectSearch, { fuzzySearch } from "react-select-search";
+import "../../../../assets/master.css";
+import { pathEndPoint } from "../../../../assets/menu";
+import "../../../../assets/select-search.css";
 import TicketManagementTable from "./table/TicketManagementTable";
 
 const useStyles = makeStyles((theme) => ({
@@ -107,7 +106,6 @@ const HistoryTicket = () => {
         }/api/v1/status`
       )
       .then((response) => {
-        console.log(response.data.data.statuss);
         const DataStatus = response.data.data.statuss;
 
         const arr = [...DataStatus];
@@ -122,7 +120,7 @@ const HistoryTicket = () => {
         setDataStatus(newArr);
       })
       .catch((error) => {
-        console.log(error);
+        alert("something wrong");
       });
   };
 
@@ -292,14 +290,6 @@ const HistoryTicket = () => {
             </NavLink>
           ))}
         </Grid>
-
-        {/* {isLoading
-          ? null
-          : links.map(({ url, text, index }) => (
-              <NavLink key={index} to={url} activeClassName="selected">
-                {text}
-              </NavLink>
-            ))} */}
         <Grid item xs={12} sm={12}>
           <div className="card">
             <div className="row">

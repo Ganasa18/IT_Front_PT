@@ -157,6 +157,7 @@ const HistoryInventoryDetail = () => {
               onMouseMove={HandleMouseMove}>
               {inventDataDate.map((row) => (
                 <div
+                  key={row.id}
                   className={`card-timeline ${
                     activeLink === row.id ? "active" : ""
                   }`}

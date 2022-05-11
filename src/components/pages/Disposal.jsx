@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from "react";
-import {
-  makeStyles,
-  Grid,
-  Typography,
-  Button,
-  Backdrop,
-  Fade,
-  Modal,
-} from "@material-ui/core";
-import SelectSearch, { fuzzySearch } from "react-select-search";
-import TableDisposal from "../table/TableDisposal";
-import axios from "axios";
 import DateFnsUtils from "@date-io/date-fns";
 import {
-  MuiPickersUtilsProvider,
+  Backdrop,
+  Fade,
+  Grid,
+  makeStyles,
+  Modal,
+  Typography,
+} from "@material-ui/core";
+import {
   KeyboardDatePicker,
+  MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import SelectSearch, { fuzzySearch } from "react-select-search";
 import { pathEndPoint } from "../../assets/menu";
+import TableDisposal from "../table/TableDisposal";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -66,7 +65,6 @@ const Disposal = () => {
         }/api/v1/status`
       )
       .then((response) => {
-        console.log(response.data.data.statuss);
         const DataStatus = response.data.data.statuss;
 
         const arr = [...DataStatus];
@@ -79,7 +77,7 @@ const Disposal = () => {
         setDataStatus(newArr);
       })
       .catch((error) => {
-        console.log(error);
+        alert("something went wrong");
       });
   };
 
