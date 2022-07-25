@@ -78,7 +78,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Roles = () => {
   const classes = useStyles();
-
   const [modalOpen, setModalOpen] = useState(false);
   const [roleName, setRoleName] = useState("");
   const [toast, setToast] = useState(false);
@@ -188,14 +187,14 @@ const Roles = () => {
               </div>
               <div className="col-4"></div>
               <div className="col-4">
-                <Button
+                {/* <Button
                   onClick={modalPop}
                   variant="contained"
                   color="primary"
                   className={classes.buttonAdd}
                   startIcon={<AddIcon />}>
                   Create New
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>

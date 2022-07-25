@@ -322,7 +322,9 @@ const FacilityAcc = () => {
         (item.departement === userData[0].departement && item.role === 6)
     );
 
-    const getDataAdmin = allDataUser.filter((item) => item.role === 1);
+    const getDataAdmin = allDataUser.filter(
+      (item) => item.role === 1 || item.role === 7
+    );
 
     if (getData.length > 0) {
       setLeadEmail(getData[0].email);
@@ -332,7 +334,9 @@ const FacilityAcc = () => {
         setLeadEmail(arr);
       }
     } else {
-      setLeadEmail("it@markindo.co.id");
+      var newArr = [];
+      getDataAdmin.forEach((x) => newArr.push(x.email));
+      setLeadEmail(newArr);
     }
   };
 

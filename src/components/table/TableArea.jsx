@@ -272,7 +272,7 @@ const TableArea = (props) => {
               <TableRow>
                 <StyledTableCell>Area Name</StyledTableCell>
                 <StyledTableCell>Alias Name</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
 
@@ -300,7 +300,7 @@ const TableArea = (props) => {
                       scope="row">
                       {row.alias_name}
                     </TableCell>
-                    <TableCell style={{ width: 100 }} align="center">
+                    {/* <TableCell style={{ width: 100 }} align="center">
                       <button
                         className="btn-edit"
                         onClick={(e) => handleEdit(row)}>
@@ -317,7 +317,7 @@ const TableArea = (props) => {
                           data-icon="ant-design:delete-filled"></span>
                         <span className="name-btn">Delete</span>
                       </button>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (

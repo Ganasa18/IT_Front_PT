@@ -518,14 +518,14 @@ const GoodReceiveTicket = () => {
             departement: item.departement,
             used_by: !item.used_by ? null : item.used_by,
           };
-
           (async () => {
             await axios
               .post(inventory, postData)
-              .then(() => {
+              .then((response) => {
+                console.log(response);
                 console.log("post data");
               })
-              .catch((err) => console.error(err));
+              .catch((err) => console.error(err.response));
           })();
           dataLoop = dataLoop + 1;
         }
@@ -580,7 +580,7 @@ const GoodReceiveTicket = () => {
               setTimeout(() => {
                 document.getElementById("overlay").style.display = "none";
                 window.location.reload();
-              }, 10000);
+              }, 20000);
             })
             .catch((err) => console.error(err));
         })();
@@ -640,7 +640,7 @@ const GoodReceiveTicket = () => {
             setTimeout(() => {
               document.getElementById("overlay").style.display = "none";
               window.location.reload();
-            }, 10000);
+            }, 20000);
           })
           .catch((err) => console.error(err));
       })();

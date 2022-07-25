@@ -24,7 +24,7 @@ import { authEndPoint } from "../../assets/menu";
 import Loading from "../asset/Loading";
 import { useDispatch, useSelector } from "react-redux";
 import TablePaginationActions from "../asset/pagination/TablePaginationActions";
-import { getDataRole } from "../redux/action";
+import { getDataRoleOnly } from "../redux/action";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -101,7 +101,7 @@ const TableRole = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      dispatch(getDataRole(token));
+      dispatch(getDataRoleOnly(token));
     }, 3000);
   }, []);
 
@@ -236,7 +236,7 @@ const TableRole = () => {
             <TableHead classes={{ root: classes.thead }}>
               <TableRow>
                 <StyledTableCell>Role Name</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
 
@@ -258,7 +258,7 @@ const TableRole = () => {
                       scope="row">
                       {row.role_name}
                     </TableCell>
-                    <TableCell style={{ width: 100 }} align="center">
+                    {/* <TableCell style={{ width: 100 }} align="center">
                       <button
                         className="btn-edit"
                         onClick={(e) => handleEdit(row)}>
@@ -267,7 +267,7 @@ const TableRole = () => {
                           data-icon="ci:edit"></span>
                         <span className="name-btn">Edit</span>
                       </button>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 ))}
                 {emptyRows > 0 && (

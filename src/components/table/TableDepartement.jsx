@@ -178,7 +178,7 @@ const useStyles2 = makeStyles((theme) => ({
 const TableDepartement = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editModal, setEditModal] = useState(false);
   const [expanded, setExpanded] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
@@ -317,7 +317,7 @@ const TableDepartement = (props) => {
                 <StyledTableCell></StyledTableCell>
                 <StyledTableCell>Name</StyledTableCell>
                 <StyledTableCell>Area</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
 
@@ -349,20 +349,14 @@ const TableDepartement = (props) => {
                           </IconButton>
                         </TableCell>
 
-                        <TableCell
-                          style={{ width: 300 }}
-                          component="th"
-                          scope="row">
+                        <TableCell component="th" scope="row">
                           {row.departement_name}
                         </TableCell>
-                        <TableCell
-                          style={{ width: 300 }}
-                          component="th"
-                          scope="row">
+                        <TableCell component="th" scope="row">
                           {row.area_name}
                         </TableCell>
 
-                        <TableCell style={{ width: 260 }} align="center">
+                        {/* <TableCell style={{ width: 260 }} align="center">
                           <button
                             className="btn-edit"
                             onClick={(e) => modalPop(row)}>
@@ -385,7 +379,7 @@ const TableDepartement = (props) => {
                               data-icon="ant-design:delete-filled"></span>
                             <span className="name-btn">Delete</span>
                           </button>
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
 
                       <TableRow>

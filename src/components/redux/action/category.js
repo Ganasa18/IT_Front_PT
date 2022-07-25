@@ -45,3 +45,25 @@ export const getLatestId = () => async (dispatch) => {
 export const filterDataCategory = (categoryData) => async (dispatch) => {
   dispatch({ type: "SET_CATEGORY", value: categoryData });
 };
+
+export const exportListCategory = () => async (dispatch) => {
+  const URL_EXP = `${pathEndPoint[0].url}${
+    pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+  }/api/v1/category/get-data-export`;
+
+  await axios
+    .get(URL_EXP)
+    .then(() => {
+      const file = `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/public/file/export/export_category.xlsx`;
+      const link = document.createElement("a");
+      link.href = file;
+      link.setAttribute("download", "file.xlsx");
+      document.body.appendChild(link);
+      link.click();
+    })
+    .catch((err) => {
+      alert("something wrong with download");
+    });
+};

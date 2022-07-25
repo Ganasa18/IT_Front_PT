@@ -29,7 +29,7 @@ const DashboardUser = () => {
           <Paper style={{ padding: "50px" }}>
             <div className="row">
               <Typography variant="h5" style={{ marginLeft: "20px" }}>
-                Action Request
+                Action Request Ticket Status
               </Typography>
               <TableActionReq />
             </div>
@@ -38,7 +38,7 @@ const DashboardUser = () => {
             <br />
             <div className="row">
               <Typography variant="h5" style={{ marginLeft: "20px" }}>
-                Facility & Access
+                Facility & Access Ticket Status
               </Typography>
               <FacilityTicketTable />
             </div>

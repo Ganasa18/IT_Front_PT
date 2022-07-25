@@ -97,6 +97,12 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: theme.shadows[2],
     padding: theme.spacing(2, 10, 3),
   },
+
+  alertImage: {
+    position: "absolute",
+    bottom: 150,
+    left: 50,
+  },
 }));
 
 const handleImage = () => {
@@ -310,7 +316,9 @@ const ActionReq = () => {
 
     // console.log(getData);
 
-    const getDataAdmin = allDataUser.filter((item) => item.role === 1);
+    const getDataAdmin = allDataUser.filter(
+      (item) => item.role === 1 || item.role === 7
+    );
 
     if (getData.length > 0) {
       setLeadEmail(getData[0].email);
@@ -320,7 +328,9 @@ const ActionReq = () => {
         setLeadEmail(arr);
       }
     } else {
-      setLeadEmail("it@markindo.co.id");
+      var newArr = [];
+      getDataAdmin.forEach((x) => newArr.push(x.email));
+      setLeadEmail(newArr);
     }
 
     // Get Asset
@@ -437,6 +447,11 @@ const ActionReq = () => {
 
     if (assetId === null) {
       alert("Please Select 1 Asset");
+      return;
+    }
+
+    if (checkFile.files.length === 0) {
+      alert("Image Must Be Upload");
       return;
     }
 
@@ -608,6 +623,10 @@ const ActionReq = () => {
                 </div>
               </div>
             </div>
+            <div className={classes.alertImage}>
+              <p>Screenshot problem or Photo the problem is a must</p>
+            </div>
+
             <div className="footer-modal-ar">
               <button className={"btn-cancel"} onClick={modalClose}>
                 Cancel

@@ -121,8 +121,8 @@ const ActionReqDetail = () => {
         </Grid>
         {dataRequest.status_id.id !== 7 ? (
           <>
-            <Grid item xs={4}></Grid>
-            <Grid item xs={8}>
+            {/* <Grid item xs={4}></Grid> */}
+            <Grid item xs={12}>
               <ChatComponent />
             </Grid>
           </>

@@ -1,4 +1,9 @@
-import { ThemeProvider, createTheme, makeStyles } from "@material-ui/core";
+import {
+  ThemeProvider,
+  createTheme,
+  unstable_createMuiStrictModeTheme as createMuiTheme,
+  makeStyles,
+} from "@material-ui/core";
 import createBreakpoints from "@material-ui/core/styles/createBreakpoints";
 import React, { useEffect } from "react";
 import PersistentDrawer from "./components/layout/PersistentDrawer";
@@ -54,7 +59,7 @@ const useStyles = makeStyles({
 });
 
 const App = () => {
-  const theme = createTheme({
+  const theme = createMuiTheme({
     spacing: 4,
     palette: {
       primary: {
@@ -109,9 +114,6 @@ const App = () => {
       MuiCheckbox: {
         colorSecondary: {
           color: "#C1C1C1",
-          // "&$checked": {
-          //   color: "#1653A6",
-          // },
         },
       },
     },

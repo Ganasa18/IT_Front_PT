@@ -15,12 +15,16 @@ import {
 
 import "../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
+import ImportExportIcon from "@material-ui/icons/ImportExport";
 import axios from "axios";
 import { authEndPoint, pathEndPoint } from "../../assets/menu";
+import { useDispatch, useSelector } from "react-redux";
 
 import Cookies from "universal-cookie";
 import TableInventory from "../table/TableInventory";
 import CreateInventory from "./inventory/CreateInventory";
+import Gap from "../asset/Gap";
+import { exportInventory, importDataInvent } from "../redux/action";
 
 const cookies = new Cookies();
 
@@ -126,6 +130,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Inventory = () => {
   const classes = useStyles();
+  const { inventoryReducer } = useSelector((state) => state);
+  const files = inventoryReducer.inventoryFile;
   const [modalOpen, setModalOpen] = useState(false);
   const [lastNumber, setLastNumber] = useState("");
   const [searchValue, SetSearchValue] = useState("");
@@ -140,6 +146,8 @@ const Inventory = () => {
   const [modalOpenSort, setModalOpenSort] = useState(false);
   const [sortActive, setSortActive] = useState("");
   const [sortValue, setSortValue] = useState("");
+  const [tag, setTag] = useState("");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getInvLatestId();
@@ -170,6 +178,7 @@ const Inventory = () => {
 
   const modalPop = () => {
     setModalOpen(true);
+    dispatch(exportInventory());
   };
 
   const modalClose = () => {
@@ -303,31 +312,107 @@ const Inventory = () => {
     }
   };
 
+  const handleFile = () => {
+    const labelFile = document.getElementById("labelFile");
+    labelFile.click();
+  };
+
+  const handleChangeFile = (e) => {
+    if (e.target.files.length !== 0) {
+      dispatch({ type: "SET_FILE_INVENTORY", value: e.target.files[0] });
+    }
+  };
+
   const bodyModal = (
     <>
       <Fade in={modalOpen}>
         <div className={classes.paper}>
           <div className="row">
-            <div className="col-10">
-              <h3>Create Inventory</h3>
-            </div>
-            <div className="col-2">
-              <p className="last-number">{lastNumber}</p>
+            <div className="col-12">
+              <h3>Import Inventory</h3>
             </div>
           </div>
-          <Divider />
+          <Gap height={"15px"} />
+          <div className="row">
+            <div className="col-2"></div>
+            <div
+              className="col-4"
+              style={{ position: "relative", right: "10px" }}>
+              <label htmlFor="">TAG</label>
+              <input
+                type="text"
+                id="statusName"
+                className="form-input"
+                placeholder="Ex: D01"
+                onChange={(e) => setTag(e.target.value.toLocaleUpperCase())}
+              />
+            </div>
+            <div className="col-4"></div>
+          </div>
+          <div className="content-wrapper-import" onClick={handleFile}>
+            <div className={`field-container-import ${files ? "succes" : ""}`}>
+              <Gap height={"20px"} />
+              <div className="field-file-input">
+                {files ? (
+                  <label htmlFor="filesImp" id="labelFile">
+                    file : {files.name}
+                  </label>
+                ) : (
+                  <label htmlFor="filesImp" id="labelFile">
+                    to open file
+                  </label>
+                )}
+                <input
+                  accept=".xlsx"
+                  type="file"
+                  className="file-req"
+                  id="filesImp"
+                  onChange={(e) => handleChangeFile(e)}
+                />
+              </div>
+            </div>
+          </div>
           <br />
-          <CreateInventory />
-          <Button
-            className={classes.cancelBtn}
-            onClick={modalClose}
-            variant="outlined">
-            Cancel
-          </Button>
+          <div className="footer-modal">
+            <button className={"btn-cancel"} onClick={modalClose}>
+              Cancel
+            </button>
+            <button
+              className={"btn-submit"}
+              onClick={importDataInvent(files, tag)}>
+              Import
+            </button>
+          </div>
         </div>
       </Fade>
     </>
   );
+
+  // const bodyModal = (
+  //   <>
+  //     <Fade in={modalOpen}>
+  //       <div className={classes.paper}>
+  //         <div className="row">
+  //           <div className="col-10">
+  //             <h3>Create Inventory</h3>
+  //           </div>
+  //           <div className="col-2">
+  //             <p className="last-number">{lastNumber}</p>
+  //           </div>
+  //         </div>
+  //         <Divider />
+  //         <br />
+  //         <CreateInventory />
+  //         <Button
+  //           className={classes.cancelBtn}
+  //           onClick={modalClose}
+  //           variant="outlined">
+  //           Cancel
+  //         </Button>
+  //       </div>
+  //     </Fade>
+  //   </>
+  // );
 
   const bodyModalFilter = (
     <>
@@ -557,8 +642,8 @@ const Inventory = () => {
                   variant="contained"
                   color="primary"
                   className={classes.buttonAdd}
-                  startIcon={<AddIcon />}>
-                  Create New
+                  startIcon={<ImportExportIcon />}>
+                  Upload
                 </Button>
               </div>
             </div>

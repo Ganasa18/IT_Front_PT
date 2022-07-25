@@ -4,6 +4,8 @@ import axios from "axios";
 import { pathEndPoint, invEndPoint, authEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAdminData } from "../../redux/action/global";
 
 import {
   useTheme,
@@ -18,10 +20,6 @@ import {
   TableRow,
   Paper,
   withStyles,
-  Fade,
-  Modal,
-  Backdrop,
-  Snackbar,
 } from "@material-ui/core";
 import "../../../assets/master.css";
 import "../../asset/chips.css";
@@ -31,6 +29,7 @@ import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
 import Cookies from "universal-cookie";
+import ModalTicket from "../../asset/modalTicket/ModalTicket";
 
 const cookies = new Cookies();
 const token = cookies.get("token");
@@ -196,12 +195,13 @@ const ActionTicketTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
 
   const { searchValue, filterValue, sortValue } = props;
 
   useEffect(() => {
     getStatusList();
-
+    dispatch(getAdminData());
     if (searchValue) {
       setTimeout(() => {
         searchHandle(searchValue);
@@ -450,6 +450,7 @@ const ActionTicketTable = (props) => {
 
   const saveStorage = (row) => {
     localStorage.setItem("req_no", row.action_req_code);
+    dispatch({ type: "SET_MODAL_REQUEST", value: true });
   };
 
   return (
@@ -482,11 +483,24 @@ const ActionTicketTable = (props) => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link
-                        onClick={() => saveStorage(row)}
-                        to="/ticket-admin/action-request/detail/information">
-                        {row.action_req_code}
-                      </Link>
+                      {console.log(row)}
+                      {row.status_id?.id === 12 ? (
+                        <div
+                          className="link-ticket"
+                          onClick={() => {
+                            saveStorage(row);
+                          }}>
+                          {row.action_req_code}
+                        </div>
+                      ) : (
+                        <Link
+                          onClick={() => {
+                            localStorage.setItem("req_no", row.action_req_code);
+                          }}
+                          to="/ticket-admin/action-request/detail/information">
+                          {row.action_req_code}
+                        </Link>
+                      )}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.invent_id.asset_number}
@@ -569,6 +583,7 @@ const ActionTicketTable = (props) => {
           </Table>
         </Paper>
       </TableContainer>
+      <ModalTicket />
     </>
   );
 };

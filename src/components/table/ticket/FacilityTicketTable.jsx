@@ -4,7 +4,7 @@ import axios from "axios";
 import { pathEndPoint, FacEndPoint } from "../../../assets/menu";
 import Loading from "../../asset/Loading";
 import { Link } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux";
 import {
   useTheme,
   makeStyles,
@@ -30,6 +30,7 @@ import FirstPageIcon from "@material-ui/icons/FirstPage";
 import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 import LastPageIcon from "@material-ui/icons/LastPage";
+import ModalTicket from "../../asset/modalTicket/ModalTicket";
 
 const useStyles1 = makeStyles((theme) => ({
   root: {
@@ -193,6 +194,7 @@ const FacilityTicketTable = (props) => {
   const [dataRequest, setDataRequest] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { searchValue, filterValue, sortValue } = props;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getStatusList();
@@ -409,7 +411,6 @@ const FacilityTicketTable = (props) => {
           });
 
           setDataRequest(arr_request);
-          // console.log(arr_request);
 
           setIsLoading(false);
         })
@@ -422,6 +423,7 @@ const FacilityTicketTable = (props) => {
 
   const saveStorage = (row) => {
     localStorage.setItem("req_no", row.facility_req_code);
+    dispatch({ type: "SET_MODAL_REQUEST", value: true });
   };
 
   const emptyRows =
@@ -464,11 +466,21 @@ const FacilityTicketTable = (props) => {
                 ).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link
-                        onClick={() => saveStorage(row)}
-                        to="/ticket-admin/facility-request/detail/information">
-                        {row.facility_req_code}
-                      </Link>
+                      {row.status_id?.id === 12 ? (
+                        <div
+                          className="link-ticket"
+                          onClick={() => {
+                            saveStorage(row);
+                          }}>
+                          {row.facility_req_code}
+                        </div>
+                      ) : (
+                        <Link
+                          onClick={() => saveStorage(row)}
+                          to="/ticket-admin/facility-request/detail/information">
+                          {row.facility_req_code}
+                        </Link>
+                      )}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.user_name}
@@ -521,6 +533,7 @@ const FacilityTicketTable = (props) => {
           </Table>
         </Paper>
       </TableContainer>
+      <ModalTicket />
     </>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SelectSearch, { fuzzySearch } from "react-select-search";
 import "../../assets/select-search.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   makeStyles,
   Grid,
@@ -10,20 +10,27 @@ import {
   Backdrop,
   Fade,
   Modal,
+  IconButton,
 } from "@material-ui/core";
 
 import "../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
+import ImportExportIcon from "@material-ui/icons/ImportExport";
 import axios from "axios";
 import { authEndPoint, pathEndPoint } from "../../assets/menu";
 
 import Cookies from "universal-cookie";
 import TableUser from "../table/TableUser";
-
+import {
+  getDataAreaUser,
+  getDataDepartementUser,
+  getDataRole,
+  importDataUser,
+  openModalExportAct,
+} from "../redux/action";
+import Gap from "../asset/Gap";
 const cookies = new Cookies();
-
 const token = cookies.get("token");
-
 const useStyles = makeStyles((theme) => ({
   toolbar: {
     display: "flex",
@@ -49,6 +56,24 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("lg")]: {
       width: "150px",
       left: "40%",
+      top: "20px",
+    },
+    [theme.breakpoints.down("sm")]: {
+      bottom: "20px",
+      width: "120px",
+    },
+    fontSize: 12,
+  },
+  buttonExport: {
+    [theme.breakpoints.up("xl")]: {
+      width: "100px",
+      left: "20%",
+      top: "20px",
+    },
+
+    [theme.breakpoints.down("lg")]: {
+      width: "100px",
+      left: "28%",
       top: "20px",
     },
     [theme.breakpoints.down("sm")]: {
@@ -99,12 +124,17 @@ const useStyles = makeStyles((theme) => ({
 
 const User = () => {
   const classes = useStyles();
-  const [dataRole, setDataRole] = useState([]);
-  const [dataArea, setDataArea] = useState([]);
-  const [listDataDepartement, setListDataDepartement] = useState([]);
+  // const [dataArea, setDataArea] = useState([]);
+
   const [dataDepartement, setDataDepartement] = useState([]);
   const [dataSubDepartement, setDataSubDepartement] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const { userReducer } = useSelector((state) => state);
+  const dataRole = userReducer.userRole;
+  const modalOpenExport = userReducer.modalOpenExport;
+  const listDataDepartement = userReducer.userDepartement;
+  const dataArea = userReducer.userArea;
+  const files = userReducer.userImport;
   const [modalOpenFilter, setModalOpenFilter] = useState(false);
   const [valueArea, setValueArea] = useState("");
   const [valueDepartement, setValueDepartement] = useState("");
@@ -122,9 +152,9 @@ const User = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getRoleList();
-    getAreaList();
-    getDepartementList();
+    dispatch(getDataRole(token));
+    dispatch(getDataAreaUser());
+    dispatch(getDataDepartementUser(token));
   }, []);
 
   const modalPopSort = () => {
@@ -137,74 +167,6 @@ const User = () => {
 
   const modalPopFilter = () => {
     setModalOpenFilter(true);
-  };
-
-  const getRoleList = async () => {
-    await axios
-      .get(
-        `${authEndPoint[0].url}${
-          authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
-        }/api/v1/role`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
-      .then((response) => {
-        const DataRole = response.data.data.roles;
-
-        const arr = [...DataRole];
-        const newArr = arr.map((row) => ({
-          value: row.id,
-          name: row.role_name,
-        }));
-        setDataRole(newArr);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const getAreaList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/area`
-      )
-      .then((response) => {
-        const DataArea = response.data.data.areas;
-
-        const arr = [...DataArea];
-        const newArr = arr.map((row) => ({
-          value: row.id,
-          name: row.area_name,
-        }));
-        setDataArea(newArr);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const getDepartementList = async () => {
-    await axios
-      .get(
-        `${pathEndPoint[0].url}${
-          pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
-        }/api/v1/departement`
-      )
-      .then((response) => {
-        const DepartementList = response.data.data.departements;
-        const arr = [...DepartementList];
-        const newArr = arr.map((row) => ({
-          value: row.id,
-          name: row.departement_name,
-        }));
-        setListDataDepartement(newArr);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   const modalClose = () => {
@@ -517,6 +479,72 @@ const User = () => {
     </>
   );
 
+  const handleFile = () => {
+    const labelFile = document.getElementById("labelFile");
+    labelFile.click();
+  };
+
+  const handleChangeFile = (e) => {
+    if (e.target.files.length !== 0) {
+      dispatch({ type: "SET_USER_FILE", value: e.target.files[0] });
+    }
+  };
+
+  const bodyModalExport = (
+    <>
+      <Fade in={modalOpenExport}>
+        <div className={classes.paper}>
+          <div className="row">
+            <div className="col-12">
+              <h3>Import User</h3>
+            </div>
+          </div>
+          <div className="content-wrapper-import" onClick={handleFile}>
+            <div className={`field-container-import ${files ? "succes" : ""}`}>
+              <Gap height={"20px"} />
+              <div className="field-file-input">
+                {files ? (
+                  <label htmlFor="filesImp" id="labelFile">
+                    file : {files.name}
+                  </label>
+                ) : (
+                  <label htmlFor="filesImp" id="labelFile">
+                    to open file
+                  </label>
+                )}
+                <input
+                  accept=".xlsx"
+                  type="file"
+                  className="file-req"
+                  id="filesImp"
+                  onChange={(e) => handleChangeFile(e)}
+                />
+              </div>
+            </div>
+          </div>
+          <br />
+          <div className="footer-modal">
+            <button
+              className={"btn-cancel"}
+              onClick={() =>
+                dispatch({
+                  type: "SET_USER_MODAL_EXPORT",
+                  value: false,
+                })
+              }>
+              Cancel
+            </button>
+            <button
+              className={"btn-submit"}
+              onClick={() => dispatch(importDataUser(files, token))}>
+              Import
+            </button>
+          </div>
+        </div>
+      </Fade>
+    </>
+  );
+
   const bodyModalFilter = (
     <>
       <Fade in={modalOpenFilter}>
@@ -717,7 +745,7 @@ const User = () => {
                   <span className="name-btn">Sort</span>
                 </button>
               </div>
-              <div className="col-4">
+              <div className="col-2">
                 <Button
                   onClick={modalPop}
                   variant="contained"
@@ -725,6 +753,16 @@ const User = () => {
                   className={classes.buttonAdd}
                   startIcon={<AddIcon />}>
                   Create New
+                </Button>
+              </div>
+              <div className="col-2">
+                <Button
+                  onClick={() => dispatch(openModalExportAct(token))}
+                  color="primary"
+                  variant="contained"
+                  className={classes.buttonExport}
+                  startIcon={<ImportExportIcon />}>
+                  Upload
                 </Button>
               </div>
             </div>
@@ -748,6 +786,15 @@ const User = () => {
           timeout: 500,
         }}>
         {bodyModal}
+      </Modal>
+      <Modal
+        open={modalOpenExport}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}>
+        {bodyModalExport}
       </Modal>
       <Modal
         open={modalOpenFilter}

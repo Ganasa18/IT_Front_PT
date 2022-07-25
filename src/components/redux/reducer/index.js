@@ -5,6 +5,7 @@ import { areaReducer } from "./area";
 import { dapartementReducer } from "./departement";
 import { userReducer } from "./user";
 import { rolesReducer } from "./role";
+import { inventoryReducer } from "./inventory";
 const reducer = combineReducers({
   areaReducer,
   categoryReducer,
@@ -12,5 +13,6 @@ const reducer = combineReducers({
   globalReducer,
   userReducer,
   rolesReducer,
+  inventoryReducer,
 });
 export default reducer;

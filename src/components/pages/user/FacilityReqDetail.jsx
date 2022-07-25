@@ -62,8 +62,6 @@ const FacilityReqDetail = () => {
   const [generalRequest] = useState(JSON.parse(dataRequest.general_request));
   const [applicationRequest] = useState(JSON.parse(dataRequest.aplication_req));
 
-  console.log(applicationRequest);
-
   return (
     <>
       <div className={classes.toolbar} />
@@ -330,8 +328,8 @@ const FacilityReqDetail = () => {
             </div>
           </div>
         </Grid>
-        <Grid item xs={4}></Grid>
-        <Grid item xs={8}>
+        {/* <Grid item xs={4}></Grid> */}
+        <Grid item xs={12}>
           <ChatFacility />
         </Grid>
       </Grid>

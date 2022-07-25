@@ -60,6 +60,10 @@ const useStyles2 = makeStyles((theme) => ({
     margin: "auto",
     width: "98%",
   },
+  paperCard: {
+    width: "110%",
+    height: "100%",
+  },
 
   thead: {
     "& th": {
@@ -135,7 +139,7 @@ const useStyles2 = makeStyles((theme) => ({
 const TableInventory = (props) => {
   const classes = useStyles2();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editModal, setEditModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [allSelected, setAllSelected] = useState(false);
@@ -485,31 +489,31 @@ const TableInventory = (props) => {
   //   return cleaned;
   // }
 
-  // function calbill(date) {
-  //   const monthNames = [
-  //     "Jan",
-  //     "Feb",
-  //     "Mar",
-  //     "Apr",
-  //     "May",
-  //     "Jun",
-  //     "Jul",
-  //     "Aug",
-  //     "Sep",
-  //     "Oct",
-  //     "Nov",
-  //     "Dec",
-  //   ];
+  function calbill(date) {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
-  //   var myDate = new Date(date);
-  //   var d = myDate.getDate();
-  //   var m = myDate.getMonth();
-  //   m += 1;
-  //   var y = myDate.getFullYear();
+    var myDate = new Date(date);
+    var d = myDate.getDate();
+    var m = myDate.getMonth();
+    m += 1;
+    var y = myDate.getFullYear();
 
-  //   var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
-  //   return newdate;
-  // }
+    var newdate = d + " " + monthNames[myDate.getMonth()] + " " + y;
+    return newdate;
+  }
 
   const selectedCount = Object.values(selected).filter(Boolean).length;
 
@@ -630,7 +634,7 @@ const TableInventory = (props) => {
         </div>
       </div>
       <TableContainer className={classes.tableWidth}>
-        <Paper>
+        <Paper className={classes.paperCard}>
           <Table
             className={classes.table}
             aria-label="custom pagination table"
@@ -644,14 +648,17 @@ const TableInventory = (props) => {
                     indeterminate={isIndeterminate} // <-- some selected
                   />
                 </StyledTableCell>
+                <StyledTableCell>Area</StyledTableCell>
+                <StyledTableCell>User/Dept.</StyledTableCell>
+                <StyledTableCell>Category</StyledTableCell>
+                <StyledTableCell>Sub Category</StyledTableCell>
                 <StyledTableCell>Asset No</StyledTableCell>
                 <StyledTableCell>Asset Name</StyledTableCell>
-                <StyledTableCell>Category</StyledTableCell>
-                <StyledTableCell>User/Dept.</StyledTableCell>
-                <StyledTableCell>Area</StyledTableCell>
-                <StyledTableCell>Fisik/Non</StyledTableCell>
                 <StyledTableCell>Used By</StyledTableCell>
+                <StyledTableCell>Fisik/Non</StyledTableCell>
                 <StyledTableCell align="center">Unit/Part.</StyledTableCell>
+                <StyledTableCell>TAG</StyledTableCell>
+                <StyledTableCell>Date TAG</StyledTableCell>
                 <StyledTableCell align="center">Status</StyledTableCell>
                 <StyledTableCell align="center">Action</StyledTableCell>
               </TableRow>
@@ -677,32 +684,41 @@ const TableInventory = (props) => {
                       />
                     </TableCell>
                     <TableCell component="th" scope="row">
+                      {row.alias_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.type_asset}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.category_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.subcategory_name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
                       {row.asset_number}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {row.asset_name}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.category_name}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.type_asset}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.alias_name}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.asset_fisik_or_none}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
                       {row.user_id === undefined
                         ? row.departement_name
                         : row.user_id.username}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.asset_fisik_or_none}
                     </TableCell>
                     <TableCell component="th" scope="row" align="center">
                       {row.asset_part_or_unit === ""
                         ? " - "
                         : row.asset_part_or_unit}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.tag_item ? row.tag_item : "no set"}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.createdAt ? calbill(row.createdAt) : "null"}
                     </TableCell>
 
                     <TableCell component="th" scope="row">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MenuItem from "./MenuItem";
-import { authEndPoint, logsEndPoint } from "../../assets/menu";
+import { authEndPoint, logsEndPoint, menuDataCrew } from "../../assets/menu";
 import Routes from "../routes/Routes";
 import clsx from "clsx";
 import axios from "axios";
@@ -237,6 +237,8 @@ const PersistentDrawer = (props) => {
       setMenuDatas(menuDataUser4);
     } else if (roleUser === "6") {
       setMenuDatas(menuDataUser5);
+    } else if (roleUser === "7") {
+      setMenuDatas(menuDataCrew);
     } else {
       setMenuDatas(menuDataUser);
     }

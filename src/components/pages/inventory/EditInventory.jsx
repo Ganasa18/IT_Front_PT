@@ -756,16 +756,16 @@ const EditInventory = (props) => {
             </div>
           </div>
           <div className="row margin-top">
-            <div className="col-6">
-              <label htmlFor="">Category</label>
-              {/* <input
+            {/* <div className="col-6"> */}
+            {/* <label htmlFor="">Category</label> */}
+            {/* <input
                 value={dataInventory.category_name}
                 type="text"
                 className="form-input-inv"
                 disabled
               /> */}
 
-              <SelectSearch
+            {/* <SelectSearch
                 id="idCategory"
                 options={dataCategory}
                 value={dataCategory}
@@ -773,8 +773,8 @@ const EditInventory = (props) => {
                 onChange={handleCategory}
                 search
                 placeholder={`${dataInventory.category_name}`}
-              />
-            </div>
+              /> */}
+            {/* </div> */}
             <div className="col-6">
               <label htmlFor="">Area</label>
               <input
@@ -783,25 +783,6 @@ const EditInventory = (props) => {
                 value={`${dataInventory.area_name}-${dataInventory.alias_name}`}
                 disabled
               />
-            </div>
-          </div>
-          <div className="row margin-top-2">
-            <div className="col-6">
-              <label htmlFor="">SubCategory</label>
-              <SelectSearch
-                options={dataSubCategory}
-                value={dataSubCategory}
-                filterOptions={fuzzySearch}
-                onChange={(e) => setSubCategoryId(e)}
-                search
-                placeholder="Search Sub Category"
-              />
-              {/* <input
-                value={dataInventory.subcategory_name}
-                type="text"
-                className="form-input-inv"
-                disabled
-              /> */}
             </div>
             <div className="col-6">
               {dataInventory.type_asset !== "" ? (
@@ -865,6 +846,25 @@ const EditInventory = (props) => {
                 </>
               )}
             </div>
+          </div>
+          <div className="row margin-top-2">
+            {/* <div className="col-6"> */}
+            {/* <label htmlFor="">SubCategory</label>
+              <SelectSearch
+                options={dataSubCategory}
+                value={dataSubCategory}
+                filterOptions={fuzzySearch}
+                onChange={(e) => setSubCategoryId(e)}
+                search
+                placeholder="Search Sub Category"
+              /> */}
+            {/* <input
+                value={dataInventory.subcategory_name}
+                type="text"
+                className="form-input-inv"
+                disabled
+              /> */}
+            {/* </div> */}
           </div>
           <div className="row">
             <Button

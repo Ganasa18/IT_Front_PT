@@ -1,7 +1,7 @@
 import axios from "axios";
 import { authEndPoint } from "../../../assets/menu";
 
-export const getDataRole = (token) => async (dispatch) => {
+export const getDataRoleOnly = (token) => async (dispatch) => {
   await axios
     .get(
       `${authEndPoint[0].url}${

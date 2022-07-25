@@ -362,14 +362,14 @@ a {
 
 .form-input-select-filter {
   width: 100%;
-  height: 50px;
+  height: 35px;
   padding: 10px 30px;
-  margin: 20px 0 10px 0px;
+  margin: 0px 0 10px 0px;
   display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  font-size: 15px;
+  font-size: 12px;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
@@ -402,6 +402,8 @@ a {
   position: relative;
   bottom: 150px;
 }
+
+
 
 .wrapper-img {
   position: relative;
@@ -2646,3 +2648,91 @@ input[type="radio"] {
     flex-direction: row;
 }
 
+/* IMPORT*/
+
+.content-wrapper-import {
+  padding: 40px 120px 40px 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.field-container-import{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0px 60px;
+  border: 1px solid #c2c2c2;
+  border-radius: 5px;
+  cursor: pointer; 
+}
+
+.field-container-import.succes{
+background-color: #48BF5419;
+}
+.field-container-import.drag-active{
+background-color: #48bf54a2;
+}
+
+.field-container-import>.iconify{
+  font-size: 80px;
+  
+}
+.field-container-import>.iconify.success{
+  color: #48BF54;
+}
+
+.field-file-input{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+#filesImp {
+  display: none;
+}
+
+
+.field-file-input p  {
+  color:  #444444;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.field-file-input p span {
+  color:  #48BF54;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  max-width: 200px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+  top: 4px;
+}
+.field-file-input>.close-btn {
+  font-size: 18px;
+  position: relative;
+  left: 15px;
+  bottom: 6px;
+  color: #C2C2C2;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+
+.link-ticket {
+  color: #1653A6;
+  cursor: pointer;
+}
+
+.link-ticket:hover {
+  color: #1652a68e;
+}

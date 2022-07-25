@@ -276,7 +276,10 @@ const ActionReqTicketDetail = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <InformationTicket />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
+              <ChatComponent />
+            </Grid>
+            <Grid item xs={12}>
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
@@ -317,9 +320,6 @@ const ActionReqTicketDetail = () => {
 
                 <br />
               </div>
-            </Grid>
-            <Grid item xs={8}>
-              <ChatComponent />
             </Grid>
           </Grid>
         </>
@@ -360,7 +360,10 @@ const ActionReqTicketDetail = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <InventoryTicket dataTicket={ticketData[0]} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
+              <ChatComponent />
+            </Grid>
+            <Grid item xs={12}>
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
@@ -400,9 +403,6 @@ const ActionReqTicketDetail = () => {
                 )}
                 <br />
               </div>
-            </Grid>
-            <Grid item xs={8}>
-              <ChatComponent />
             </Grid>
           </Grid>
         </>
@@ -452,7 +452,10 @@ const ActionReqTicketDetail = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <PurchaseTicket dataTicket={ticketData[0]} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
+              <ChatComponent />
+            </Grid>
+            <Grid item xs={12}>
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
@@ -493,9 +496,6 @@ const ActionReqTicketDetail = () => {
                 <br />
               </div>
             </Grid>
-            <Grid item xs={8}>
-              <ChatComponent />
-            </Grid>
           </Grid>
           <Modal
             open={modalOpen}
@@ -535,7 +535,10 @@ const ActionReqTicketDetail = () => {
             <Grid item xs={12} className={classes.cardPadding}>
               <GoodReceiveTicket dataTicket={ticketData[0]} />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
+              <ChatComponent />
+            </Grid>
+            <Grid item xs={12}>
               <div className="card-status">
                 <h3>Change Status</h3>
                 <br />
@@ -563,9 +566,6 @@ const ActionReqTicketDetail = () => {
                 )}
                 <br />
               </div>
-            </Grid>
-            <Grid item xs={8}>
-              <ChatComponent />
             </Grid>
           </Grid>
         </>

@@ -106,7 +106,7 @@ const Routes = () => {
       <Route
         path="/user/asset"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <UserAsset {...props} />
           ) : (
             <Redirect to="/" />
@@ -124,7 +124,7 @@ const Routes = () => {
         }
       />
 
-      <Route
+      {/* <Route
         path="/master/troubleshoot"
         component={(props) =>
           parseInt(roleUser) === 1 ? (
@@ -133,13 +133,13 @@ const Routes = () => {
             <Redirect to="/" />
           )
         }
-      />
+      /> */}
 
       <Route
         exact
         path="/inventory"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <Inventory {...props} />
           ) : (
             <Redirect to="/" />
@@ -151,7 +151,7 @@ const Routes = () => {
         exact
         path="/inventory/used"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <UsedInventory {...props} />
           ) : (
             <Redirect to="/" />
@@ -163,7 +163,7 @@ const Routes = () => {
         exact
         path="/gr/asset"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <GoodReceipt {...props} />
           ) : (
             <Redirect to="/" />
@@ -174,7 +174,7 @@ const Routes = () => {
         exact
         path="/gr/asset/detail"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <GoodReceiptDetail {...props} />
           ) : (
             <Redirect to="/" />
@@ -186,7 +186,7 @@ const Routes = () => {
         exact
         path="/gr/asset-facility"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <GoodReceiptFacility {...props} />
           ) : (
             <Redirect to="/" />
@@ -198,7 +198,7 @@ const Routes = () => {
         exact
         path="/disposal-assets"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <Disposal {...props} />
           ) : (
             <Redirect to="/" />
@@ -209,7 +209,7 @@ const Routes = () => {
       <Route
         path="/disposal-assets/detail"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <DisposalDetail {...props} />
           ) : (
             <Redirect to="/" />
@@ -296,7 +296,7 @@ const Routes = () => {
         exact
         path="/ticket-admin/action-request"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <ActionTicket {...props} />
           ) : (
             <Redirect to="/" />
@@ -307,7 +307,7 @@ const Routes = () => {
       <Route
         path="/ticket-admin/action-request/detail"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <ActionReqTicketDetail {...props} />
           ) : (
             <Redirect to="/" />
@@ -318,7 +318,7 @@ const Routes = () => {
       <Route
         path="/ticket-admin/facility-request/detail"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <FacilityReqTicketDetail {...props} />
           ) : (
             <Redirect to="/" />
@@ -330,7 +330,7 @@ const Routes = () => {
         exact
         path="/ticket-admin/facility-request"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <FacilityTicket {...props} />
           ) : (
             <Redirect to="/" />
@@ -342,7 +342,7 @@ const Routes = () => {
         exact
         path="/history/ticket"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryTicket {...props} />
           ) : (
             <Redirect to="/" />
@@ -353,7 +353,7 @@ const Routes = () => {
       <Route
         path="/history/ticket/action-req/detail/"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryActionReq {...props} />
           ) : (
             <Redirect to="/" />
@@ -365,7 +365,7 @@ const Routes = () => {
         exact
         path="/history/facility-access"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryFaciltyAccess {...props} />
           ) : (
             <Redirect to="/" />
@@ -376,7 +376,7 @@ const Routes = () => {
       <Route
         path="/history/ticket/facility-req/detail/"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryFacilityReq {...props} />
           ) : (
             <Redirect to="/" />
@@ -388,7 +388,7 @@ const Routes = () => {
         exact
         path="/history/inventory"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryInventory {...props} />
           ) : (
             <Redirect to="/" />
@@ -399,7 +399,7 @@ const Routes = () => {
       <Route
         path="/history/inventory/detail/"
         component={(props) =>
-          parseInt(roleUser) === 1 ? (
+          parseInt(roleUser) === 1 || parseInt(roleUser) === 7 ? (
             <HistoryInventoryDetail {...props} />
           ) : (
             <Redirect to="/" />

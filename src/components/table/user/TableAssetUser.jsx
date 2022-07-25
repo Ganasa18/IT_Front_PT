@@ -79,9 +79,9 @@ const useStyles = makeStyles((theme) => ({
 const TableAssetUser = () => {
   const classes = useStyles();
   const [page] = useState(0);
-  const [rowsPerPage] = useState(3);
+  const [rowsPerPage] = useState(10);
   const [page2] = useState(0);
-  const [rowsPerPage2] = useState(3);
+  const [rowsPerPage2] = useState(10);
   const [dataAssetUser, setDataAssetUser] = useState([]);
   const [dataAssetDepartement, setDataAssetDepartement] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

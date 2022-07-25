@@ -39,7 +39,7 @@ const Home = () => {
           </Typography>
         </Grid>
         <Grid container spacing={3}>
-          {roleUser === "1" ? (
+          {roleUser === "1" || roleUser === "7" ? (
             <>
               <Grid item xs={12}>
                 <Paper style={{ padding: "50px" }}>

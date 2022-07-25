@@ -103,7 +103,6 @@ const FacilityTicket = () => {
         }/api/v1/status`
       )
       .then((response) => {
-        console.log(response.data.data.statuss);
         const DataStatus = response.data.data.statuss;
 
         const arr = [...DataStatus];

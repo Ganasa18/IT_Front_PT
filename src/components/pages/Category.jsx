@@ -12,6 +12,9 @@ import "../../assets/master.css";
 import AddIcon from "@material-ui/icons/Add";
 import TableCategory from "../table/TableCategory";
 import StepperComponent from "../asset/category/StepperComponent";
+import GetAppIcon from "@material-ui/icons/GetApp";
+import { useDispatch, useSelector } from "react-redux";
+import { exportListCategory } from "../redux/action";
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -77,6 +80,7 @@ const Category = () => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(false);
   const [searchValue, SetSearchValue] = useState("");
+  const dispatch = useDispatch();
 
   const modalPop = () => {
     setModalOpen((prevSelected) => !prevSelected);
@@ -140,12 +144,12 @@ const Category = () => {
               <div className="col-4"></div>
               <div className="col-4">
                 <Button
-                  onClick={modalPop}
+                  onClick={() => dispatch(exportListCategory())}
                   variant="contained"
                   color="primary"
                   className={classes.buttonAdd}
-                  startIcon={<AddIcon />}>
-                  Create New
+                  startIcon={<GetAppIcon />}>
+                  Export
                 </Button>
               </div>
             </div>

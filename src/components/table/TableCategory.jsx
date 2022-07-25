@@ -628,7 +628,8 @@ const TableCategory = (props) => {
               <TableRow>
                 <StyledTableCell></StyledTableCell>
                 <StyledTableCell>Name</StyledTableCell>
-                <StyledTableCell align="center">Action</StyledTableCell>
+                <StyledTableCell>Code Item</StyledTableCell>
+                {/* <StyledTableCell align="center">Action</StyledTableCell> */}
               </TableRow>
             </TableHead>
 
@@ -643,7 +644,7 @@ const TableCategory = (props) => {
                     )
                   : category
                 )
-                  .sort((a, b) => (a.id > b.id ? -1 : 1))
+                  // .sort((a, b) => (a.id > b.id ? -1 : 1))
                   .map((row, index) => (
                     <>
                       <TableRow key={row.id}>
@@ -660,14 +661,14 @@ const TableCategory = (props) => {
                           </IconButton>
                         </TableCell>
 
-                        <TableCell
-                          style={{ width: 300 }}
-                          component="th"
-                          scope="row">
+                        <TableCell component="th" scope="row">
                           {row.category_name}
                         </TableCell>
+                        <TableCell component="th" scope="row">
+                          {row.code_category}
+                        </TableCell>
 
-                        <TableCell style={{ width: 260 }} align="center">
+                        {/* <TableCell style={{ width: 260 }} align="center">
                           <button
                             className="btn-edit"
                             onClick={(e) => modalPop(row)}>
@@ -694,7 +695,7 @@ const TableCategory = (props) => {
                               </button>
                             </>
                           ) : null}
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
 
                       <TableRow>
@@ -713,6 +714,7 @@ const TableCategory = (props) => {
                                 <TableHead>
                                   <TableRow>
                                     <TableCell>Sub Category</TableCell>
+                                    <TableCell>Code</TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -720,6 +722,9 @@ const TableCategory = (props) => {
                                     <TableRow key={row.id}>
                                       <TableCell>
                                         {row.subcategory_name}
+                                      </TableCell>
+                                      <TableCell>
+                                        {row.code_subcategory}
                                       </TableCell>
                                     </TableRow>
                                   ))}

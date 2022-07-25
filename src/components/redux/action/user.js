@@ -109,7 +109,6 @@ export const getDataUser = (token) => async (dispatch) => {
 
         let JoinSubDepartement = JoinDepartement;
 
-        // console.log(JoinSubDepartement);
         dispatch({ type: "SET_USER", value: JoinSubDepartement });
         dispatch({ type: "SET_LOADING", value: false });
       })
@@ -118,5 +117,122 @@ export const getDataUser = (token) => async (dispatch) => {
       alert("something wrong");
       // react on errors.
       //   console.error(errors);
+    });
+};
+
+export const openModalExportAct = (token) => async (dispatch) => {
+  dispatch({ type: "SET_USER_MODAL_EXPORT", value: true });
+  const URL_EXP = `${authEndPoint[0].url}${
+    authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+  }/api/v1/auth/export-user`;
+
+  await axios
+    .get(URL_EXP, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(() => {
+      const file = `${authEndPoint[0].url}${
+        authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+      }/public/file/export/export_user.xlsx`;
+
+      const link = document.createElement("a");
+      link.href = file;
+      link.setAttribute("download", "file.xlsx");
+      document.body.appendChild(link);
+      link.click();
+    })
+    .catch((err) => {
+      alert("something wrong with download");
+    });
+};
+
+export const getDataRole = (token) => async (dispatch) => {
+  await axios
+    .get(
+      `${authEndPoint[0].url}${
+        authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+      }/api/v1/role`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+    .then((response) => {
+      const DataRole = response.data.data.roles;
+
+      const arr = [...DataRole];
+      const newArr = arr.map((row) => ({
+        value: row.id,
+        name: row.role_name,
+      }));
+
+      dispatch({ type: "SET_USER_ROLE", value: newArr });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const getDataDepartementUser = () => async (dispatch) => {
+  await axios
+    .get(
+      `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/departement`
+    )
+    .then((response) => {
+      const DepartementList = response.data.data.departements;
+      const arr = [...DepartementList];
+      const newArr = arr.map((row) => ({
+        value: row.id,
+        name: row.departement_name,
+      }));
+      dispatch({ type: "SET_USER_DEPARTEMENT", value: newArr });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const getDataAreaUser = () => async (dispatch) => {
+  await axios
+    .get(
+      `${pathEndPoint[0].url}${
+        pathEndPoint[0].port !== "" ? ":" + pathEndPoint[0].port : ""
+      }/api/v1/area`
+    )
+    .then((response) => {
+      const DataArea = response.data.data.areas;
+
+      const arr = [...DataArea];
+      const newArr = arr.map((row) => ({
+        value: row.id,
+        name: row.area_name,
+      }));
+      dispatch({ type: "SET_USER_AREA", value: newArr });
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+export const importDataUser = (files, token) => async (dispatch) => {
+  const URL = `${authEndPoint[0].url}${
+    authEndPoint[0].port !== "" ? ":" + authEndPoint[0].port : ""
+  }/api/v1/auth/import-user`;
+  const fileFormData = new FormData();
+  fileFormData.append("user_data", files);
+
+  await axios
+    .post(URL, fileFormData, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((response) => {
+      alert(response.data.status);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    })
+    .catch((err) => {
+      alert("something wrong");
     });
 };
